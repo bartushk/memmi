@@ -19,7 +19,7 @@ module.exports = {
     preLoaders: [
       {
         test: /\.js$|\.jsx$/,
-        exclude: /node_modules/,
+        exclude: [/node_modules/, /src\/pbuf/],
         loaders: ["eslint"]
       }
     ],
@@ -39,6 +39,10 @@ module.exports = {
         test: /.*\.(gif|png|jpe?g|svg)$/i,
         loaders: ['file?hash=sha512&digest=hex&name=[hash].[ext]',
                   'image-webpack'],
+     },
+     {
+        test: /\.proto$/,
+        use:  'raw-loader'
      }
     ],
   },
