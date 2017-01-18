@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 )
 
@@ -17,6 +16,5 @@ func (handler *MockHandler) ShouldHandle(r *http.Request) bool {
 
 func (handler *MockHandler) Handle(w http.ResponseWriter, r *http.Request) bool {
 	handler.CallCount += 1
-	fmt.Println("Handler count: %s", handler.CallCount)
 	return handler.ShouldContinue
 }

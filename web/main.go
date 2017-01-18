@@ -6,6 +6,7 @@ import (
 )
 
 func main() {
-	http.HandleFunc("/", handlers.GetRouter().GetHandleFunc())
+	router := new(handlers.Router)
+	http.HandleFunc("/", router.GetHandleFunc())
 	http.ListenAndServe(":8080", nil)
 }
