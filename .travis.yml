@@ -1,0 +1,13 @@
+language: go
+go_import_path: web
+go:
+  - 1.x
+  - 1.6
+  - 1.7.x
+  - master
+
+install:
+  - go get -d ./web/...
+
+script:
+  - go test -v ./web/...
