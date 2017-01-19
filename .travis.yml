@@ -19,8 +19,8 @@ before_install:
   - go get -u github.com/golang/protobuf/proto
   - go get -u github.com/golang/protobuf/protoc-gen-go
   - export GOPATH=$(pwd)/web
-  - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/protobuf/lib
-  - export PATH=$PATH:$HOME/protobuf/bin
+  - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/lib
+  - export PATH=$PATH:$HOME/bin
   - ./pbuf.sh
 
 install:

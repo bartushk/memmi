@@ -1,6 +1,4 @@
 machine:
-  go:
-    vesrion: 1.7.4
   node:
     version: 6.1.0
 
