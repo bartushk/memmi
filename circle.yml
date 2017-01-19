@@ -3,7 +3,7 @@ machine:
     version: 6.1.0
   environment:
     PATH: "${HOME}/memmi/web/bin:${PATH}"
-    GOPATH: "${HOME}/memmi/web:${GOPATH}"
+    GOPATH: "${HOME}/.go_workspace:/usr/local/go_workspace:${HOME}/.go_project:${HOME}/memmi/web"
 
 dependencies:
   pre:
