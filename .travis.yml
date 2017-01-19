@@ -6,12 +6,17 @@ go:
   - 1.7.x
   - master
 
+cache:
+  directories:
+    - $HOME/protobuf
+
 before_install:
   - nvm install 6.9.4
   - npm install npm@latest -g
   - npm install -g protobufjs
   - go get -u github.com/golang/protobuf/{proto,protoc-gen-go}
   - export GOPATH=$(pwd)/web
+  - ./install_pbuf.sh
   - ./pbuf.sh
 
 install:
