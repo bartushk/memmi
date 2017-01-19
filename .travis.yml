@@ -6,10 +6,6 @@ go:
   - 1.7.x
   - master
 
-cache:
-  directories:
-    - $HOME/protobuf
-
 before_install:
   - wget https://github.com/google/protobuf/releases/download/v3.1.0/protoc-3.1.0-linux-x86_64.zip
   - unzip protoc-3.1.0-linux-x86_64.zip
@@ -19,8 +15,8 @@ before_install:
   - go get -u github.com/golang/protobuf/proto
   - go get -u github.com/golang/protobuf/protoc-gen-go
   - export GOPATH=$(pwd)/web
-  - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/lib
-  - export PATH=$PATH:$HOME/bin
+  - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)/lib
+  - export PATH=$PATH:$(pwd)/bin
   - ./pbuf.sh
 
 install:

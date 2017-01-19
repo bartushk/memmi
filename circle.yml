@@ -6,12 +6,12 @@ dependencies:
   pre:
     - wget https://github.com/google/protobuf/releases/download/v3.1.0/protoc-3.1.0-linux-x86_64.zip
     - unzip protoc-3.1.0-linux-x86_64.zip
-    - npm install -g protbufjs
+    - npm install -g protobufjs
     - export GOPATH=$(pwd)/web
     - go get -u github.com/golang/protobuf/proto 
     - go get -u github.com/golang/protobuf/protoc-gen-go
-    - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/lib
-    - export PATH=$PATH:$HOME/bin
+    - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)/lib
+    - export PATH=$PATH:$(pwd)/bin
     - ./pbuf.sh
 
   override:
