@@ -14,7 +14,7 @@ before_install:
   - npm install -g protobufjs
   - go get -u github.com/golang/protobuf/proto
   - go get -u github.com/golang/protobuf/protoc-gen-go
-  - export GOPATH=$(pwd)/web
+  - export GOPATH=$(pwd)/web:$GOPATH
   - export LD_LIBRARY_PATH=$(pwd)/lib:$LD_LIBRARY_PATH
   - export PATH=$(pwd)/bin:$PATH
   - ./pbuf.sh

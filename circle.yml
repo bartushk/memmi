@@ -3,7 +3,7 @@ machine:
     version: 6.1.0
   environment:
     PATH: "${HOME}/memmi/web/bin:${PATH}"
-    GOPATH: "${HOME}/memmi/web"
+    GOPATH: "${HOME}/memmi/web:${GOPATH}"
 
 dependencies:
   pre:
