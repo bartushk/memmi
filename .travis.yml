@@ -11,6 +11,8 @@ cache:
     - $HOME/protobuf
 
 before_install:
+  - wget https://github.com/google/protobuf/releases/download/v3.1.0/protoc-3.1.0-linux-x86_64.zip
+  - unzip protoc-3.1.0-linux-x86_64.zip
   - nvm install 6.9.4
   - npm install npm@latest -g
   - npm install -g protobufjs
@@ -19,7 +21,6 @@ before_install:
   - export GOPATH=$(pwd)/web
   - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/protobuf/lib
   - export PATH=$PATH:$HOME/protobuf/bin
-  - ./install_pbuf.sh
   - ./pbuf.sh
 
 install:
