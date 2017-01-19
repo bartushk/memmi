@@ -7,7 +7,8 @@ go:
   - master
 
 before_install:
-  - rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`) && source ~/.nvm/nvm.sh && nvm install latest
+  - sudo apt-get update
+  - sudo apt-get install nodejs npm
   - npm install -g protobufjs
   - go get -u github.com/golang/protobuf/{proto,protoc-gen-go}
   - export GOPATH=$(pwd)/web
