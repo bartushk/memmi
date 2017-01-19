@@ -7,10 +7,9 @@ go:
   - master
 
 before_install:
-  - sudo add-apt-repository -y ppa:chris-lea/node.js
-  - sudo apt-get -y update
-  - sudo apt-get install nodejs
-  - sudo npm install -g protobufjs
+  - npm install -g update-travis
+  - update-travis
+  - npm install -g protobufjs
   - go get -u github.com/golang/protobuf/{proto,protoc-gen-go}
   - export GOPATH=$(pwd)/web
   - ./pbuf.sh
