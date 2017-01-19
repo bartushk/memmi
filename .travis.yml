@@ -14,7 +14,8 @@ before_install:
   - nvm install 6.9.4
   - npm install npm@latest -g
   - npm install -g protobufjs
-  - go get -u github.com/golang/protobuf/{proto,protoc-gen-go}
+  - go get -u github.com/golang/protobuf/proto
+  - go get -u github.com/golang/protobuf/protoc-gen-go
   - export GOPATH=$(pwd)/web
   - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/protobuf/lib
   - export PATH=$PATH:$HOME/protobuf/bin
