@@ -21,8 +21,8 @@ func (router *Router) GetHandleFunc() func(http.ResponseWriter, *http.Request) {
 			router.Logger.Log(r)
 		}
 		for _, handler := range router.handlers {
-			if handler.ShouldHandle(r) {
-				if !handler.Handle(w, r) {
+			if handler.ShouldHandle(r, nil) {
+				if !handler.Handle(w, r, nil) {
 					break
 				}
 			}
