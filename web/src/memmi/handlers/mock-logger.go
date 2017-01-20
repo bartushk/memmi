@@ -5,9 +5,9 @@ import (
 )
 
 type MockLogger struct {
-	CallCount int
+	CallRequests []*http.Request
 }
 
 func (logger *MockLogger) Log(r *http.Request) {
-	logger.CallCount += 1
+	logger.CallRequests = append(logger.CallRequests, r)
 }

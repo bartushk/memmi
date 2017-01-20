@@ -7,10 +7,10 @@ import (
 
 type MockAuthenticator struct {
 	AuthenticatedUser pbuf.User
-	CallCount         int
+	CallRequests      []*http.Request
 }
 
 func (auth *MockAuthenticator) AuthenticateUser(r *http.Request) pbuf.User {
-	auth.CallCount += 1
+	auth.CallRequests = append(auth.CallRequests, r)
 	return auth.AuthenticatedUser
 }

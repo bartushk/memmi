@@ -10,8 +10,8 @@ type HttpAuthenticator interface {
 }
 
 type RequestHandler interface {
-	ShouldHandle(r *http.Request, u *pbuf.User) bool
-	Handle(w http.ResponseWriter, r *http.Request, u *pbuf.User) bool
+	ShouldHandle(r *http.Request, u pbuf.User) bool
+	Handle(w http.ResponseWriter, r *http.Request, u pbuf.User) bool
 }
 
 type HttpLogger interface {

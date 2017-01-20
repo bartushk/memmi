@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"memmi/pbuf"
 	"net/http"
 )
 
@@ -23,22 +22,11 @@ func (router *Router) GetHandleFunc() func(http.ResponseWriter, *http.Request) {
 			router.Logger.Log(r)
 		}
 
-		user := pbuf.User{
-			Id:              0,
-			UserName:        "anon",
-			FirstName:       "Cool",
-			LastName:        "Person",
-			Email:           "none",
-			IsAuthenticated: false,
-		}
-
-		if router.Authenticator != nil {
-			user = router.Authenticator.AuthenticateUser(r)
-		}
+		user := router.Authenticator.AuthenticateUser(r)
 
 		for _, handler := range router.handlers {
-			if handler.ShouldHandle(r, &user) {
-				if !handler.Handle(w, r, &user) {
+			if handler.ShouldHandle(r, user) {
+				if !handler.Handle(w, r, user) {
 					break
 				}
 			}
