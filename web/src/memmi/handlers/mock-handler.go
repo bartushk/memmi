@@ -9,6 +9,8 @@ type MockHandler struct {
 	DoHandle       bool
 	CallCount      int
 	ShouldContinue bool
+	LastUser       *pbuf.User
+	LastRequest    *http.Request
 }
 
 func (handler *MockHandler) ShouldHandle(r *http.Request, user *pbuf.User) bool {

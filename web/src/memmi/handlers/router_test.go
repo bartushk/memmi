@@ -4,11 +4,13 @@ import (
 	"testing"
 )
 
-func getMockedRouter(i int) (Router, *MockLogger, []*MockHandler) {
+func getMockedRouter(i int) (Router, *MockLogger, []*MockHandler, *MockAuthenticator) {
 	var handlers []*MockHandler
 	logger := new(MockLogger)
+	auth := new(MockAuthenticator)
 	router := Router{
-		Logger: logger,
+		Logger:        logger,
+		Authenticator: auth,
 	}
 	for k := 0; k < i; k++ {
 		handler := new(MockHandler)
@@ -17,7 +19,7 @@ func getMockedRouter(i int) (Router, *MockLogger, []*MockHandler) {
 		handlers = append(handlers, handler)
 		router.AddHandler(handler)
 	}
-	return router, logger, handlers
+	return router, logger, handlers, auth
 }
 
 func Test_Handlers_Router_Constructor_NoHandlers(t *testing.T) {
@@ -77,7 +79,7 @@ func Test_Handlers_Router_AddHandler_MultipeCopies(t *testing.T) {
 }
 
 func Test_Handlers_Router_HandleFunc_NotNull(t *testing.T) {
-	var r, _, _ = getMockedRouter(0)
+	var r, _, _, _ = getMockedRouter(0)
 	var hf = r.GetHandleFunc()
 	if hf == nil {
 		t.Error("Handle func was nil.")
@@ -85,7 +87,7 @@ func Test_Handlers_Router_HandleFunc_NotNull(t *testing.T) {
 }
 
 func Test_Handlers_Router_HandleFunc_NoHandlers_LoggerCalled(t *testing.T) {
-	var r, l, _ = getMockedRouter(0)
+	var r, l, _, _ = getMockedRouter(0)
 	var hf = r.GetHandleFunc()
 	hf(nil, nil)
 	if l.CallCount != 1 {
@@ -94,7 +96,7 @@ func Test_Handlers_Router_HandleFunc_NoHandlers_LoggerCalled(t *testing.T) {
 }
 
 func Test_Handlers_Router_HandleFunc_Handlers_LoggerCalled(t *testing.T) {
-	var r, l, _ = getMockedRouter(3)
+	var r, l, _, _ = getMockedRouter(3)
 	var hf = r.GetHandleFunc()
 	hf(nil, nil)
 	hf(nil, nil)
@@ -104,7 +106,7 @@ func Test_Handlers_Router_HandleFunc_Handlers_LoggerCalled(t *testing.T) {
 }
 
 func Test_Handlers_Router_HandleFunc_ShouldGo_AllCalled(t *testing.T) {
-	var r, _, h = getMockedRouter(4)
+	var r, _, h, _ = getMockedRouter(4)
 	var hf = r.GetHandleFunc()
 	hf(nil, nil)
 	hf(nil, nil)
@@ -118,7 +120,7 @@ func Test_Handlers_Router_HandleFunc_ShouldGo_AllCalled(t *testing.T) {
 }
 
 func Test_Handlers_Router_HandleFunc_ShouldNotContinue_LoopBreaks(t *testing.T) {
-	var r, _, h = getMockedRouter(4)
+	var r, _, h, _ = getMockedRouter(4)
 	h[1].ShouldContinue = false
 	var hf = r.GetHandleFunc()
 	hf(nil, nil)
@@ -141,7 +143,7 @@ func Test_Handlers_Router_HandleFunc_ShouldNotContinue_LoopBreaks(t *testing.T) 
 }
 
 func Test_Handlers_Router_HandleFunc_ShouldNotHandle_DoesNotHandle(t *testing.T) {
-	var r, _, h = getMockedRouter(4)
+	var r, _, h, _ = getMockedRouter(4)
 	h[0].DoHandle = false
 	var hf = r.GetHandleFunc()
 	hf(nil, nil)

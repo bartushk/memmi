@@ -8,6 +8,7 @@ message User {
   string firstName = 3;
   string lastName = 4;
   string email = 5;
+  bool isAuthenticated = 6;
 }
 
 message CardSet {
