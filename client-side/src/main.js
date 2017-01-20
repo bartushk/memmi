@@ -7,8 +7,10 @@ import createSagaMiddleware                          from 'redux-saga'
 import { reducers }                                  from './reducers/index'
 import { sagas }                                     from './sagas/index'
 import AppContainer                                  from 'containers/AppContainer'
+import injectTapEventPlugin                          from 'react-tap-event-plugin'
 import './components/main.scss'
 
+injectTapEventPlugin()
 // create the store
 const sagaMiddleware = createSagaMiddleware()
 let middleware = applyMiddleware(routerMiddleware(browserHistory), sagaMiddleware)

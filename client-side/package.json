@@ -38,13 +38,16 @@
   "dependencies": {
     "babel-preset-stage-0": "^6.16.0",
     "lodash": "^4.16.4",
+    "material-ui": "^0.16.7",
     "protobufjs": "^6.4.6",
     "raw-loader": "^0.5.1",
     "react": "^15.3.2",
+    "react-addons-css-transition-group": "^15.4.2",
     "react-dom": "^15.3.2",
     "react-redux": "^4.4.5",
     "react-router": "^2.8.1",
     "react-router-redux": "^4.0.6",
+    "react-tap-event-plugin": "^2.0.1",
     "redux": "^3.5.2",
     "redux-form": "^6.0.2",
     "redux-saga": "^0.11.1"
