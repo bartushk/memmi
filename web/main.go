@@ -7,11 +7,11 @@ import (
 )
 
 func main() {
-	server := ":8080"
+	server := ":8081"
 	router := new(handlers.Router)
 	router.Logger = new(handlers.ConsoleLogger)
 	router.Authenticator = new(handlers.MockAuthenticator)
 	http.HandleFunc("/", router.GetHandleFunc())
 	fmt.Printf("Server listening on '%s'\n", server)
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(server, nil)
 }

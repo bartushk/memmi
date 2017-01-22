@@ -8,6 +8,7 @@ import { reducers }                                  from './reducers/index'
 import { sagas }                                     from './sagas/index'
 import AppContainer                                  from 'containers/AppContainer'
 import injectTapEventPlugin                          from 'react-tap-event-plugin'
+import {SetAction}                                     from './action-wrapper'
 import './components/main.scss'
 
 injectTapEventPlugin()
@@ -18,6 +19,7 @@ if (process.env.NODE_ENV !== 'production' && window.devToolsExtension) {
   middleware = compose(middleware, window.devToolsExtension && window.devToolsExtension())
 }
 const store = createStore(reducers, middleware)
+SetAction((type, value = {}) => store.dispatch({type, value}))
 const history = syncHistoryWithStore(browserHistory, store)
 sagaMiddleware.run(sagas)
 
