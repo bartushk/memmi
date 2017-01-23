@@ -21,6 +21,8 @@ before_install:
 
 install:
   - go get -d ./web/...
+  - cd ./client-side && npm install && cd ..
 
 script:
   - go test -v ./web/...
+  - cd ./client-side && npm test && cd ..

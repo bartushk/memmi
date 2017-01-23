@@ -1,20 +1,13 @@
-import 'whatwg-fetch'
-import {put, call, take} from 'redux-saga/effects'
+import {put, take} from 'redux-saga/effects'
 
-
-export function* sendRequest() {
+export function* sendTest() {
   while (true) {
-    const action = yield take('TEST')
-    console.log(action)
-    const result = yield call(fetch, '/api', { method: 'post', body: JSON.stringify(action.value)})
-    console.log('-')
-    console.log(result)
-    console.log('-')
+    yield take('TEST')
     yield put({type: 'TEST_DONE', value: {}})
   }
 }
 
 
 export function* sagas() {
-  yield [ sendRequest() ]
+  yield [ sendTest() ]
 }

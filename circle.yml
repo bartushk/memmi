@@ -17,7 +17,9 @@ dependencies:
 
   override:
     - go get -d ./web/...
+    - cd ./client-side && npm install && cd ..
 
 test:
   override:
     - go test -v ./web/...
+    - cd ./client-side && npm test && cd ..
