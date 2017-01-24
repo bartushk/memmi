@@ -24,5 +24,5 @@ install:
   - cd ./client-side && npm install && cd ..
 
 script:
-  - go test -v ./web/...
+  - go test -v ./web/src/...
   - cd ./client-side && npm test && cd ..

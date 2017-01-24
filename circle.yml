@@ -21,5 +21,5 @@ dependencies:
 
 test:
   override:
-    - go test -v ./web/...
+    - go test -v ./web/src/...
     - cd ./client-side && npm test && cd ..
