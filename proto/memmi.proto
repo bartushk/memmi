@@ -3,7 +3,7 @@ package pbuf;
 
 
 message User {
-  string id = 1;
+  bytes id = 1;
   string userName = 2;
   string firstName = 3;
   string lastName = 4;
@@ -12,17 +12,17 @@ message User {
 }
 
 message CardSet {
-  string id = 1;
+  bytes id = 1;
   int32 version = 2;
   string createdDate = 3;
-  string authorId = 4;
+  bytes authorId = 4;
   string setName = 5;
   string title = 6;
   repeated Card cards = 7;
 }
 
 message Card {
-  string id = 1;
+  bytes id = 1;
   int32 cardIndex = 2;
   string title = 3;
   CardInfo front = 4;
@@ -35,21 +35,27 @@ message CardInfo {
 }
 
 message CardUpdate {
-  string cardId = 1;
+  bytes cardId = 1;
   int32 score = 2;
 }
 
-message PlayerHistory {
-  string playerId = 1;
-  string cardSetId = 2;
+message UserHistory {
+  bytes userId = 1;
+  bytes cardSetId = 2;
   int32 playIndex = 3;
   repeated CardHistory history = 4;
 }
 
 message CardHistory {
-  string cardId = 1;
+  bytes cardId = 1;
   int32 currentScore = 2;
   int32 cardIndex = 3;
   repeated int32 scores = 4;
   repeated int32 indicies = 5;
+}
+
+message UserAuthInfo {
+  bytes userId = 1;  
+  bytes userName = 2;
+  bytes passHash = 3;
 }

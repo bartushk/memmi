@@ -2,7 +2,7 @@ import pbuf from '../../src/pbuf/pbuf'
 const proto = pbuf.pbuf
 
 const fakeUser = {
-  id:                   'testUser',
+  id:                   new Buffer('testUser'),
   userName:             'd_cat',
   firstName:            'Doodie',
   lastName:             'Cat',
@@ -11,7 +11,7 @@ const fakeUser = {
 }
 
 const fakeCardOne = {
-  id:           'cardOne',
+  id:           new Buffer('cardOne'),
   cardIndex:    0,
   title:        'Card One',
   front:        {type: 'html', value: '<h1>Hello</h1>'},
@@ -19,7 +19,7 @@ const fakeCardOne = {
 }
 
 const fakeHistoryOne = {
-  cardId:       'cardOne',
+  cardId:       new Buffer('cardOne'),
   currentScore: 1,
   cardIndex:    0,
   scores:       [1],
@@ -27,7 +27,7 @@ const fakeHistoryOne = {
 }
 
 const fakeCardTwo = {
-  id:           'cardTwo',
+  id:           new Buffer('cardTwo'),
   cardIndex:    1,
   title:        'Card Two',
   front:        {type: 'html', value: '<h1>Ni Hao</h1>'},
@@ -35,7 +35,7 @@ const fakeCardTwo = {
 }
 
 const fakeHistoryTwo = {
-  cardId:       'cardTwo',
+  cardId:       new Buffer('cardTwo'),
   currentScore: -2,
   cardIndex:    1,
   scores:       [-2],
@@ -43,30 +43,30 @@ const fakeHistoryTwo = {
 }
 
 const fakeCardSet = {
-  id:           'testCardSet',
+  id:           new Buffer('testCardSet'),
   version:      0,
   createdDate:  Date.now().toString(),
-  authorId:     'testUser',
+  authorId:     new Buffer('testUser'),
   setName:      'CatSet',
   title:        'Cat Cards',
   cards:        [fakeCardOne, fakeCardTwo]
 }
 
 const fakeCardUpdate = {
-  cardId:       'coolCard',
+  cardId:       new Buffer('coolCard'),
   score:        2
 }
 
-const fakePlayerHistory = {
-  playerId:     'd_cat',
-  cardSetId:    'testCardSet',
+const fakeUserHistory = {
+  userId:     new Buffer('d_cat'),
+  cardSetId:    new Buffer('testCardSet'),
   playIndex:    0,
   history:      [fakeHistoryOne, fakeHistoryTwo]
 }
 
 export default {
   getFakeCardSet:       () => { return proto.CardSet.create(fakeCardSet) },
-  getFakePlayerHistory: () => { return proto.PlayerHistory.create(fakePlayerHistory) },
+  getFakeUserHistory: () => { return proto.UserHistory.create(fakeUserHistory) },
   getFakeCardUpdate:    () => { return proto.CardUpdate.create(fakeCardUpdate) },
   getFakeUser:          () => { return proto.User.create(fakeUser) },
   getFakeCardOne:       () => { return proto.Card.create(fakeCardOne) },

@@ -20,7 +20,7 @@ function decode(data, type) {
   case 'card-update':
     return protos.CardUpdate.decode(data)
   case 'player-history':
-    return protos.PlayerHistory.decode(data)
+    return protos.UserHistory.decode(data)
   default:
     return {}
   }
@@ -37,7 +37,7 @@ function encode(proto, type) {
   case 'card-update':
     return protos.CardUpdate.encode(proto).finish()
   case 'player-history':
-    return protos.PlayerHistory.encode(proto).finish()
+    return protos.UserHistory.encode(proto).finish()
   default:
     throw exception('Invalid type to decode with: ' + type)
   }

@@ -5,10 +5,10 @@ import (
 )
 
 type CardSelection interface {
-	SelectCard(history *pbuf.PlayerHistory, previousCard *pbuf.Card) pbuf.Card
+	SelectCard(history *pbuf.UserHistory, previousCard *pbuf.Card) pbuf.Card
 }
 
-type CardManagment interface {
-	GetCardSetById(id string) pbuf.CardSet
-	GetCardById(id string) pbuf.Card
+type CardManagement interface {
+	GetCardSetById(id []byte) pbuf.CardSet
+	GetCardById(id []byte) pbuf.Card
 }

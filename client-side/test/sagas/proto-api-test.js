@@ -124,7 +124,7 @@ test('Request with card-update type.', (assert) => {
 
 test('Request with player-history type.', (assert) => {
   const url = 'api'
-  let result = api(url, data.getFakePlayerHistory(), 'player-history', null)
+  let result = api(url, data.getFakeUserHistory(), 'player-history', null)
 
   assert.equal(result.url, url, 'Correct url passed to fetch.')
   assert.equal(result.args.method, 'POST', 'Method should be post.')
@@ -143,7 +143,7 @@ test('Request with player-history type.', (assert) => {
 
   assert.deepEqual(
     result.decode,
-    data.getFakePlayerHistory(),
+    data.getFakeUserHistory(),
     'Decoded value should match input.'
   )
 
