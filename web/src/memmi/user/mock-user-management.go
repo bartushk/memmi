@@ -5,31 +5,22 @@ import (
 )
 
 type MockUserManagement struct {
-	HasHistoryReturn     bool
-	HasHistoryUserIds    [][]byte
-	HasHistoryCardSetIds [][]byte
-
 	GetHistoryReturn     pbuf.UserHistory
-	GetHistoryUserIds    [][]byte
+	GetHistoryUsers      []pbuf.User
 	GetHistoryCardSetIds [][]byte
 
 	AuthInfoReturn    pbuf.UserAuthInfo
 	AuthInfoUserNames []string
 	AuthInfoIds       [][]byte
 
-	UpdateHistoryUserIds     [][]byte
+	UpdateHistoryUsers       []pbuf.User
 	UpdateHistoryCardSetIds  [][]byte
 	UpdateHistoryCardUpdates []pbuf.CardUpdate
+	UpdateHistoryReturn      error
 }
 
-func (management *MockUserManagement) HasHistory(userId []byte, cardSetId []byte) bool {
-	management.HasHistoryUserIds = append(management.HasHistoryUserIds, userId)
-	management.HasHistoryCardSetIds = append(management.HasHistoryCardSetIds, cardSetId)
-	return management.HasHistoryReturn
-}
-
-func (management *MockUserManagement) GetHistory(userId []byte, cardSetId []byte) pbuf.UserHistory {
-	management.GetHistoryUserIds = append(management.GetHistoryUserIds, userId)
+func (management *MockUserManagement) GetHistory(user pbuf.User, cardSetId []byte) pbuf.UserHistory {
+	management.GetHistoryUsers = append(management.GetHistoryUsers, user)
 	management.GetHistoryCardSetIds = append(management.GetHistoryCardSetIds, cardSetId)
 	return management.GetHistoryReturn
 }
@@ -44,8 +35,9 @@ func (management *MockUserManagement) GetAuthInfoById(userId []byte) pbuf.UserAu
 	return management.AuthInfoReturn
 }
 
-func (management *MockUserManagement) UpdateHistory(userId []byte, cardSetId []byte, update pbuf.CardUpdate) {
-	management.UpdateHistoryUserIds = append(management.UpdateHistoryUserIds, userId)
+func (management *MockUserManagement) UpdateHistory(user pbuf.User, cardSetId []byte, update pbuf.CardUpdate) error {
+	management.UpdateHistoryUsers = append(management.UpdateHistoryUsers, user)
 	management.UpdateHistoryCardSetIds = append(management.UpdateHistoryCardSetIds, cardSetId)
 	management.UpdateHistoryCardUpdates = append(management.UpdateHistoryCardUpdates, update)
+	return management.UpdateHistoryReturn
 }

@@ -5,12 +5,12 @@ import (
 )
 
 type MockCardSelection struct {
-	UserHistories []*pbuf.UserHistory
-	PreviousCards []*pbuf.Card
+	UserHistories   []*pbuf.UserHistory
+	PreviousCardIds [][]byte
 }
 
-func (selection *MockCardSelection) SelectCard(history *pbuf.UserHistory, previousCard *pbuf.Card) pbuf.Card {
+func (selection *MockCardSelection) SelectCard(history *pbuf.UserHistory, previousCard []byte) pbuf.Card {
 	selection.UserHistories = append(selection.UserHistories, history)
-	selection.PreviousCards = append(selection.PreviousCards, previousCard)
+	selection.PreviousCardIds = append(selection.PreviousCardIds, previousCard)
 	return pbuf.Card{}
 }

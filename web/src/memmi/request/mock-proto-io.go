@@ -7,7 +7,7 @@ import (
 )
 
 type MockProtoIO struct {
-	MessageWrites   []*proto.Message
+	MessageWrites   []proto.Message
 	ResponseWriters []http.ResponseWriter
 	WriteReturn     error
 
@@ -24,7 +24,7 @@ type MockProtoIO struct {
 	ReportNextError    error
 }
 
-func (io *MockProtoIO) WriteProtoResponse(w http.ResponseWriter, message *proto.Message) error {
+func (io *MockProtoIO) WriteProtoResponse(w http.ResponseWriter, message proto.Message) error {
 	io.ResponseWriters = append(io.ResponseWriters, w)
 	io.MessageWrites = append(io.MessageWrites, message)
 	return io.WriteReturn

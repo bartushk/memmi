@@ -5,9 +5,8 @@ import (
 )
 
 type UserManagement interface {
-	HasHistory(userId []byte, cardSetId []byte) bool
-	GetHistory(userId []byte, cardSetId []byte) pbuf.UserHistory
+	GetHistory(user pbuf.User, cardSetId []byte) pbuf.UserHistory
 	GetAuthInfoByUserName(userName string) pbuf.UserAuthInfo
 	GetAuthInfoById(userId []byte) pbuf.UserAuthInfo
-	UpdateHistory(userId []byte, cardSetId []byte, update pbuf.CardUpdate)
+	UpdateHistory(user pbuf.User, cardSetId []byte, update pbuf.CardUpdate) error
 }

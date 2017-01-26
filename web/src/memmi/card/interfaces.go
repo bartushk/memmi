@@ -5,7 +5,7 @@ import (
 )
 
 type CardSelection interface {
-	SelectCard(history *pbuf.UserHistory, previousCard *pbuf.Card) pbuf.Card
+	SelectCard(history *pbuf.UserHistory, previousCardId []byte) pbuf.Card
 }
 
 type CardManagement interface {

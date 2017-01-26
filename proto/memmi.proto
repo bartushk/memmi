@@ -13,6 +13,7 @@ message User {
   string lastName = 4;
   string email = 5;
   bool isAuthenticated = 6;
+  bool isAnon = 7;
 }
 
 message CardSet {
@@ -47,7 +48,8 @@ message UserHistory {
   bytes userId = 1;
   bytes cardSetId = 2;
   int32 playIndex = 3;
-  repeated CardHistory history = 4;
+  bool isEmpty = 4;
+  repeated CardHistory history = 5;
 }
 
 message CardHistory {
