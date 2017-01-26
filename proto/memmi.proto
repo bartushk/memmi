@@ -1,6 +1,10 @@
 syntax = "proto3";
 package pbuf;
 
+enum SelectionAlgorithm {
+  random = 0;
+  inOrder = 1;
+}
 
 message User {
   bytes id = 1;
@@ -58,4 +62,24 @@ message UserAuthInfo {
   bytes userId = 1;  
   bytes userName = 2;
   bytes passHash = 3;
+}
+
+message NextCardRequest {
+  bytes cardSetId = 1;
+  bytes previousCardId = 2;
+  SelectionAlgorithm algorithm = 3;  
+}
+
+message CardScoreReport {
+  bytes cardSetId = 1;
+  CardUpdate update = 2;
+}
+
+message ReportAndNext {
+  NextCardRequest nextRequest = 1;
+  CardScoreReport report = 2;
+}
+
+message RequestError {
+  string reason = 1;
 }
