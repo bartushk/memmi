@@ -9,10 +9,10 @@ type MockCardManagement struct {
 	ReturnCard    pbuf.Card
 }
 
-func (manager *MockCardManagement) GetCardSetById(id string) pbuf.CardSet {
+func (manager *MockCardManagement) GetCardSetById(id []byte) pbuf.CardSet {
 	return manager.ReturnCardSet
 }
 
-func (manager *MockCardManagement) GetCardById(id string) pbuf.Card {
+func (manager *MockCardManagement) GetCardById(id []byte) pbuf.Card {
 	return manager.ReturnCard
 }

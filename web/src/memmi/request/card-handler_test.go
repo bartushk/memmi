@@ -1,11 +1,26 @@
 package request
 
 import (
+	"memmi/card"
 	"memmi/pbuf"
+	"memmi/user"
 	"net/http"
 	"net/url"
 	"testing"
 )
+
+func getMockedHandler() (RequestHandler, *MockProtoIO, *card.MockCardManagement, *card.MockCardSelection, *user.MockUserManagement) {
+	handler := &CardRequestHandler{}
+	pio := &MockProtoIO{}
+	cardMan := &card.MockCardManagement{}
+	cardSel := &card.MockCardSelection{}
+	userMan := &user.MockUserManagement{}
+	handler.Pio = pio
+	handler.CardMan = cardMan
+	handler.CardSel = cardSel
+	handler.UserMan = userMan
+	return handler, pio, cardMan, cardSel, userMan
+}
 
 func requestFromURL(url_string string) *http.Request {
 	test_url := &url.URL{}
