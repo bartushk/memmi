@@ -17,6 +17,7 @@ type MockHandler struct {
 }
 
 func (handler *MockHandler) ShouldHandle(r *http.Request, user pbuf.User, responseWritten bool) bool {
+	handler.ShouldWritten = append(handler.ShouldWritten, responseWritten)
 	handler.ShouldUsers = append(handler.ShouldUsers, user)
 	handler.ShouldRequests = append(handler.ShouldRequests, r)
 	return handler.DoHandle

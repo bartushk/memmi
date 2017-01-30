@@ -38,6 +38,14 @@ func Test_CardHandler_ExactUrl_ShouldHanlde(t *testing.T) {
 	}
 }
 
+func Test_CardHandler_ExactUrl_IfPreviouslyWritten_ShouldNotHandle(t *testing.T) {
+	var req = requestFromURL(CARD_API_URL)
+	handler := CardRequestHandler{}
+	if handler.ShouldHandle(req, pbuf.User{}, true) {
+		t.Error("Handler should not handle request with responseWritten true.")
+	}
+}
+
 func Test_CardHandler_UrlPlusQuery_ShouldHanlde(t *testing.T) {
 	test_url := CARD_API_URL + "?asdf"
 	var req = requestFromURL(test_url)

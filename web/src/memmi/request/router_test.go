@@ -158,6 +158,26 @@ func Test_Router_HandleFunc_ShouldNotContinue_LoopBreaks(t *testing.T) {
 	}
 }
 
+func Test_Router_HandleFunc_ResponseWritten_PassedCorrectly(t *testing.T) {
+	var r, _, h, _ = getMockedRouter(4)
+	h[1].Result.ResponseWritten = true
+	var hf = r.GetHandleFunc()
+	hf(nil, nil)
+	hf(nil, nil)
+
+	for i, handler := range h[:1] {
+		if handler.ShouldWritten[0] || handler.ShouldWritten[1] {
+			t.Error("Should written should not be true on handler", i)
+		}
+	}
+
+	for i, handler := range h[2:] {
+		if !(handler.ShouldWritten[0] && handler.ShouldWritten[1]) {
+			t.Error("Should written should be true on handler", i)
+		}
+	}
+}
+
 func Test_Router_HandleFunc_ShouldNotHandle_DoesNotHandle(t *testing.T) {
 	var r, _, h, _ = getMockedRouter(4)
 	h[0].DoHandle = false
