@@ -15,7 +15,6 @@ const CARD_REPORT_NEXT_URL = CARD_API_URL + "/report-get-next"
 
 type CardRequestHandler struct {
 	Pio     ProtoIO
-	CardMan card.CardManagement
 	CardSel card.CardSelection
 	UserMan user.UserManagement
 }
@@ -40,8 +39,7 @@ func (handler *CardRequestHandler) Handle(w http.ResponseWriter, r *http.Request
 func (handler *CardRequestHandler) handleNext(w http.ResponseWriter, r *http.Request, user pbuf.User) bool {
 	nextRequest, err := handler.Pio.ReadNextCardRequest(r)
 	if err != nil {
-		pErr := &pbuf.RequestError{Reason: "Could not read request body."}
-		handler.Pio.WriteProtoResponse(w, pErr)
+		handler.Pio.WriteProtoResponse(w, BODY_READ_ERROR)
 		return true
 	}
 	history := handler.UserMan.GetHistory(user, nextRequest.CardSetId)
@@ -53,14 +51,12 @@ func (handler *CardRequestHandler) handleNext(w http.ResponseWriter, r *http.Req
 func (handler *CardRequestHandler) handleReport(w http.ResponseWriter, r *http.Request, user pbuf.User) bool {
 	cardScoreReport, csErr := handler.Pio.ReadCardScoreReport(r)
 	if csErr != nil {
-		pErr := &pbuf.RequestError{Reason: "Could not read request body."}
-		handler.Pio.WriteProtoResponse(w, pErr)
+		handler.Pio.WriteProtoResponse(w, BODY_READ_ERROR)
 		return true
 	}
 	updateErr := handler.UserMan.UpdateHistory(user, cardScoreReport.CardSetId, *cardScoreReport.Update)
 	if updateErr != nil {
-		pErr := &pbuf.RequestError{Reason: "Could not update user history."}
-		handler.Pio.WriteProtoResponse(w, pErr)
+		handler.Pio.WriteProtoResponse(w, USER_HISTORY_UPDATE_ERROR)
 	}
 	return true
 }

@@ -41,3 +41,10 @@ func (management *MockUserManagement) UpdateHistory(user pbuf.User, cardSetId []
 	management.UpdateHistoryCardUpdates = append(management.UpdateHistoryCardUpdates, update)
 	return management.UpdateHistoryReturn
 }
+
+func (management *MockUserManagement) TotalCalls() int {
+	return len(management.UpdateHistoryUsers) +
+		len(management.AuthInfoUserNames) +
+		len(management.AuthInfoIds) +
+		len(management.GetHistoryUsers)
+}

@@ -6,6 +6,9 @@ import (
 	"net/http"
 )
 
+var BODY_READ_ERROR = &pbuf.RequestError{Reason: "Could not read request body."}
+var USER_HISTORY_UPDATE_ERROR = &pbuf.RequestError{Reason: "Could not update user history."}
+
 type HttpAuthenticator interface {
 	AuthenticateUser(r *http.Request) pbuf.User
 }
