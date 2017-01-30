@@ -33,7 +33,7 @@ func requestFromURL(url_string string) *http.Request {
 func Test_CardHandler_ExactUrl_ShouldHanlde(t *testing.T) {
 	var req = requestFromURL(CARD_API_URL)
 	handler := CardRequestHandler{}
-	if !handler.ShouldHandle(req, pbuf.User{}) {
+	if !handler.ShouldHandle(req, pbuf.User{}, false) {
 		t.Error("Handler should handle request with URL:", CARD_API_URL)
 	}
 }
@@ -42,7 +42,7 @@ func Test_CardHandler_UrlPlusQuery_ShouldHanlde(t *testing.T) {
 	test_url := CARD_API_URL + "?asdf"
 	var req = requestFromURL(test_url)
 	handler := CardRequestHandler{}
-	if !handler.ShouldHandle(req, pbuf.User{}) {
+	if !handler.ShouldHandle(req, pbuf.User{}, false) {
 		t.Error("Handler should handle request with URL:", test_url)
 	}
 }
@@ -51,7 +51,7 @@ func Test_CardHandler_UrlSubUrl_ShouldHanlde(t *testing.T) {
 	test_url := CARD_API_URL + "/asdf/fffa"
 	var req = requestFromURL(test_url)
 	handler := CardRequestHandler{}
-	if !handler.ShouldHandle(req, pbuf.User{}) {
+	if !handler.ShouldHandle(req, pbuf.User{}, false) {
 		t.Error("Handler should handle request with URL:", test_url)
 	}
 }
@@ -60,7 +60,7 @@ func Test_CardHandler_AnyDifferentPrefix_ShouldNotHanlde(t *testing.T) {
 	test_url := "/tes" + CARD_API_URL
 	var req = requestFromURL(test_url)
 	handler := CardRequestHandler{}
-	if handler.ShouldHandle(req, pbuf.User{}) {
+	if handler.ShouldHandle(req, pbuf.User{}, false) {
 		t.Error("Handler should not handle request with URL:", test_url)
 	}
 }

@@ -15,7 +15,7 @@ func getMockedRouter(i int) (Router, *MockLogger, []*MockHandler, *MockAuthentic
 	}
 	for k := 0; k < i; k++ {
 		handler := new(MockHandler)
-		handler.ShouldContinue = true
+		handler.Result.Continue = true
 		handler.DoHandle = true
 		handlers = append(handlers, handler)
 		router.AddHandler(handler)
@@ -137,7 +137,7 @@ func Test_Router_HandleFunc_ShouldGo_AllCalled(t *testing.T) {
 
 func Test_Router_HandleFunc_ShouldNotContinue_LoopBreaks(t *testing.T) {
 	var r, _, h, _ = getMockedRouter(4)
-	h[1].ShouldContinue = false
+	h[1].Result.Continue = false
 	var hf = r.GetHandleFunc()
 	hf(nil, nil)
 	hf(nil, nil)

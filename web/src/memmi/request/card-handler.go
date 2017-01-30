@@ -20,35 +20,34 @@ type CardRequestHandler struct {
 	UserMan user.UserManagement
 }
 
-func (handler *CardRequestHandler) ShouldHandle(r *http.Request, user pbuf.User) bool {
-	return strings.HasPrefix(r.URL.EscapedPath(), CARD_API_URL)
+func (handler *CardRequestHandler) ShouldHandle(r *http.Request, user pbuf.User, responseWritten bool) bool {
+	return strings.HasPrefix(r.URL.EscapedPath(), CARD_API_URL) && !responseWritten
 }
 
-func (handler *CardRequestHandler) Handle(w http.ResponseWriter, r *http.Request, user pbuf.User) bool {
+func (handler *CardRequestHandler) Handle(w http.ResponseWriter, r *http.Request, user pbuf.User) HandleResult {
+	result := HandleResult{Continue: true, ResponseWritten: false}
 	switch r.URL.EscapedPath() {
 	case CARD_NEXT_URL:
-		handler.handleNext(w, r, user)
+		result.ResponseWritten = handler.handleNext(w, r, user)
 	case CARD_REPORT_URL:
-		if handler.handleReport(w, r, user) {
-			var toWrite []byte
-			w.Write(toWrite)
-		}
+		result.ResponseWritten = handler.handleReport(w, r, user)
 	case CARD_REPORT_NEXT_URL:
 		handler.handleReportNext(w, r, user)
 	}
-	return false
+	return result
 }
 
-func (handler *CardRequestHandler) handleNext(w http.ResponseWriter, r *http.Request, user pbuf.User) {
+func (handler *CardRequestHandler) handleNext(w http.ResponseWriter, r *http.Request, user pbuf.User) bool {
 	nextRequest, err := handler.Pio.ReadNextCardRequest(r)
 	if err != nil {
 		pErr := &pbuf.RequestError{Reason: "Could not read request body."}
 		handler.Pio.WriteProtoResponse(w, pErr)
-		return
+		return true
 	}
 	history := handler.UserMan.GetHistory(user, nextRequest.CardSetId)
 	nextCard := handler.CardSel.SelectCard(&history, nextRequest.PreviousCardId)
 	handler.Pio.WriteProtoResponse(w, &nextCard)
+	return true
 }
 
 func (handler *CardRequestHandler) handleReport(w http.ResponseWriter, r *http.Request, user pbuf.User) bool {
@@ -56,18 +55,16 @@ func (handler *CardRequestHandler) handleReport(w http.ResponseWriter, r *http.R
 	if csErr != nil {
 		pErr := &pbuf.RequestError{Reason: "Could not read request body."}
 		handler.Pio.WriteProtoResponse(w, pErr)
-		return false
+		return true
 	}
 	updateErr := handler.UserMan.UpdateHistory(user, cardScoreReport.CardSetId, *cardScoreReport.Update)
 	if updateErr != nil {
 		pErr := &pbuf.RequestError{Reason: "Could not update user history."}
 		handler.Pio.WriteProtoResponse(w, pErr)
-		return false
 	}
 	return true
 }
 
-func (handler *CardRequestHandler) handleReportNext(w http.ResponseWriter, r *http.Request, user pbuf.User) {
-	handler.handleReport(w, r, user)
-	handler.handleNext(w, r, user)
+func (handler *CardRequestHandler) handleReportNext(w http.ResponseWriter, r *http.Request, user pbuf.User) bool {
+	return false
 }

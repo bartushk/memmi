@@ -23,12 +23,14 @@ func (router *Router) GetHandleFunc() func(http.ResponseWriter, *http.Request) {
 		}
 
 		user := router.Authenticator.AuthenticateUser(r)
-
+		var responseWritten = false
 		for _, handler := range router.handlers {
-			if handler.ShouldHandle(r, user) {
-				if !handler.Handle(w, r, user) {
+			if handler.ShouldHandle(r, user, responseWritten) {
+				handleResult := handler.Handle(w, r, user)
+				if !handleResult.Continue {
 					break
 				}
+				responseWritten = handleResult.ResponseWritten || responseWritten
 			}
 		}
 	}

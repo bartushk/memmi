@@ -10,9 +10,14 @@ type HttpAuthenticator interface {
 	AuthenticateUser(r *http.Request) pbuf.User
 }
 
+type HandleResult struct {
+	Continue        bool
+	ResponseWritten bool
+}
+
 type RequestHandler interface {
-	ShouldHandle(r *http.Request, u pbuf.User) bool
-	Handle(w http.ResponseWriter, r *http.Request, u pbuf.User) bool
+	ShouldHandle(r *http.Request, u pbuf.User, responseWritten bool) bool
+	Handle(w http.ResponseWriter, r *http.Request, u pbuf.User) HandleResult
 }
 
 type HttpLogger interface {
