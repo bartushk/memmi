@@ -120,7 +120,69 @@ func Test_CardHandler_HandleNext_ProtoReadGood_HandledCorrectly(t *testing.T) {
 	}
 
 	if !CompareByteSlices(um.GetHistoryCardSetIds[0], nextCardRequest.CardSetId) {
-		t.Error("Wrong card set Id passed to GetHistory")
+		t.Error("Wrong card set Id passed to GetHistory",
+			"Expected:", um.GetHistoryCardSetIds[0],
+			"Got:", nextCardRequest.CardSetId)
+	}
+
+}
+
+func Test_CardHandler_Report_ProtoReadError_WriteError(t *testing.T) {
+	var handler, pio, cs, um = getMockedHandler()
+	var req = RequestFromURL(CARD_REPORT_URL)
+	pio.ReportError = errors.New("")
+	handler.Handle(nil, req, pbuf.User{})
+	if len(pio.MessageWrites) != 1 {
+		t.Error("There should be one write to proto io, got:", len(pio.MessageWrites))
+	}
+	if pio.MessageWrites[0] != BODY_READ_ERROR {
+		t.Error("Wrong error type written to proto io.",
+			"Expected:", BODY_READ_ERROR,
+			"Got:", pio.MessageWrites[0])
+	}
+	if len(cs.UserHistories) != 0 {
+		t.Error("Card selection should not be run. Times run:", len(cs.UserHistories))
+	}
+	if um.TotalCalls() != 0 {
+		t.Error("User managment should not be called. Times called:", um.TotalCalls)
+	}
+}
+
+func Test_CardHandler_Report_UpdateError_WriteError(t *testing.T) {
+	var handler, pio, cs, um = getMockedHandler()
+	var req = RequestFromURL(CARD_REPORT_URL)
+	testUser := pbuf.User{Id: []byte{2, 3, 7}}
+	testCardReport := pbuf.CardScoreReport{CardSetId: []byte{1, 2, 10}}
+	testCardReport.Update = &pbuf.CardUpdate{}
+	um.UpdateHistoryReturn = errors.New("")
+	pio.ReportReturn = testCardReport
+	handler.Handle(nil, req, testUser)
+	if len(pio.MessageWrites) != 1 {
+		t.Error("There should be one write to proto io, got:", len(pio.MessageWrites))
+	}
+	if pio.MessageWrites[0] != USER_HISTORY_UPDATE_ERROR {
+		t.Error("Wrong error type written to proto io.",
+			"Expected:", USER_HISTORY_UPDATE_ERROR,
+			"Got:", pio.MessageWrites[0])
+	}
+	if len(cs.UserHistories) != 0 {
+		t.Error("Card selection should not be run. Times run:", len(cs.UserHistories))
+	}
+
+	if um.TotalCalls() != 1 {
+		t.Error("User managment should be called once. Times called:", um.TotalCalls)
+	}
+
+	if !CompareByteSlices(um.UpdateHistoryUsers[0].Id, testUser.Id) {
+		t.Error("Wrong user passed to update history.",
+			"Expected:", um.UpdateHistoryUsers[0].Id,
+			"Got:", testUser.Id)
+	}
+
+	if !CompareByteSlices(um.UpdateHistoryCardSetIds[0], testCardReport.CardSetId) {
+		t.Error("Wrong user passed to update history.",
+			"Expected:", um.UpdateHistoryCardSetIds[0],
+			"Got:", testCardReport.CardSetId)
 	}
 
 }
