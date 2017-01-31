@@ -6,6 +6,11 @@ enum SelectionAlgorithm {
   inOrder = 1;
 }
 
+enum UpdateStatus {
+  good = 0;
+  bad = 1;
+}
+
 message User {
   bytes id = 1;
   string userName = 2;
@@ -84,4 +89,8 @@ message ReportAndNext {
 
 message RequestError {
   string reason = 1;
+}
+
+message UpdateResponse {
+  UpdateStatus status  = 1;
 }

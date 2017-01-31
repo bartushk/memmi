@@ -57,7 +57,9 @@ func (handler *CardRequestHandler) handleReport(w http.ResponseWriter, r *http.R
 	updateErr := handler.UserMan.UpdateHistory(user, cardScoreReport.CardSetId, *cardScoreReport.Update)
 	if updateErr != nil {
 		handler.Pio.WriteProtoResponse(w, USER_HISTORY_UPDATE_ERROR)
+		return true
 	}
+	handler.Pio.WriteProtoResponse(w, &pbuf.UpdateResponse{Status: 1})
 	return true
 }
 
