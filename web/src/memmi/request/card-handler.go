@@ -64,5 +64,10 @@ func (handler *CardRequestHandler) handleReport(w http.ResponseWriter, r *http.R
 }
 
 func (handler *CardRequestHandler) handleReportNext(w http.ResponseWriter, r *http.Request, user pbuf.User) bool {
+	_, csErr := handler.Pio.ReadReportAndNext(r)
+	if csErr != nil {
+		handler.Pio.WriteProtoResponse(w, BODY_READ_ERROR)
+		return true
+	}
 	return false
 }

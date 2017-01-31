@@ -68,7 +68,7 @@ func Test_CardHandler_HandleNext_ProtoReadError_WriteError(t *testing.T) {
 	pio.NextCardError = errors.New("")
 	handler.Handle(nil, req, pbuf.User{})
 	if len(pio.MessageWrites) != 1 {
-		t.Error("There should be one write to proto io, got:", len(pio.MessageWrites))
+		t.Fatal("There should be one write to proto io, got:", len(pio.MessageWrites))
 	}
 	if pio.MessageWrites[0] != BODY_READ_ERROR {
 		t.Error("Wrong error type written to proto io.",
@@ -95,7 +95,7 @@ func Test_CardHandler_HandleNext_ProtoReadGood_HandledCorrectly(t *testing.T) {
 	handler.Handle(nil, req, pbuf.User{})
 
 	if len(pio.MessageWrites) != 1 {
-		t.Error("There should be one write to proto io, got:", len(pio.MessageWrites))
+		t.Fatal("There should be one write to proto io, got:", len(pio.MessageWrites))
 	}
 
 	if pio.MessageWrites[0].String() != nextCard.String() {
@@ -105,7 +105,7 @@ func Test_CardHandler_HandleNext_ProtoReadGood_HandledCorrectly(t *testing.T) {
 	}
 
 	if len(cs.UserHistories) != 1 {
-		t.Error("Card selection should not be run. Times run:", len(cs.UserHistories))
+		t.Fatal("Card selection should be run once. Times run:", len(cs.UserHistories))
 	}
 
 	if cs.UserHistories[0].PlayIndex != testHistory.PlayIndex {
@@ -116,7 +116,7 @@ func Test_CardHandler_HandleNext_ProtoReadGood_HandledCorrectly(t *testing.T) {
 	}
 
 	if um.TotalCalls() != 1 {
-		t.Error("User managment should be called once. Times called:", um.TotalCalls)
+		t.Fatal("User managment should be called once. Times called:", um.TotalCalls)
 	}
 
 	if !CompareByteSlices(um.GetHistoryCardSetIds[0], nextCardRequest.CardSetId) {
@@ -133,7 +133,7 @@ func Test_CardHandler_Report_ProtoReadError_WriteError(t *testing.T) {
 	pio.ReportError = errors.New("")
 	handler.Handle(nil, req, pbuf.User{})
 	if len(pio.MessageWrites) != 1 {
-		t.Error("There should be one write to proto io, got:", len(pio.MessageWrites))
+		t.Fatal("There should be one write to proto io, got:", len(pio.MessageWrites))
 	}
 	if pio.MessageWrites[0] != BODY_READ_ERROR {
 		t.Error("Wrong error type written to proto io.",
@@ -158,7 +158,7 @@ func Test_CardHandler_Report_UpdateError_WriteError(t *testing.T) {
 	pio.ReportReturn = testCardReport
 	handler.Handle(nil, req, testUser)
 	if len(pio.MessageWrites) != 1 {
-		t.Error("There should be one write to proto io, got:", len(pio.MessageWrites))
+		t.Fatal("There should be one write to proto io, got:", len(pio.MessageWrites))
 	}
 	if pio.MessageWrites[0] != USER_HISTORY_UPDATE_ERROR {
 		t.Error("Wrong error type written to proto io.",
@@ -170,7 +170,7 @@ func Test_CardHandler_Report_UpdateError_WriteError(t *testing.T) {
 	}
 
 	if um.TotalCalls() != 1 {
-		t.Error("User managment should be called once. Times called:", um.TotalCalls)
+		t.Fatal("User managment should be called once. Times called:", um.TotalCalls)
 	}
 
 	if !CompareByteSlices(um.UpdateHistoryUsers[0].Id, testUser.Id) {
@@ -197,7 +197,7 @@ func Test_CardHandler_Report_Success_HandledCorrectly(t *testing.T) {
 	pio.ReportReturn = testCardReport
 	handler.Handle(nil, req, testUser)
 	if len(pio.MessageWrites) != 1 {
-		t.Error("There should be one write to proto io, got:", len(pio.MessageWrites))
+		t.Fatal("There should be one write to proto io, got:", len(pio.MessageWrites))
 	}
 
 	if pio.MessageWrites[0].String() != expectedResponseWrite.String() {
@@ -211,7 +211,7 @@ func Test_CardHandler_Report_Success_HandledCorrectly(t *testing.T) {
 	}
 
 	if um.TotalCalls() != 1 {
-		t.Error("User managment should be called once. Times called:", um.TotalCalls)
+		t.Fatal("User managment should be called once. Times called:", um.TotalCalls)
 	}
 
 	if !CompareByteSlices(um.UpdateHistoryUsers[0].Id, testUser.Id) {
@@ -224,5 +224,26 @@ func Test_CardHandler_Report_Success_HandledCorrectly(t *testing.T) {
 		t.Error("Wrong user passed to update history.",
 			"Expected:", um.UpdateHistoryCardSetIds[0],
 			"Got:", testCardReport.CardSetId)
+	}
+}
+
+func Test_CardHandler_ReportNext_ProtoIO_ErrorWritten(t *testing.T) {
+	var handler, pio, cs, um = getMockedHandler()
+	var req = RequestFromURL(CARD_REPORT_NEXT_URL)
+	pio.ReportNextError = errors.New("")
+	handler.Handle(nil, req, pbuf.User{})
+	if len(pio.MessageWrites) != 1 {
+		t.Fatal("There should be one write to proto io, got:", len(pio.MessageWrites))
+	}
+	if pio.MessageWrites[0] != BODY_READ_ERROR {
+		t.Error("Wrong error type written to proto io.",
+			"Expected:", BODY_READ_ERROR,
+			"Got:", pio.MessageWrites[0])
+	}
+	if len(cs.UserHistories) != 0 {
+		t.Error("Card selection should not be run. Times run:", len(cs.UserHistories))
+	}
+	if um.TotalCalls() != 0 {
+		t.Error("User managment should not be called. Times called:", um.TotalCalls)
 	}
 }
