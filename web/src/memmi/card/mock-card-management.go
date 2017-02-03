@@ -5,6 +5,9 @@ import (
 )
 
 type MockCardManagement struct {
+	GetCardSetIds [][]byte
+	GetCardIds    [][]byte
+
 	ReturnCardSet pbuf.CardSet
 	ReturnCard    pbuf.Card
 }

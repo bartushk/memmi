@@ -28,7 +28,7 @@ message CardSet {
   bytes authorId = 4;
   string setName = 5;
   string title = 6;
-  repeated Card cards = 7;
+  repeated bytes cardIds = 7;
 }
 
 message Card {
@@ -93,4 +93,12 @@ message RequestError {
 
 message UpdateResponse {
   UpdateStatus status  = 1;
+}
+
+message CardSetRequest {
+  bytes id = 1;
+}
+
+message CardRequest {
+  bytes id = 1;
 }

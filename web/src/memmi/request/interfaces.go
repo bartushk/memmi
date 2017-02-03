@@ -37,4 +37,6 @@ type ProtoIO interface {
 	ReadNextCardRequest(r *http.Request) (pbuf.NextCardRequest, error)
 	ReadCardScoreReport(r *http.Request) (pbuf.CardScoreReport, error)
 	ReadReportAndNext(r *http.Request) (pbuf.ReportAndNext, error)
+	ReadCardSetRequest(r *http.Request) (pbuf.CardSetRequest, error)
+	ReadCardRequest(r *http.Request) (pbuf.CardRequest, error)
 }

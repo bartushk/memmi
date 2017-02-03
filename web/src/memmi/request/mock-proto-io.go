@@ -22,6 +22,14 @@ type MockProtoIO struct {
 	ReportNextRequests []*http.Request
 	ReportNextReturn   pbuf.ReportAndNext
 	ReportNextError    error
+
+	CardSetRequests []*http.Request
+	CardSetReturn   pbuf.CardSetRequest
+	CardSetError    error
+
+	CardRequests []*http.Request
+	CardReturn   pbuf.CardRequest
+	CardError    error
 }
 
 func (io *MockProtoIO) WriteProtoResponse(w http.ResponseWriter, message proto.Message) error {
@@ -43,4 +51,14 @@ func (io *MockProtoIO) ReadCardScoreReport(r *http.Request) (pbuf.CardScoreRepor
 func (io *MockProtoIO) ReadReportAndNext(r *http.Request) (pbuf.ReportAndNext, error) {
 	io.ReportNextRequests = append(io.ReportNextRequests, r)
 	return io.ReportNextReturn, io.ReportNextError
+}
+
+func (io *MockProtoIO) ReadCardSetRequest(r *http.Request) (pbuf.CardSetRequest, error) {
+	io.CardSetRequests = append(io.CardSetRequests, r)
+	return io.CardSetReturn, io.CardSetError
+}
+
+func (io *MockProtoIO) ReadCardRequest(r *http.Request) (pbuf.CardRequest, error) {
+	io.CardRequests = append(io.CardRequests, r)
+	return io.CardReturn, io.CardError
 }
