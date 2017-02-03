@@ -49,7 +49,7 @@ const fakeCardSet = {
   authorId:     new Buffer('testUser'),
   setName:      'CatSet',
   title:        'Cat Cards',
-  cards:        [fakeCardOne, fakeCardTwo]
+  cardIds:        [fakeCardOne.id, fakeCardTwo.id]
 }
 
 const fakeCardUpdate = {
