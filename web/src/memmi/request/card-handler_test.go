@@ -88,9 +88,9 @@ func Test_CardHandler_HandleNext_ProtoReadGood_HandledCorrectly(t *testing.T) {
 	var req = RequestFromURL(CARD_NEXT_URL)
 	nextCardRequest := pbuf.NextCardRequest{CardSetId: []byte{0, 1, 2}}
 	nextCard := pbuf.Card{Title: "TestCard"}
-	testHistory := pbuf.UserHistory{PlayIndex: 123}
 	cs.NextCard = nextCard
 	pio.NextCardReturn = nextCardRequest
+	testHistory := pbuf.UserHistory{PlayIndex: 123}
 	um.GetHistoryReturn = testHistory
 	handler.Handle(nil, req, pbuf.User{})
 
@@ -245,5 +245,93 @@ func Test_CardHandler_ReportNext_ProtoIO_ErrorWritten(t *testing.T) {
 	}
 	if um.TotalCalls() != 0 {
 		t.Error("User managment should not be called. Times called:", um.TotalCalls)
+	}
+}
+
+func Test_CardHandler_ReportNext_HandledCorrectly(t *testing.T) {
+	var handler, pio, cs, um = getMockedHandler()
+	var req = RequestFromURL(CARD_NEXT_URL)
+	nextCardRequest := pbuf.NextCardRequest{CardSetId: []byte{0, 1, 2}}
+	nextCard := pbuf.Card{Title: "TestCard"}
+	cs.NextCard = nextCard
+	pio.NextCardReturn = nextCardRequest
+	testHistory := pbuf.UserHistory{PlayIndex: 123}
+	um.GetHistoryReturn = testHistory
+	handler.Handle(nil, req, pbuf.User{})
+
+	if len(pio.MessageWrites) != 1 {
+		t.Fatal("There should be one write to proto io, got:", len(pio.MessageWrites))
+	}
+
+	if pio.MessageWrites[0].String() != nextCard.String() {
+		t.Error("Next card should have been written to proto io",
+			"Expected:", nextCard.String(),
+			"Got:", pio.MessageWrites[0].String())
+	}
+
+	if len(cs.UserHistories) != 1 {
+		t.Fatal("Card selection should be run once. Times run:", len(cs.UserHistories))
+	}
+
+	if cs.UserHistories[0].PlayIndex != testHistory.PlayIndex {
+		t.Error("Wrong history passed to card selection",
+			"Expected:", testHistory,
+			"Got:", cs.UserHistories[0])
+		t.Error("Card selection should not be run. Times run:", len(cs.UserHistories))
+	}
+
+	if um.TotalCalls() != 1 {
+		t.Fatal("User managment should be called once. Times called:", um.TotalCalls)
+	}
+
+	if !CompareByteSlices(um.GetHistoryCardSetIds[0], nextCardRequest.CardSetId) {
+		t.Error("Wrong card set Id passed to GetHistory",
+			"Expected:", um.GetHistoryCardSetIds[0],
+			"Got:", nextCardRequest.CardSetId)
+	}
+}
+
+func Test_CardHandler_ReportNext_WithUpdateError_ErrorSilent(t *testing.T) {
+	var handler, pio, cs, um = getMockedHandler()
+	var req = RequestFromURL(CARD_NEXT_URL)
+	nextCardRequest := pbuf.NextCardRequest{CardSetId: []byte{0, 1, 2}}
+	nextCard := pbuf.Card{Title: "TestCard"}
+	cs.NextCard = nextCard
+	pio.NextCardReturn = nextCardRequest
+	testHistory := pbuf.UserHistory{PlayIndex: 123}
+	um.GetHistoryReturn = testHistory
+	um.UpdateHistoryReturn = errors.New("")
+
+	handler.Handle(nil, req, pbuf.User{})
+
+	if len(pio.MessageWrites) != 1 {
+		t.Fatal("There should be one write to proto io, got:", len(pio.MessageWrites))
+	}
+
+	if pio.MessageWrites[0].String() != nextCard.String() {
+		t.Error("Next card should have been written to proto io",
+			"Expected:", nextCard.String(),
+			"Got:", pio.MessageWrites[0].String())
+	}
+
+	if len(cs.UserHistories) != 1 {
+		t.Fatal("Card selection should be run once. Times run:", len(cs.UserHistories))
+	}
+
+	if cs.UserHistories[0].PlayIndex != testHistory.PlayIndex {
+		t.Error("Wrong history passed to card selection",
+			"Expected:", testHistory,
+			"Got:", cs.UserHistories[0])
+		t.Error("Card selection should not be run. Times run:", len(cs.UserHistories))
+	}
+
+	if um.TotalCalls() != 1 {
+		t.Fatal("User managment should be called once. Times called:", um.TotalCalls)
+	}
+
+	if !CompareByteSlices(um.GetHistoryCardSetIds[0], nextCardRequest.CardSetId) {
+		t.Error("Wrong card set Id passed to GetHistory",
+			"Expected:", um.GetHistoryCardSetIds[0],
+			"Got:", nextCardRequest.CardSetId)
 	}
 }

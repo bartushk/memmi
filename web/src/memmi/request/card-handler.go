@@ -64,10 +64,16 @@ func (handler *CardRequestHandler) handleReport(w http.ResponseWriter, r *http.R
 }
 
 func (handler *CardRequestHandler) handleReportNext(w http.ResponseWriter, r *http.Request, user pbuf.User) bool {
-	_, csErr := handler.Pio.ReadReportAndNext(r)
+	reportAndNext, csErr := handler.Pio.ReadReportAndNext(r)
 	if csErr != nil {
 		handler.Pio.WriteProtoResponse(w, BODY_READ_ERROR)
 		return true
 	}
+	handler.UserMan.UpdateHistory(user, reportAndNext.Report.CardSetId, *reportAndNext.Report.Update)
+
+	history := handler.UserMan.GetHistory(user, reportAndNext.NextRequest.CardSetId)
+	nextCard := handler.CardSel.SelectCard(&history, reportAndNext.NextRequest.PreviousCardId)
+	handler.Pio.WriteProtoResponse(w, &nextCard)
+
 	return false
 }
