@@ -1,6 +1,7 @@
 package request
 
 import (
+	"errors"
 	"memmi/card"
 	"memmi/pbuf"
 	"testing"
@@ -48,4 +49,28 @@ func Test_CardSetHandler_AnyDifferentPrefix_ShouldNotHandle(t *testing.T) {
 	if handler.ShouldHandle(req, pbuf.User{}, false) {
 		t.Error("Handler should not handle with URL:", test_url)
 	}
+}
+
+func Test_CardSetHandler_GetCardSet_ProtoIOReadError_WriteError(t *testing.T) {
+	var handler, pio, cm = getCardSetMocked()
+	var req = RequestFromURL(GET_CARDSET_URL)
+	testUser := pbuf.User{}
+	pio.CardSetError = errors.New("")
+
+	handler.Handle(nil, req, testUser)
+
+	if len(pio.MessageWrites) != 1 {
+		t.Fatal("There should be one write to proto io, got:", len(pio.MessageWrites))
+	}
+
+	if pio.MessageWrites[0] != BODY_READ_ERROR {
+		t.Error("Wrong error type written to proto io.",
+			"Expected:", BODY_READ_ERROR,
+			"Got:", pio.MessageWrites[0])
+	}
+
+	if cm.TotalCalls() != 0 {
+		t.Error("Expected total calls to card management to be zero. Got: ", cm.TotalCalls())
+	}
+
 }
