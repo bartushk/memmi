@@ -1,8 +1,9 @@
 package request
 
 import (
+	"bytes"
+	"io/ioutil"
 	"net/http"
-	"net/url"
 )
 
 func CompareByteSlices(first []byte, second []byte) bool {
@@ -18,9 +19,29 @@ func CompareByteSlices(first []byte, second []byte) bool {
 }
 
 func RequestFromURL(url_string string) *http.Request {
-	test_url := &url.URL{}
-	test_request := &http.Request{}
-	test_url.Path = url_string
-	test_request.URL = test_url
-	return test_request
+	req, _ := http.NewRequest(http.MethodPost, url_string, nil)
+	req.Body = ioutil.NopCloser(bytes.NewReader([]byte{}))
+	return req
+}
+
+type MockResponseWriter struct {
+	ReturnHeader      http.Header
+	WriteHeaderInputs []int
+
+	WriteReturn int
+	WriteError  error
+	WriteInputs [][]byte
+}
+
+func (writer *MockResponseWriter) Header() http.Header {
+	return writer.ReturnHeader
+}
+
+func (writer *MockResponseWriter) Write(toWrite []byte) (int, error) {
+	writer.WriteInputs = append(writer.WriteInputs, toWrite)
+	return writer.WriteReturn, writer.WriteError
+}
+
+func (writer *MockResponseWriter) WriteHeader(toWrite int) {
+	writer.WriteHeaderInputs = append(writer.WriteHeaderInputs, toWrite)
 }
