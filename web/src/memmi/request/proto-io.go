@@ -2,7 +2,6 @@ package request
 
 import (
 	"errors"
-	"fmt"
 	"github.com/golang/protobuf/proto"
 	"io/ioutil"
 	"memmi/pbuf"
@@ -83,6 +82,5 @@ func (io *ProtoIoImpl) ReadCardRequest(r *http.Request) (pbuf.CardRequest, error
 		return retCardRequest, readErr
 	}
 	marshalError := proto.Unmarshal(data, &retCardRequest)
-	fmt.Println(marshalError)
 	return retCardRequest, marshalError
 }
