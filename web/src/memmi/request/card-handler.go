@@ -16,6 +16,7 @@ const CARD_REPORT_NEXT_URL = CARD_API_URL + "/report-get-next"
 type CardRequestHandler struct {
 	Pio     ProtoIO
 	CardSel card.CardSelection
+	CardMan card.CardManagement
 	UserMan user.UserManagement
 }
 
@@ -43,7 +44,8 @@ func (handler *CardRequestHandler) handleNext(w http.ResponseWriter, r *http.Req
 		return true
 	}
 	history := handler.UserMan.GetHistory(user, nextRequest.CardSetId)
-	nextCard := handler.CardSel.SelectCard(&history, nextRequest.PreviousCardId)
+	nextCardId := handler.CardSel.SelectCard(&history, nextRequest.PreviousCardId)
+	nextCard := handler.CardMan.GetCardById(nextCardId)
 	handler.Pio.WriteProtoResponse(w, &nextCard)
 	return true
 }
@@ -72,8 +74,8 @@ func (handler *CardRequestHandler) handleReportNext(w http.ResponseWriter, r *ht
 	handler.UserMan.UpdateHistory(user, reportAndNext.Report.CardSetId, *reportAndNext.Report.Update)
 
 	history := handler.UserMan.GetHistory(user, reportAndNext.NextRequest.CardSetId)
-	nextCard := handler.CardSel.SelectCard(&history, reportAndNext.NextRequest.PreviousCardId)
+	nextCardId := handler.CardSel.SelectCard(&history, reportAndNext.NextRequest.PreviousCardId)
+	nextCard := handler.CardMan.GetCardById(nextCardId)
 	handler.Pio.WriteProtoResponse(w, &nextCard)
-
 	return false
 }

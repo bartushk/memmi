@@ -7,7 +7,6 @@ import (
 )
 
 type Factory interface {
-	GetProtoIO() request.ProtoIO
 	GetRouter() request.Router
 	GetCardManagment() card.CardManagement
 	GetCardSelection() card.CardSelection
