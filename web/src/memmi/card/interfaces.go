@@ -11,4 +11,6 @@ type CardSelection interface {
 type CardManagement interface {
 	GetCardSetById(id []byte) pbuf.CardSet
 	GetCardById(id []byte) pbuf.Card
+	SaveCardSet(*pbuf.CardSet) ([]byte, error)
+	SaveCard(*pbuf.Card) ([]byte, error)
 }
