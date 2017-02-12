@@ -6,6 +6,10 @@ import (
 	"memmi/pbuf"
 )
 
+func (manager *InMemoryCardManagement) getKey(id []byte) string {
+	return fmt.Sprintf("%x", id)
+}
+
 func NewInMemoryManagement() *InMemoryCardManagement {
 	newVal := &InMemoryCardManagement{
 		cardSets: make(map[string]pbuf.CardSet),
@@ -20,12 +24,12 @@ type InMemoryCardManagement struct {
 }
 
 func (manager *InMemoryCardManagement) GetCardSetById(id []byte) pbuf.CardSet {
-	key := fmt.Sprintf("%x", id)
+	key := manager.getKey(id)
 	return manager.cardSets[key]
 }
 
 func (manager *InMemoryCardManagement) GetCardById(id []byte) pbuf.Card {
-	key := fmt.Sprintf("%x", id)
+	key := manager.getKey(id)
 	return manager.cards[key]
 }
 
