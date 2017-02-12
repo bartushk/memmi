@@ -5,11 +5,11 @@ import (
 )
 
 type MockCardManagement struct {
-	GetCardSetIds [][]byte
-	GetCardIds    [][]byte
+	GetCardIds [][]byte
+	ReturnCard pbuf.Card
 
+	GetCardSetIds [][]byte
 	ReturnCardSet pbuf.CardSet
-	ReturnCard    pbuf.Card
 
 	SavedCardSets    []pbuf.CardSet
 	SaveCardSetError error
@@ -18,6 +18,12 @@ type MockCardManagement struct {
 	SavedCards    []pbuf.Card
 	SaveCardError error
 	SaveCardId    []byte
+
+	DeleteCardSetIds   [][]byte
+	DeleteCardSetError error
+
+	DeleteCardIds   [][]byte
+	DeleteCardError error
 }
 
 func (manager *MockCardManagement) GetCardSetById(id []byte) pbuf.CardSet {
@@ -42,4 +48,14 @@ func (manager *MockCardManagement) SaveCardSet(set *pbuf.CardSet) ([]byte, error
 func (manager *MockCardManagement) SaveCard(card *pbuf.Card) ([]byte, error) {
 	manager.SavedCards = append(manager.SavedCards, *card)
 	return manager.SaveCardId, manager.SaveCardError
+}
+
+func (manager *MockCardManagement) DeleteCardSet(id []byte) error {
+	manager.DeleteCardSetIds = append(manager.DeleteCardSetIds, id)
+	return manager.DeleteCardSetError
+}
+
+func (manager *MockCardManagement) DeleteCard(id []byte) error {
+	manager.DeleteCardIds = append(manager.DeleteCardIds, id)
+	return manager.DeleteCardError
 }

@@ -13,4 +13,6 @@ type CardManagement interface {
 	GetCardById(id []byte) pbuf.Card
 	SaveCardSet(*pbuf.CardSet) ([]byte, error)
 	SaveCard(*pbuf.Card) ([]byte, error)
+	DeleteCardSet(id []byte) error
+	DeleteCard(id []byte) error
 }
