@@ -5,6 +5,10 @@ import (
 	"memmi/pbuf"
 )
 
+func NewRandomCardSelection() RandomCardSelection {
+	return RandomCardSelection{src: rand.NewSource(0)}
+}
+
 type RandomCardSelection struct {
 	src rand.Source
 }
