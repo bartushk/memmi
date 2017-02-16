@@ -53,8 +53,9 @@ message UserHistory {
   bytes userId = 1;
   bytes cardSetId = 2;
   int32 playIndex = 3;
-  bool isEmpty = 4;
-  repeated CardHistory history = 5;
+  int32 setVersion = 4;
+  bool isEmpty = 5;
+  repeated CardHistory history = 6;
 }
 
 message CardHistory {

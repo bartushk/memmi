@@ -13,6 +13,10 @@ type MockUserManagement struct {
 	AuthInfoUserNames []string
 	AuthInfoIds       [][]byte
 
+	GetUserReturn    pbuf.User
+	GetUserUserNames []string
+	GetUserIds       [][]byte
+
 	UpdateHistoryUsers       []pbuf.User
 	UpdateHistoryCardSetIds  [][]byte
 	UpdateHistoryCardUpdates []pbuf.CardUpdate
@@ -42,6 +46,16 @@ func (management *MockUserManagement) GetAuthInfoById(userId []byte) pbuf.UserAu
 	return management.AuthInfoReturn
 }
 
+func (management *MockUserManagement) GetUserByUserName(userName string) pbuf.User {
+	management.GetUserUserNames = append(management.GetUserUserNames, userName)
+	return management.GetUserReturn
+}
+
+func (management *MockUserManagement) GetUserById(userId []byte) pbuf.User {
+	management.GetUserIds = append(management.GetUserIds, userId)
+	return management.GetUserReturn
+}
+
 func (management *MockUserManagement) UpdateHistory(user pbuf.User, cardSetId []byte, update pbuf.CardUpdate) error {
 	management.UpdateHistoryUsers = append(management.UpdateHistoryUsers, user)
 	management.UpdateHistoryCardSetIds = append(management.UpdateHistoryCardSetIds, cardSetId)
@@ -65,6 +79,8 @@ func (management *MockUserManagement) TotalCalls() int {
 		len(management.AuthInfoUserNames) +
 		len(management.AuthInfoIds) +
 		len(management.AddUserUsers) +
+		len(management.GetUserIds) +
+		len(management.GetUserUserNames) +
 		len(management.DeleteUserIds) +
 		len(management.GetHistoryUsers)
 }
