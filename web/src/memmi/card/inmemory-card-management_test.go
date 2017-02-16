@@ -78,17 +78,17 @@ func Test_InMemoryCardManagement_GetCardById_GoodKey_CardReturned(t *testing.T) 
 	}
 }
 
-func Test_InMemoryCardManagement_DeleteCardSetById_BadKey_ErrorReturned(t *testing.T) {
+func Test_InMemoryCardManagement_DeleteCardSet_BadKey_ErrorReturned(t *testing.T) {
 	newMan := NewInMemoryManagement()
 
-	result := newMan.DeleteCardSetById([]byte{1, 4, 6})
+	result := newMan.DeleteCardSet([]byte{1, 4, 6})
 
 	if result == nil {
 		t.Error("Error was not returned, it should have been.")
 	}
 }
 
-func Test_InMemoryCardManagement_DeleteCardSetById_GoodKey_CardSetRemoved(t *testing.T) {
+func Test_InMemoryCardManagement_DeleteCardSet_GoodKey_CardSetRemoved(t *testing.T) {
 	newMan := NewInMemoryManagement()
 	testId := []byte{1, 2, 3}
 	testCardSet := pbuf.CardSet{
@@ -99,7 +99,7 @@ func Test_InMemoryCardManagement_DeleteCardSetById_GoodKey_CardSetRemoved(t *tes
 	blankSet := pbuf.CardSet{}
 	newMan.cardSets[newMan.getKey(testId)] = testCardSet
 
-	result := newMan.DeleteCardSetById(testId)
+	result := newMan.DeleteCardSet(testId)
 	mapResult := newMan.cardSets[newMan.getKey(testId)]
 
 	if result != nil {
@@ -109,6 +109,41 @@ func Test_InMemoryCardManagement_DeleteCardSetById_GoodKey_CardSetRemoved(t *tes
 	if !proto.Equal(&mapResult, &blankSet) {
 		t.Error("Wrong result returned",
 			"Expected:", blankSet,
+			"Got:", mapResult)
+	}
+}
+
+func Test_InMemoryCardManagement_DeleteCard_BadKey_ErrorReturned(t *testing.T) {
+	newMan := NewInMemoryManagement()
+
+	result := newMan.DeleteCard([]byte{1, 4, 6})
+
+	if result == nil {
+		t.Error("Error was not returned, it should have been.")
+	}
+}
+
+func Test_InMemoryCardManagement_DeleteCard_GoodKey_CardRemoved(t *testing.T) {
+	newMan := NewInMemoryManagement()
+	testId := []byte{1, 2, 3}
+	testCard := pbuf.Card{
+		Id:    testId,
+		Title: "Hello World!",
+	}
+
+	blankCard := pbuf.Card{}
+	newMan.cards[newMan.getKey(testId)] = testCard
+
+	result := newMan.DeleteCard(testId)
+	mapResult := newMan.cards[newMan.getKey(testId)]
+
+	if result != nil {
+		t.Error("No error should have been returned by delete operation.")
+	}
+
+	if !proto.Equal(&mapResult, &blankCard) {
+		t.Error("Wrong result returned",
+			"Expected:", blankCard,
 			"Got:", mapResult)
 	}
 }

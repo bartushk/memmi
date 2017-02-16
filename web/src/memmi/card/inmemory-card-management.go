@@ -42,7 +42,7 @@ func (manager *InMemoryCardManagement) GetCardById(id []byte) pbuf.Card {
 	return manager.cards[key]
 }
 
-func (manager *InMemoryCardManagement) DeleteCardSetById(id []byte) error {
+func (manager *InMemoryCardManagement) DeleteCardSet(id []byte) error {
 	key := fmt.Sprintf("%x", id)
 	_, ok := manager.cardSets[key]
 	if !ok {
@@ -52,13 +52,13 @@ func (manager *InMemoryCardManagement) DeleteCardSetById(id []byte) error {
 	return nil
 }
 
-func (manager *InMemoryCardManagement) DeleteCardById(id []byte) error {
+func (manager *InMemoryCardManagement) DeleteCard(id []byte) error {
 	key := fmt.Sprintf("%x", id)
 	_, ok := manager.cards[key]
 	if !ok {
 		return errors.New("Card with that ID does not exist and could not be deleted.")
 	}
-	delete(manager.cardSets, key)
+	delete(manager.cards, key)
 	return nil
 }
 
