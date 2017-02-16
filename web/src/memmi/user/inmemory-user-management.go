@@ -9,13 +9,24 @@ import (
 	"reflect"
 )
 
+func NewInMemoryManagement() *InMemoryUserManagement {
+	newMan := &InMemoryUserManagement{
+		userIds:       make(map[string][]byte),
+		authInfo:      make(map[string]pbuf.UserAuthInfo),
+		users:         make(map[string]pbuf.User),
+		userHistories: make(map[string]pbuf.UserHistory),
+		CardMan:       card.NewInMemoryManagement(),
+	}
+	return newMan
+}
+
 type InMemoryUserManagement struct {
 	userIds       map[string][]byte
 	authInfo      map[string]pbuf.UserAuthInfo
 	users         map[string]pbuf.User
 	userHistories map[string]pbuf.UserHistory
 	userCounter   uint32
-	cardMan       card.CardManagement
+	CardMan       card.CardManagement
 }
 
 func (manager *InMemoryUserManagement) getKey(id []byte) string {
@@ -32,7 +43,7 @@ func (manager *InMemoryUserManagement) GetHistory(user pbuf.User, cardSetId []by
 	fullId := append(user.Id, cardSetId...)
 	key := manager.getKey(fullId)
 	savedHistory, ok := manager.userHistories[key]
-	set := manager.cardMan.GetCardSetById(cardSetId)
+	set := manager.CardMan.GetCardSetById(cardSetId)
 	// If not okay, generate a new blank set for this user
 	if !ok {
 		newHistory := card.GenerateEmptyHistory(&set)
