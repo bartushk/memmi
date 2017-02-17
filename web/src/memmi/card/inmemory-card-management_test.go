@@ -23,10 +23,14 @@ func Test_InMemoryCardManagement_GetCardSetById_NoKey_BlankReturned(t *testing.T
 	testId := []byte{1, 2, 3}
 	blankSet := pbuf.CardSet{}
 
-	result := newMan.GetCardSetById(testId)
+	result, err := newMan.GetCardSetById(testId)
 
 	if !proto.Equal(&result, &blankSet) {
 		t.Error("Empty CardSet was not returned when no key is present.")
+	}
+
+	if err == nil {
+		t.Error("Error should have been returned.")
 	}
 }
 
@@ -39,12 +43,16 @@ func Test_InMemoryCardManagement_GetCardSetById_GoodKey_CardReturned(t *testing.
 	}
 	newMan.cardSets[newMan.getKey(testId)] = testCardSet
 
-	result := newMan.GetCardSetById(testId)
+	result, err := newMan.GetCardSetById(testId)
 
 	if !proto.Equal(&result, &testCardSet) {
 		t.Error("Wrong result returned",
 			"Expected:", testCardSet,
 			"Got:", result)
+	}
+
+	if err != nil {
+		t.Error("Error should have been returned:", err)
 	}
 }
 
@@ -53,10 +61,14 @@ func Test_InMemoryCardManagement_GetCardById_NoKey_BlankReturned(t *testing.T) {
 	testId := []byte{1, 2, 3}
 	blankCard := pbuf.Card{}
 
-	result := newMan.GetCardById(testId)
+	result, err := newMan.GetCardById(testId)
 
 	if !proto.Equal(&result, &blankCard) {
 		t.Error("Empty Card was not returned when no key is present.")
+	}
+
+	if err == nil {
+		t.Error("Error should have been returned.")
 	}
 }
 
@@ -69,12 +81,16 @@ func Test_InMemoryCardManagement_GetCardById_GoodKey_CardReturned(t *testing.T) 
 	}
 	newMan.cards[newMan.getKey(testId)] = testCard
 
-	result := newMan.GetCardById(testId)
+	result, err := newMan.GetCardById(testId)
 
 	if !proto.Equal(&result, &testCard) {
 		t.Error("Wrong result returned",
 			"Expected:", testCard,
 			"Got:", result)
+	}
+
+	if err != nil {
+		t.Error("Error should have been returned:", err)
 	}
 }
 

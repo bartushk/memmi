@@ -45,7 +45,8 @@ func (handler *CardRequestHandler) handleNext(w http.ResponseWriter, r *http.Req
 	}
 	history := handler.UserMan.GetHistory(user, nextRequest.CardSetId)
 	nextCardId := handler.CardSel.SelectCard(&history, nextRequest.PreviousCardId)
-	nextCard := handler.CardMan.GetCardById(nextCardId)
+	// TODO: Handle card management errors
+	nextCard, _ := handler.CardMan.GetCardById(nextCardId)
 	handler.Pio.WriteProtoResponse(w, &nextCard)
 	return true
 }
@@ -75,7 +76,8 @@ func (handler *CardRequestHandler) handleReportNext(w http.ResponseWriter, r *ht
 
 	history := handler.UserMan.GetHistory(user, reportAndNext.NextRequest.CardSetId)
 	nextCardId := handler.CardSel.SelectCard(&history, reportAndNext.NextRequest.PreviousCardId)
-	nextCard := handler.CardMan.GetCardById(nextCardId)
+	// TODO: Handle card management errors
+	nextCard, _ := handler.CardMan.GetCardById(nextCardId)
 	handler.Pio.WriteProtoResponse(w, &nextCard)
 	return false
 }

@@ -5,11 +5,13 @@ import (
 )
 
 type MockCardManagement struct {
-	GetCardIds [][]byte
-	ReturnCard pbuf.Card
+	GetCardIds   [][]byte
+	GetCardError error
+	ReturnCard   pbuf.Card
 
-	GetCardSetIds [][]byte
-	ReturnCardSet pbuf.CardSet
+	GetCardSetIds   [][]byte
+	GetCardSetError error
+	ReturnCardSet   pbuf.CardSet
 
 	SavedCardSets    []pbuf.CardSet
 	SaveCardSetError error
@@ -26,14 +28,14 @@ type MockCardManagement struct {
 	DeleteCardError error
 }
 
-func (manager *MockCardManagement) GetCardSetById(id []byte) pbuf.CardSet {
+func (manager *MockCardManagement) GetCardSetById(id []byte) (pbuf.CardSet, error) {
 	manager.GetCardSetIds = append(manager.GetCardSetIds, id)
-	return manager.ReturnCardSet
+	return manager.ReturnCardSet, manager.GetCardSetError
 }
 
-func (manager *MockCardManagement) GetCardById(id []byte) pbuf.Card {
+func (manager *MockCardManagement) GetCardById(id []byte) (pbuf.Card, error) {
 	manager.GetCardIds = append(manager.GetCardIds, id)
-	return manager.ReturnCard
+	return manager.ReturnCard, manager.GetCardError
 }
 
 func (manager *MockCardManagement) TotalCalls() int {

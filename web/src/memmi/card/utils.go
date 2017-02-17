@@ -12,7 +12,6 @@ func GenerateEmptyHistory(cardSet *pbuf.CardSet) pbuf.UserHistory {
 		UserId:    []byte{},
 		CardSetId: cardSet.Id,
 		PlayIndex: 0,
-		IsEmpty:   len(cardSet.CardIds) > 0,
 		History:   []*pbuf.CardHistory{},
 	}
 	for i, cardId := range cardSet.CardIds {

@@ -32,14 +32,22 @@ type InMemoryCardManagement struct {
 	cardSetCounter uint32
 }
 
-func (manager *InMemoryCardManagement) GetCardSetById(id []byte) pbuf.CardSet {
+func (manager *InMemoryCardManagement) GetCardSetById(id []byte) (pbuf.CardSet, error) {
 	key := manager.getKey(id)
-	return manager.cardSets[key]
+	cardSet, ok := manager.cardSets[key]
+	if !ok {
+		return pbuf.CardSet{}, errors.New("Card set not found.")
+	}
+	return cardSet, nil
 }
 
-func (manager *InMemoryCardManagement) GetCardById(id []byte) pbuf.Card {
+func (manager *InMemoryCardManagement) GetCardById(id []byte) (pbuf.Card, error) {
 	key := manager.getKey(id)
-	return manager.cards[key]
+	card, ok := manager.cards[key]
+	if !ok {
+		return pbuf.Card{}, errors.New("Card not found.")
+	}
+	return card, nil
 }
 
 func (manager *InMemoryCardManagement) DeleteCardSet(id []byte) error {

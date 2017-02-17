@@ -4,6 +4,7 @@ import (
 	"memmi/pbuf"
 )
 
+//TODO: Make these return errors properly.
 type UserManagement interface {
 	GetHistory(user pbuf.User, cardSetId []byte) pbuf.UserHistory
 	GetAuthInfoByUserName(userName string) pbuf.UserAuthInfo

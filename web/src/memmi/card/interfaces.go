@@ -9,8 +9,8 @@ type CardSelection interface {
 }
 
 type CardManagement interface {
-	GetCardSetById(id []byte) pbuf.CardSet
-	GetCardById(id []byte) pbuf.Card
+	GetCardSetById(id []byte) (pbuf.CardSet, error)
+	GetCardById(id []byte) (pbuf.Card, error)
 	SaveCardSet(*pbuf.CardSet) ([]byte, error)
 	SaveCard(*pbuf.Card) ([]byte, error)
 	DeleteCardSet(id []byte) error

@@ -38,7 +38,7 @@ func (handler *CardSetRequestHandler) handleCardSet(w http.ResponseWriter, r *ht
 		handler.Pio.WriteProtoResponse(w, BODY_READ_ERROR)
 		return true
 	}
-	var cardSet = handler.CardMan.GetCardSetById(cardSetRequest.Id)
+	cardSet, _ := handler.CardMan.GetCardSetById(cardSetRequest.Id)
 	handler.Pio.WriteProtoResponse(w, &cardSet)
 	return true
 }
@@ -49,7 +49,7 @@ func (handler *CardSetRequestHandler) handleCard(w http.ResponseWriter, r *http.
 		handler.Pio.WriteProtoResponse(w, BODY_READ_ERROR)
 		return true
 	}
-	var card = handler.CardMan.GetCardById(cardRequest.Id)
+	card, _ := handler.CardMan.GetCardById(cardRequest.Id)
 	handler.Pio.WriteProtoResponse(w, &card)
 	return true
 }

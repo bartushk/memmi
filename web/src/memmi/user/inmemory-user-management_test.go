@@ -1,6 +1,8 @@
 package user
 
 import (
+	"github.com/golang/protobuf/proto"
+	"memmi/pbuf"
 	"testing"
 )
 
@@ -26,4 +28,19 @@ func Test_InMemoryUserManagement_NewInMemoryUserManagement(t *testing.T) {
 	if newMan.CardMan == nil {
 		t.Error("CardMan should be initialized.")
 	}
+}
+
+func Test_InMemoryUserManagement_GetHistory_BadId_ReturnBlank(t *testing.T) {
+	newMan := NewInMemoryManagement()
+	testUser := getTestUser()
+	blank := pbuf.UserHistory{}
+
+	result := newMan.GetHistory(testUser, nil)
+
+	if !proto.Equal(&blank, &result) {
+		t.Error("Wrong history returned.",
+			"Expected:", blank,
+			"Got:", result)
+	}
+
 }

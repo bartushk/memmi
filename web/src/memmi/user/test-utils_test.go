@@ -1,8 +1,28 @@
-package card
+package user
 
 import (
 	"memmi/pbuf"
 )
+
+func getTestUser() pbuf.User {
+	return pbuf.User{
+		Id:              []byte{2, 5, 9},
+		UserName:        "bartushk",
+		FirstName:       "Kyle",
+		LastName:        "Bartush",
+		Email:           "bartushk@gmail.com",
+		IsAuthenticated: false,
+		IsAnon:          false,
+	}
+}
+
+func getFakeAuthInfo() pbuf.UserAuthInfo {
+	return pbuf.UserAuthInfo{
+		UserId:   []byte{2, 5, 9},
+		UserName: "bartushk",
+		PassHash: []byte{3, 4, 6, 11},
+	}
+}
 
 func getTestHistory() pbuf.UserHistory {
 	ret := pbuf.UserHistory{

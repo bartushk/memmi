@@ -43,7 +43,12 @@ func (manager *InMemoryUserManagement) GetHistory(user pbuf.User, cardSetId []by
 	fullId := append(user.Id, cardSetId...)
 	key := manager.getKey(fullId)
 	savedHistory, ok := manager.userHistories[key]
-	set := manager.CardMan.GetCardSetById(cardSetId)
+	set, err := manager.CardMan.GetCardSetById(cardSetId)
+
+	if err != nil {
+		return pbuf.UserHistory{}
+	}
+
 	// If not okay, generate a new blank set for this user
 	if !ok {
 		newHistory := card.GenerateEmptyHistory(&set)
