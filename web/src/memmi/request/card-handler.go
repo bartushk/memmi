@@ -43,7 +43,8 @@ func (handler *CardRequestHandler) handleNext(w http.ResponseWriter, r *http.Req
 		handler.Pio.WriteProtoResponse(w, BODY_READ_ERROR)
 		return true
 	}
-	history := handler.UserMan.GetHistory(user, nextRequest.CardSetId)
+	//TODO: Handle history error
+	history, _ := handler.UserMan.GetHistory(user, nextRequest.CardSetId)
 	nextCardId := handler.CardSel.SelectCard(&history, nextRequest.PreviousCardId)
 	// TODO: Handle card management errors
 	nextCard, _ := handler.CardMan.GetCardById(nextCardId)
@@ -74,7 +75,8 @@ func (handler *CardRequestHandler) handleReportNext(w http.ResponseWriter, r *ht
 	}
 	handler.UserMan.UpdateHistory(user, reportAndNext.Report.CardSetId, *reportAndNext.Report.Update)
 
-	history := handler.UserMan.GetHistory(user, reportAndNext.NextRequest.CardSetId)
+	//TODO: Handle history error
+	history, _ := handler.UserMan.GetHistory(user, reportAndNext.NextRequest.CardSetId)
 	nextCardId := handler.CardSel.SelectCard(&history, reportAndNext.NextRequest.PreviousCardId)
 	// TODO: Handle card management errors
 	nextCard, _ := handler.CardMan.GetCardById(nextCardId)

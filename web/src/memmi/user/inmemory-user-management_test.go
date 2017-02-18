@@ -35,7 +35,7 @@ func Test_InMemoryUserManagement_GetHistory_BadId_ReturnBlank(t *testing.T) {
 	testUser := getTestUser()
 	blank := pbuf.UserHistory{}
 
-	result := newMan.GetHistory(testUser, nil)
+	result, err := newMan.GetHistory(testUser, nil)
 
 	if !proto.Equal(&blank, &result) {
 		t.Error("Wrong history returned.",
@@ -43,4 +43,7 @@ func Test_InMemoryUserManagement_GetHistory_BadId_ReturnBlank(t *testing.T) {
 			"Got:", result)
 	}
 
+	if err == nil {
+		t.Error("An error should have been returned.")
+	}
 }

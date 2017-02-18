@@ -6,14 +6,17 @@ import (
 
 type MockUserManagement struct {
 	GetHistoryReturn     pbuf.UserHistory
+	GetHistoryError      error
 	GetHistoryUsers      []pbuf.User
 	GetHistoryCardSetIds [][]byte
 
 	AuthInfoReturn    pbuf.UserAuthInfo
+	AuthInfoError     error
 	AuthInfoUserNames []string
 	AuthInfoIds       [][]byte
 
 	GetUserReturn    pbuf.User
+	GetUserError     error
 	GetUserUserNames []string
 	GetUserIds       [][]byte
 
@@ -30,30 +33,30 @@ type MockUserManagement struct {
 	DeleteUserReturn error
 }
 
-func (management *MockUserManagement) GetHistory(user pbuf.User, cardSetId []byte) pbuf.UserHistory {
+func (management *MockUserManagement) GetHistory(user pbuf.User, cardSetId []byte) (pbuf.UserHistory, error) {
 	management.GetHistoryUsers = append(management.GetHistoryUsers, user)
 	management.GetHistoryCardSetIds = append(management.GetHistoryCardSetIds, cardSetId)
-	return management.GetHistoryReturn
+	return management.GetHistoryReturn, management.GetHistoryError
 }
 
-func (management *MockUserManagement) GetAuthInfoByUserName(userName string) pbuf.UserAuthInfo {
+func (management *MockUserManagement) GetAuthInfoByUserName(userName string) (pbuf.UserAuthInfo, error) {
 	management.AuthInfoUserNames = append(management.AuthInfoUserNames, userName)
-	return management.AuthInfoReturn
+	return management.AuthInfoReturn, management.AuthInfoError
 }
 
-func (management *MockUserManagement) GetAuthInfoById(userId []byte) pbuf.UserAuthInfo {
+func (management *MockUserManagement) GetAuthInfoById(userId []byte) (pbuf.UserAuthInfo, error) {
 	management.AuthInfoIds = append(management.AuthInfoIds, userId)
-	return management.AuthInfoReturn
+	return management.AuthInfoReturn, management.AuthInfoError
 }
 
-func (management *MockUserManagement) GetUserByUserName(userName string) pbuf.User {
+func (management *MockUserManagement) GetUserByUserName(userName string) (pbuf.User, error) {
 	management.GetUserUserNames = append(management.GetUserUserNames, userName)
-	return management.GetUserReturn
+	return management.GetUserReturn, management.GetUserError
 }
 
-func (management *MockUserManagement) GetUserById(userId []byte) pbuf.User {
+func (management *MockUserManagement) GetUserById(userId []byte) (pbuf.User, error) {
 	management.GetUserIds = append(management.GetUserIds, userId)
-	return management.GetUserReturn
+	return management.GetUserReturn, management.GetUserError
 }
 
 func (management *MockUserManagement) UpdateHistory(user pbuf.User, cardSetId []byte, update pbuf.CardUpdate) error {

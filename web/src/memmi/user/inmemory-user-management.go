@@ -39,51 +39,69 @@ func (manager *InMemoryUserManagement) getId(input uint32) []byte {
 	return hash.Sum(nil)
 }
 
-func (manager *InMemoryUserManagement) GetHistory(user pbuf.User, cardSetId []byte) pbuf.UserHistory {
+func (manager *InMemoryUserManagement) GetHistory(user pbuf.User, cardSetId []byte) (pbuf.UserHistory, error) {
 	fullId := append(user.Id, cardSetId...)
 	key := manager.getKey(fullId)
 	savedHistory, ok := manager.userHistories[key]
 	set, err := manager.CardMan.GetCardSetById(cardSetId)
 
 	if err != nil {
-		return pbuf.UserHistory{}
+		return pbuf.UserHistory{}, err
+	}
+
+	if user.IsAnon {
+		return card.GenerateEmptyHistory(&set), nil
 	}
 
 	// If not okay, generate a new blank set for this user
 	if !ok {
 		newHistory := card.GenerateEmptyHistory(&set)
 		manager.userHistories[key] = newHistory
-		return newHistory
+		return newHistory, nil
 	}
 
 	// Check if the history is the correct version, generate a new one if it isn't
 	if savedHistory.SetVersion != set.Version {
 		updatedHistory := card.GenerateEmptyHistory(&set)
 		manager.userHistories[key] = updatedHistory
-		return updatedHistory
+		return updatedHistory, nil
 	}
 
-	return savedHistory
+	return savedHistory, nil
 }
 
-func (manager *InMemoryUserManagement) GetAuthInfoByUserName(userName string) pbuf.UserAuthInfo {
-	userId := manager.userIds[userName]
+func (manager *InMemoryUserManagement) GetAuthInfoByUserName(userName string) (pbuf.UserAuthInfo, error) {
+	userId, ok := manager.userIds[userName]
+	if !ok {
+		return pbuf.UserAuthInfo{}, errors.New("No auth info found.")
+	}
 	return manager.GetAuthInfoById(userId)
 }
 
-func (manager *InMemoryUserManagement) GetAuthInfoById(userId []byte) pbuf.UserAuthInfo {
+func (manager *InMemoryUserManagement) GetAuthInfoById(userId []byte) (pbuf.UserAuthInfo, error) {
 	key := manager.getKey(userId)
-	return manager.authInfo[key]
+	result, ok := manager.authInfo[key]
+	if !ok {
+		return pbuf.UserAuthInfo{}, errors.New("No auth info found.")
+	}
+	return result, nil
 }
 
-func (manager *InMemoryUserManagement) GetUserByUserName(userName string) pbuf.User {
-	userId := manager.userIds[userName]
+func (manager *InMemoryUserManagement) GetUserByUserName(userName string) (pbuf.User, error) {
+	userId, ok := manager.userIds[userName]
+	if !ok {
+		return pbuf.User{}, errors.New("No user found.")
+	}
 	return manager.GetUserById(userId)
 }
 
-func (manager *InMemoryUserManagement) GetUserById(userId []byte) pbuf.User {
+func (manager *InMemoryUserManagement) GetUserById(userId []byte) (pbuf.User, error) {
 	key := manager.getKey(userId)
-	return manager.users[key]
+	result, ok := manager.users[key]
+	if !ok {
+		return pbuf.User{}, errors.New("No user found.")
+	}
+	return result, nil
 }
 
 func (manager *InMemoryUserManagement) UpdateHistory(user pbuf.User, cardSetId []byte, update pbuf.CardUpdate) error {
