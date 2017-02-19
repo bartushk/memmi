@@ -1,17 +1,15 @@
 package card
 
 import (
+	"github.com/stretchr/testify/mock"
 	"memmi/pbuf"
 )
 
 type MockCardSelection struct {
-	UserHistories   []*pbuf.UserHistory
-	PreviousCardIds []int64
-	NextCard        int64
+	mock.Mock
 }
 
 func (selection *MockCardSelection) SelectCard(history *pbuf.UserHistory, previousCard int64) int64 {
-	selection.UserHistories = append(selection.UserHistories, history)
-	selection.PreviousCardIds = append(selection.PreviousCardIds, previousCard)
-	return selection.NextCard
+	args := selection.Called(history, previousCard)
+	return args.Get(0).(int64)
 }

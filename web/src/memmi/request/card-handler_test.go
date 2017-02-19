@@ -2,6 +2,7 @@ package request
 
 import (
 	"errors"
+	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/mock"
 	"memmi/card"
 	"memmi/pbuf"
@@ -79,22 +80,21 @@ func Test_CardHandler_HandleNext_ProtoReadError_WriteError(t *testing.T) {
 			"Expected:", BODY_READ_ERROR,
 			"Got:", pio.MessageWrites[0])
 	}
-	if len(cs.UserHistories) != 0 {
-		t.Error("Card selection should not be run. Times run:", len(cs.UserHistories))
-	}
 	if um.TotalCalls() != 0 {
 		t.Error("User managment should not be called. Times called:", um.TotalCalls)
 	}
+	cs.AssertNotCalled(t, "SelectCard", mock.Anything)
 	cm.AssertNotCalled(t, "GetCardById", mock.Anything)
 }
 
 func Test_CardHandler_HandleNext_ProtoReadGood_HandledCorrectly(t *testing.T) {
 	var handler, pio, cs, um, cm = getMockedHandler()
 	var req = RequestFromURL(CARD_NEXT_URL)
-	nextCardRequest := pbuf.NextCardRequest{CardSetId: int64(3)}
+	nextCardRequest := pbuf.NextCardRequest{CardSetId: int64(3), PreviousCardId: int64(7)}
 	nextCard := pbuf.Card{Title: "TestCard"}
+	csReturn := int64(3)
 	cm.On("GetCardById", mock.Anything).Return(nextCard, nil)
-	cs.NextCard = int64(3)
+	cs.On("SelectCard", mock.Anything, mock.Anything).Return(csReturn)
 	pio.NextCardReturn = nextCardRequest
 	testHistory := pbuf.UserHistory{PlayIndex: 123}
 	um.GetHistoryReturn = testHistory
@@ -110,17 +110,6 @@ func Test_CardHandler_HandleNext_ProtoReadGood_HandledCorrectly(t *testing.T) {
 			"Got:", pio.MessageWrites[0].String())
 	}
 
-	if len(cs.UserHistories) != 1 {
-		t.Fatal("Card selection should be run once. Times run:", len(cs.UserHistories))
-	}
-
-	if cs.UserHistories[0].PlayIndex != testHistory.PlayIndex {
-		t.Error("Wrong history passed to card selection",
-			"Expected:", testHistory,
-			"Got:", cs.UserHistories[0])
-		t.Error("Card selection should not be run. Times run:", len(cs.UserHistories))
-	}
-
 	if um.TotalCalls() != 1 {
 		t.Fatal("User managment should be called once. Times called:", um.TotalCalls)
 	}
@@ -131,7 +120,10 @@ func Test_CardHandler_HandleNext_ProtoReadGood_HandledCorrectly(t *testing.T) {
 			"Got:", nextCardRequest.CardSetId)
 	}
 
-	cm.AssertCalled(t, "GetCardById", cs.NextCard)
+	cs.AssertCalled(t, "SelectCard", mock.MatchedBy(func(h *pbuf.UserHistory) bool {
+		return proto.Equal(h, &testHistory)
+	}), nextCardRequest.PreviousCardId)
+	cm.AssertCalled(t, "GetCardById", csReturn)
 }
 
 func Test_CardHandler_Report_ProtoReadError_WriteError(t *testing.T) {
@@ -147,13 +139,11 @@ func Test_CardHandler_Report_ProtoReadError_WriteError(t *testing.T) {
 			"Expected:", BODY_READ_ERROR,
 			"Got:", pio.MessageWrites[0])
 	}
-	if len(cs.UserHistories) != 0 {
-		t.Error("Card selection should not be run. Times run:", len(cs.UserHistories))
-	}
 	if um.TotalCalls() != 0 {
 		t.Error("User managment should not be called. Times called:", um.TotalCalls)
 	}
 
+	cs.AssertNotCalled(t, "SelectCard", mock.Anything)
 	cm.AssertNotCalled(t, "GetCardById", mock.Anything)
 }
 
@@ -174,9 +164,6 @@ func Test_CardHandler_Report_UpdateError_WriteError(t *testing.T) {
 			"Expected:", USER_HISTORY_UPDATE_ERROR,
 			"Got:", pio.MessageWrites[0])
 	}
-	if len(cs.UserHistories) != 0 {
-		t.Error("Card selection should not be run. Times run:", len(cs.UserHistories))
-	}
 
 	if um.TotalCalls() != 1 {
 		t.Fatal("User managment should be called once. Times called:", um.TotalCalls)
@@ -194,6 +181,7 @@ func Test_CardHandler_Report_UpdateError_WriteError(t *testing.T) {
 			"Got:", testCardReport.CardSetId)
 	}
 
+	cs.AssertNotCalled(t, "SelectCard", mock.Anything)
 	cm.AssertNotCalled(t, "GetCardById", mock.Anything)
 }
 
@@ -216,10 +204,6 @@ func Test_CardHandler_Report_Success_HandledCorrectly(t *testing.T) {
 			"Got:", pio.MessageWrites[0])
 	}
 
-	if len(cs.UserHistories) != 0 {
-		t.Error("Card selection should not be run. Times run:", len(cs.UserHistories))
-	}
-
 	if um.TotalCalls() != 1 {
 		t.Fatal("User managment should be called once. Times called:", um.TotalCalls)
 	}
@@ -236,6 +220,7 @@ func Test_CardHandler_Report_Success_HandledCorrectly(t *testing.T) {
 			"Got:", testCardReport.CardSetId)
 	}
 
+	cs.AssertNotCalled(t, "SelectCard", mock.Anything)
 	cm.AssertNotCalled(t, "GetCardById", mock.Anything)
 }
 
@@ -252,12 +237,10 @@ func Test_CardHandler_ReportNext_ProtoIO_ErrorWritten(t *testing.T) {
 			"Expected:", BODY_READ_ERROR,
 			"Got:", pio.MessageWrites[0])
 	}
-	if len(cs.UserHistories) != 0 {
-		t.Error("Card selection should not be run. Times run:", len(cs.UserHistories))
-	}
 	if um.TotalCalls() != 0 {
 		t.Error("User managment should not be called. Times called:", um.TotalCalls)
 	}
+	cs.AssertNotCalled(t, "SelectCard", mock.Anything)
 	cm.AssertNotCalled(t, "GetCardById", mock.Anything)
 }
 
@@ -266,8 +249,9 @@ func Test_CardHandler_ReportNext_HandledCorrectly(t *testing.T) {
 	var req = RequestFromURL(CARD_NEXT_URL)
 	nextCardRequest := pbuf.NextCardRequest{CardSetId: int64(3)}
 	nextCard := pbuf.Card{Title: "TestCard"}
+	csReturn := int64(3)
 	cm.On("GetCardById", mock.Anything).Return(nextCard, nil)
-	cs.NextCard = int64(3)
+	cs.On("SelectCard", mock.Anything, mock.Anything).Return(csReturn)
 	pio.NextCardReturn = nextCardRequest
 	testHistory := pbuf.UserHistory{PlayIndex: 123}
 	um.GetHistoryReturn = testHistory
@@ -283,17 +267,6 @@ func Test_CardHandler_ReportNext_HandledCorrectly(t *testing.T) {
 			"Got:", pio.MessageWrites[0].String())
 	}
 
-	if len(cs.UserHistories) != 1 {
-		t.Fatal("Card selection should be run once. Times run:", len(cs.UserHistories))
-	}
-
-	if cs.UserHistories[0].PlayIndex != testHistory.PlayIndex {
-		t.Error("Wrong history passed to card selection",
-			"Expected:", testHistory,
-			"Got:", cs.UserHistories[0])
-		t.Error("Card selection should not be run. Times run:", len(cs.UserHistories))
-	}
-
 	if um.TotalCalls() != 1 {
 		t.Fatal("User managment should be called once. Times called:", um.TotalCalls)
 	}
@@ -304,7 +277,10 @@ func Test_CardHandler_ReportNext_HandledCorrectly(t *testing.T) {
 			"Got:", nextCardRequest.CardSetId)
 	}
 
-	cm.AssertCalled(t, "GetCardById", cs.NextCard)
+	cs.AssertCalled(t, "SelectCard", mock.MatchedBy(func(h *pbuf.UserHistory) bool {
+		return proto.Equal(h, &testHistory)
+	}), nextCardRequest.PreviousCardId)
+	cm.AssertCalled(t, "GetCardById", csReturn)
 }
 
 func Test_CardHandler_ReportNext_WithUpdateError_ErrorSilent(t *testing.T) {
@@ -312,8 +288,9 @@ func Test_CardHandler_ReportNext_WithUpdateError_ErrorSilent(t *testing.T) {
 	var req = RequestFromURL(CARD_NEXT_URL)
 	nextCardRequest := pbuf.NextCardRequest{CardSetId: int64(3)}
 	nextCard := pbuf.Card{Title: "TestCard"}
+	csReturn := int64(3)
 	cm.On("GetCardById", mock.Anything).Return(nextCard, nil)
-	cs.NextCard = int64(3)
+	cs.On("SelectCard", mock.Anything, mock.Anything).Return(csReturn)
 	pio.NextCardReturn = nextCardRequest
 	testHistory := pbuf.UserHistory{PlayIndex: 123}
 	um.GetHistoryReturn = testHistory
@@ -331,17 +308,6 @@ func Test_CardHandler_ReportNext_WithUpdateError_ErrorSilent(t *testing.T) {
 			"Got:", pio.MessageWrites[0].String())
 	}
 
-	if len(cs.UserHistories) != 1 {
-		t.Fatal("Card selection should be run once. Times run:", len(cs.UserHistories))
-	}
-
-	if cs.UserHistories[0].PlayIndex != testHistory.PlayIndex {
-		t.Error("Wrong history passed to card selection",
-			"Expected:", testHistory,
-			"Got:", cs.UserHistories[0])
-		t.Error("Card selection should not be run. Times run:", len(cs.UserHistories))
-	}
-
 	if um.TotalCalls() != 1 {
 		t.Fatal("User managment should be called once. Times called:", um.TotalCalls)
 	}
@@ -352,5 +318,8 @@ func Test_CardHandler_ReportNext_WithUpdateError_ErrorSilent(t *testing.T) {
 			"Got:", nextCardRequest.CardSetId)
 	}
 
-	cm.AssertCalled(t, "GetCardById", cs.NextCard)
+	cs.AssertCalled(t, "SelectCard", mock.MatchedBy(func(h *pbuf.UserHistory) bool {
+		return proto.Equal(h, &testHistory)
+	}), nextCardRequest.PreviousCardId)
+	cm.AssertCalled(t, "GetCardById", csReturn)
 }
