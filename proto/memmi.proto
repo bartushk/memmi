@@ -19,12 +19,13 @@ message User {
   string email = 5;
   bool isAuthenticated = 6;
   bool isAnon = 7;
+  int64 joinedDate = 8;
 }
 
 message CardSet {
   int64 id = 1;
   int32 version = 2;
-  string createdDate = 3;
+  int64 createdDate = 3;
   int64 authorId = 4;
   string setName = 5;
   string title = 6;
@@ -37,6 +38,7 @@ message Card {
   string title = 3;
   CardInfo front = 4;
   CardInfo back = 5;
+  int64 createdDate = 6;
 }
 
 message CardInfo {

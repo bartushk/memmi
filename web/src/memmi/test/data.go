@@ -24,6 +24,10 @@ func GetFakeAuthInfo() pbuf.UserAuthInfo {
 	}
 }
 
+func GetFakeCardSet() pbuf.CardSet {
+	return pbuf.CardSet{}
+}
+
 func GetTestHistory() pbuf.UserHistory {
 	ret := pbuf.UserHistory{
 		UserId:    int64(3),
