@@ -80,9 +80,9 @@ func Test_CardHandler_HandleNext_ProtoReadError_WriteError(t *testing.T) {
 			"Expected:", BODY_READ_ERROR,
 			"Got:", pio.MessageWrites[0])
 	}
-	if um.TotalCalls() != 0 {
-		t.Error("User managment should not be called. Times called:", um.TotalCalls)
-	}
+
+	um.AssertNotCalled(t, "UpdateHistory", mock.Anything)
+	um.AssertNotCalled(t, "GetHistory", mock.Anything)
 	cs.AssertNotCalled(t, "SelectCard", mock.Anything)
 	cm.AssertNotCalled(t, "GetCardById", mock.Anything)
 }
@@ -90,15 +90,18 @@ func Test_CardHandler_HandleNext_ProtoReadError_WriteError(t *testing.T) {
 func Test_CardHandler_HandleNext_ProtoReadGood_HandledCorrectly(t *testing.T) {
 	var handler, pio, cs, um, cm = getMockedHandler()
 	var req = RequestFromURL(CARD_NEXT_URL)
+	testUser := pbuf.User{UserName: "bartushk"}
 	nextCardRequest := pbuf.NextCardRequest{CardSetId: int64(3), PreviousCardId: int64(7)}
 	nextCard := pbuf.Card{Title: "TestCard"}
+	testHistory := pbuf.UserHistory{PlayIndex: 123}
 	csReturn := int64(3)
+
 	cm.On("GetCardById", mock.Anything).Return(nextCard, nil)
 	cs.On("SelectCard", mock.Anything, mock.Anything).Return(csReturn)
+	um.On("GetHistory", mock.Anything, mock.Anything).Return(testHistory, nil)
 	pio.NextCardReturn = nextCardRequest
-	testHistory := pbuf.UserHistory{PlayIndex: 123}
-	um.GetHistoryReturn = testHistory
-	handler.Handle(nil, req, pbuf.User{})
+
+	handler.Handle(nil, req, testUser)
 
 	if len(pio.MessageWrites) != 1 {
 		t.Fatal("There should be one write to proto io, got:", len(pio.MessageWrites))
@@ -110,19 +113,14 @@ func Test_CardHandler_HandleNext_ProtoReadGood_HandledCorrectly(t *testing.T) {
 			"Got:", pio.MessageWrites[0].String())
 	}
 
-	if um.TotalCalls() != 1 {
-		t.Fatal("User managment should be called once. Times called:", um.TotalCalls)
-	}
-
-	if um.GetHistoryCardSetIds[0] != nextCardRequest.CardSetId {
-		t.Error("Wrong card set Id passed to GetHistory",
-			"Expected:", um.GetHistoryCardSetIds[0],
-			"Got:", nextCardRequest.CardSetId)
-	}
+	um.AssertCalled(t, "GetHistory", mock.MatchedBy(func(u pbuf.User) bool {
+		return proto.Equal(&u, &testUser)
+	}), nextCardRequest.CardSetId)
 
 	cs.AssertCalled(t, "SelectCard", mock.MatchedBy(func(h *pbuf.UserHistory) bool {
 		return proto.Equal(h, &testHistory)
 	}), nextCardRequest.PreviousCardId)
+
 	cm.AssertCalled(t, "GetCardById", csReturn)
 }
 
@@ -139,10 +137,9 @@ func Test_CardHandler_Report_ProtoReadError_WriteError(t *testing.T) {
 			"Expected:", BODY_READ_ERROR,
 			"Got:", pio.MessageWrites[0])
 	}
-	if um.TotalCalls() != 0 {
-		t.Error("User managment should not be called. Times called:", um.TotalCalls)
-	}
 
+	um.AssertNotCalled(t, "UpdateHistory", mock.Anything)
+	um.AssertNotCalled(t, "GetHistory", mock.Anything)
 	cs.AssertNotCalled(t, "SelectCard", mock.Anything)
 	cm.AssertNotCalled(t, "GetCardById", mock.Anything)
 }
@@ -151,11 +148,15 @@ func Test_CardHandler_Report_UpdateError_WriteError(t *testing.T) {
 	var handler, pio, cs, um, cm = getMockedHandler()
 	var req = RequestFromURL(CARD_REPORT_URL)
 	testUser := pbuf.User{Id: int64(3)}
+	testUpdate := pbuf.CardUpdate{CardId: int64(3)}
 	testCardReport := pbuf.CardScoreReport{CardSetId: int64(3)}
-	testCardReport.Update = &pbuf.CardUpdate{}
-	um.UpdateHistoryReturn = errors.New("")
+	testCardReport.Update = &testUpdate
 	pio.ReportReturn = testCardReport
+
+	um.On("UpdateHistory", mock.Anything, mock.Anything, mock.Anything).Return(errors.New(""))
+
 	handler.Handle(nil, req, testUser)
+
 	if len(pio.MessageWrites) != 1 {
 		t.Fatal("There should be one write to proto io, got:", len(pio.MessageWrites))
 	}
@@ -165,21 +166,11 @@ func Test_CardHandler_Report_UpdateError_WriteError(t *testing.T) {
 			"Got:", pio.MessageWrites[0])
 	}
 
-	if um.TotalCalls() != 1 {
-		t.Fatal("User managment should be called once. Times called:", um.TotalCalls)
-	}
-
-	if um.UpdateHistoryUsers[0].Id != testUser.Id {
-		t.Error("Wrong user passed to update history.",
-			"Expected:", um.UpdateHistoryUsers[0].Id,
-			"Got:", testUser.Id)
-	}
-
-	if um.UpdateHistoryCardSetIds[0] != testCardReport.CardSetId {
-		t.Error("Wrong user passed to update history.",
-			"Expected:", um.UpdateHistoryCardSetIds[0],
-			"Got:", testCardReport.CardSetId)
-	}
+	um.AssertCalled(t, "UpdateHistory", mock.MatchedBy(func(u pbuf.User) bool {
+		return proto.Equal(&u, &testUser)
+	}), testCardReport.CardSetId, mock.MatchedBy(func(up pbuf.CardUpdate) bool {
+		return proto.Equal(&up, &testUpdate)
+	}))
 
 	cs.AssertNotCalled(t, "SelectCard", mock.Anything)
 	cm.AssertNotCalled(t, "GetCardById", mock.Anything)
@@ -190,9 +181,13 @@ func Test_CardHandler_Report_Success_HandledCorrectly(t *testing.T) {
 	var req = RequestFromURL(CARD_REPORT_URL)
 	expectedResponseWrite := pbuf.UpdateResponse{Status: 1}
 	testUser := pbuf.User{Id: int64(3)}
+	testUpdate := pbuf.CardUpdate{CardId: int64(3)}
 	testCardReport := pbuf.CardScoreReport{CardSetId: int64(3)}
-	testCardReport.Update = &pbuf.CardUpdate{}
+	testCardReport.Update = &testUpdate
 	pio.ReportReturn = testCardReport
+
+	um.On("UpdateHistory", mock.Anything, mock.Anything, mock.Anything).Return(nil)
+
 	handler.Handle(nil, req, testUser)
 	if len(pio.MessageWrites) != 1 {
 		t.Fatal("There should be one write to proto io, got:", len(pio.MessageWrites))
@@ -204,21 +199,11 @@ func Test_CardHandler_Report_Success_HandledCorrectly(t *testing.T) {
 			"Got:", pio.MessageWrites[0])
 	}
 
-	if um.TotalCalls() != 1 {
-		t.Fatal("User managment should be called once. Times called:", um.TotalCalls)
-	}
-
-	if um.UpdateHistoryUsers[0].Id != testUser.Id {
-		t.Error("Wrong user passed to update history.",
-			"Expected:", um.UpdateHistoryUsers[0].Id,
-			"Got:", testUser.Id)
-	}
-
-	if um.UpdateHistoryCardSetIds[0] != testCardReport.CardSetId {
-		t.Error("Wrong user passed to update history.",
-			"Expected:", um.UpdateHistoryCardSetIds[0],
-			"Got:", testCardReport.CardSetId)
-	}
+	um.AssertCalled(t, "UpdateHistory", mock.MatchedBy(func(u pbuf.User) bool {
+		return proto.Equal(&u, &testUser)
+	}), testCardReport.CardSetId, mock.MatchedBy(func(up pbuf.CardUpdate) bool {
+		return proto.Equal(&up, &testUpdate)
+	}))
 
 	cs.AssertNotCalled(t, "SelectCard", mock.Anything)
 	cm.AssertNotCalled(t, "GetCardById", mock.Anything)
@@ -237,25 +222,32 @@ func Test_CardHandler_ReportNext_ProtoIO_ErrorWritten(t *testing.T) {
 			"Expected:", BODY_READ_ERROR,
 			"Got:", pio.MessageWrites[0])
 	}
-	if um.TotalCalls() != 0 {
-		t.Error("User managment should not be called. Times called:", um.TotalCalls)
-	}
+	um.AssertNotCalled(t, "UpdateHistory", mock.Anything)
+	um.AssertNotCalled(t, "GetHistory", mock.Anything)
 	cs.AssertNotCalled(t, "SelectCard", mock.Anything)
 	cm.AssertNotCalled(t, "GetCardById", mock.Anything)
 }
 
 func Test_CardHandler_ReportNext_HandledCorrectly(t *testing.T) {
 	var handler, pio, cs, um, cm = getMockedHandler()
-	var req = RequestFromURL(CARD_NEXT_URL)
-	nextCardRequest := pbuf.NextCardRequest{CardSetId: int64(3)}
+	var req = RequestFromURL(CARD_REPORT_NEXT_URL)
+	testUpdate := pbuf.CardUpdate{CardId: int64(3)}
+	reportAndNext := pbuf.ReportAndNext{
+		NextRequest: &pbuf.NextCardRequest{CardSetId: int64(10), PreviousCardId: int64(18)},
+		Report:      &pbuf.CardScoreReport{CardSetId: int64(10), Update: &testUpdate},
+	}
 	nextCard := pbuf.Card{Title: "TestCard"}
+	testHistory := pbuf.UserHistory{PlayIndex: 123}
+	testUser := pbuf.User{Id: int64(3)}
 	csReturn := int64(3)
+
+	um.On("UpdateHistory", mock.Anything, mock.Anything, mock.Anything).Return(nil)
+	um.On("GetHistory", mock.Anything, mock.Anything).Return(testHistory, nil)
 	cm.On("GetCardById", mock.Anything).Return(nextCard, nil)
 	cs.On("SelectCard", mock.Anything, mock.Anything).Return(csReturn)
-	pio.NextCardReturn = nextCardRequest
-	testHistory := pbuf.UserHistory{PlayIndex: 123}
-	um.GetHistoryReturn = testHistory
-	handler.Handle(nil, req, pbuf.User{})
+	pio.ReportNextReturn = reportAndNext
+
+	handler.Handle(nil, req, testUser)
 
 	if len(pio.MessageWrites) != 1 {
 		t.Fatal("There should be one write to proto io, got:", len(pio.MessageWrites))
@@ -267,36 +259,43 @@ func Test_CardHandler_ReportNext_HandledCorrectly(t *testing.T) {
 			"Got:", pio.MessageWrites[0].String())
 	}
 
-	if um.TotalCalls() != 1 {
-		t.Fatal("User managment should be called once. Times called:", um.TotalCalls)
-	}
+	um.AssertCalled(t, "UpdateHistory", mock.MatchedBy(func(u pbuf.User) bool {
+		return proto.Equal(&u, &testUser)
+	}), reportAndNext.NextRequest.CardSetId, mock.MatchedBy(func(up pbuf.CardUpdate) bool {
+		return proto.Equal(&up, &testUpdate)
+	}))
 
-	if um.GetHistoryCardSetIds[0] != nextCardRequest.CardSetId {
-		t.Error("Wrong card set Id passed to GetHistory",
-			"Expected:", um.GetHistoryCardSetIds[0],
-			"Got:", nextCardRequest.CardSetId)
-	}
+	um.AssertCalled(t, "GetHistory", mock.MatchedBy(func(u pbuf.User) bool {
+		return proto.Equal(&u, &testUser)
+	}), reportAndNext.NextRequest.CardSetId)
 
 	cs.AssertCalled(t, "SelectCard", mock.MatchedBy(func(h *pbuf.UserHistory) bool {
 		return proto.Equal(h, &testHistory)
-	}), nextCardRequest.PreviousCardId)
+	}), reportAndNext.NextRequest.PreviousCardId)
+
 	cm.AssertCalled(t, "GetCardById", csReturn)
 }
 
 func Test_CardHandler_ReportNext_WithUpdateError_ErrorSilent(t *testing.T) {
 	var handler, pio, cs, um, cm = getMockedHandler()
-	var req = RequestFromURL(CARD_NEXT_URL)
-	nextCardRequest := pbuf.NextCardRequest{CardSetId: int64(3)}
+	var req = RequestFromURL(CARD_REPORT_NEXT_URL)
+	testUpdate := pbuf.CardUpdate{CardId: int64(3)}
+	reportAndNext := pbuf.ReportAndNext{
+		NextRequest: &pbuf.NextCardRequest{CardSetId: int64(10), PreviousCardId: int64(18)},
+		Report:      &pbuf.CardScoreReport{CardSetId: int64(10), Update: &testUpdate},
+	}
 	nextCard := pbuf.Card{Title: "TestCard"}
+	testUser := pbuf.User{Id: int64(3)}
+	testHistory := pbuf.UserHistory{PlayIndex: 123}
 	csReturn := int64(3)
+
+	um.On("GetHistory", mock.Anything, mock.Anything).Return(testHistory, nil)
+	um.On("UpdateHistory", mock.Anything, mock.Anything, mock.Anything).Return(errors.New(""))
 	cm.On("GetCardById", mock.Anything).Return(nextCard, nil)
 	cs.On("SelectCard", mock.Anything, mock.Anything).Return(csReturn)
-	pio.NextCardReturn = nextCardRequest
-	testHistory := pbuf.UserHistory{PlayIndex: 123}
-	um.GetHistoryReturn = testHistory
-	um.UpdateHistoryReturn = errors.New("")
+	pio.ReportNextReturn = reportAndNext
 
-	handler.Handle(nil, req, pbuf.User{})
+	handler.Handle(nil, req, testUser)
 
 	if len(pio.MessageWrites) != 1 {
 		t.Fatal("There should be one write to proto io, got:", len(pio.MessageWrites))
@@ -308,18 +307,19 @@ func Test_CardHandler_ReportNext_WithUpdateError_ErrorSilent(t *testing.T) {
 			"Got:", pio.MessageWrites[0].String())
 	}
 
-	if um.TotalCalls() != 1 {
-		t.Fatal("User managment should be called once. Times called:", um.TotalCalls)
-	}
+	um.AssertCalled(t, "UpdateHistory", mock.MatchedBy(func(u pbuf.User) bool {
+		return proto.Equal(&u, &testUser)
+	}), reportAndNext.NextRequest.CardSetId, mock.MatchedBy(func(up pbuf.CardUpdate) bool {
+		return proto.Equal(&up, &testUpdate)
+	}))
 
-	if um.GetHistoryCardSetIds[0] != nextCardRequest.CardSetId {
-		t.Error("Wrong card set Id passed to GetHistory",
-			"Expected:", um.GetHistoryCardSetIds[0],
-			"Got:", nextCardRequest.CardSetId)
-	}
+	um.AssertCalled(t, "GetHistory", mock.MatchedBy(func(u pbuf.User) bool {
+		return proto.Equal(&u, &testUser)
+	}), reportAndNext.NextRequest.CardSetId)
 
 	cs.AssertCalled(t, "SelectCard", mock.MatchedBy(func(h *pbuf.UserHistory) bool {
 		return proto.Equal(h, &testHistory)
-	}), nextCardRequest.PreviousCardId)
+	}), reportAndNext.NextRequest.PreviousCardId)
+
 	cm.AssertCalled(t, "GetCardById", csReturn)
 }
