@@ -1,13 +1,14 @@
 package request
 
 import (
+	"github.com/stretchr/testify/mock"
 	"net/http"
 )
 
 type MockLogger struct {
-	CallRequests []*http.Request
+	mock.Mock
 }
 
 func (logger *MockLogger) Log(r *http.Request) {
-	logger.CallRequests = append(logger.CallRequests, r)
+	logger.Called(r)
 }

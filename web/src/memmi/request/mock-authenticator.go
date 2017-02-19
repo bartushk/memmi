@@ -1,16 +1,16 @@
 package request
 
 import (
+	"github.com/stretchr/testify/mock"
 	"memmi/pbuf"
 	"net/http"
 )
 
 type MockAuthenticator struct {
-	AuthenticatedUser pbuf.User
-	CallRequests      []*http.Request
+	mock.Mock
 }
 
 func (auth *MockAuthenticator) AuthenticateUser(r *http.Request) pbuf.User {
-	auth.CallRequests = append(auth.CallRequests, r)
-	return auth.AuthenticatedUser
+	args := auth.Called(r)
+	return args.Get(0).(pbuf.User)
 }

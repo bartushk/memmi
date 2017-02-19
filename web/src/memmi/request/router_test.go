@@ -1,22 +1,30 @@
 package request
 
 import (
+	"github.com/golang/protobuf/proto"
+	"github.com/stretchr/testify/mock"
+	"memmi/pbuf"
 	"net/http"
 	"testing"
 )
 
-func getMockedRouter(i int) (Router, *MockLogger, []*MockHandler, *MockAuthenticator) {
+func getMockedRouter(i, skip int) (Router, *MockLogger, []*MockHandler, *MockAuthenticator) {
 	var handlers []*MockHandler
-	logger := new(MockLogger)
-	auth := new(MockAuthenticator)
+	logger := &MockLogger{}
+	logger.On("Log", mock.Anything).Return()
+	auth := &MockAuthenticator{}
+	auth.On("AuthenticateUser", mock.Anything).Return(pbuf.User{})
 	router := Router{
 		Logger:        logger,
 		Authenticator: auth,
 	}
 	for k := 0; k < i; k++ {
-		handler := new(MockHandler)
-		handler.Result.Continue = true
-		handler.DoHandle = true
+		handler := &MockHandler{}
+		if k != skip {
+			hRes := HandleResult{Continue: true, ResponseWritten: false}
+			handler.On("Handle", mock.Anything, mock.Anything, mock.Anything).Return(hRes)
+			handler.On("ShouldHandle", mock.Anything, mock.Anything, mock.Anything).Return(true)
+		}
 		handlers = append(handlers, handler)
 		router.AddHandler(handler)
 	}
@@ -32,9 +40,9 @@ func Test_Router_Constructor_NoHandlers(t *testing.T) {
 
 func Test_Router_AddHandler_HandlersAdded(t *testing.T) {
 	router := Router{}
-	h1 := new(MockHandler)
-	h2 := new(MockHandler)
-	h3 := new(MockHandler)
+	h1 := &MockHandler{}
+	h2 := &MockHandler{}
+	h3 := &MockHandler{}
 	router.AddHandler(h1)
 	router.AddHandler(h2)
 	router.AddHandler(h3)
@@ -55,10 +63,10 @@ func Test_Router_AddHandler_HandlersAdded(t *testing.T) {
 	}
 }
 
-func Test_Router_AddHandler_MultipeCopies(t *testing.T) {
+func Test_Router_AddHandler_MultipleCopies(t *testing.T) {
 	router := Router{}
-	h1 := new(MockHandler)
-	h2 := new(MockHandler)
+	h1 := &MockHandler{}
+	h2 := &MockHandler{}
 	router.AddHandler(h1)
 	router.AddHandler(h2)
 	router.AddHandler(h1)
@@ -80,7 +88,7 @@ func Test_Router_AddHandler_MultipeCopies(t *testing.T) {
 }
 
 func Test_Router_HandleFunc_NotNull(t *testing.T) {
-	var r, _, _, _ = getMockedRouter(0)
+	var r, _, _, _ = getMockedRouter(0, -1)
 	var hf = r.GetHandleFunc()
 	if hf == nil {
 		t.Error("Handle func was nil.")
@@ -88,227 +96,190 @@ func Test_Router_HandleFunc_NotNull(t *testing.T) {
 }
 
 func Test_Router_HandleFunc_NoHandlers_LoggerCalled(t *testing.T) {
-	var r, l, _, _ = getMockedRouter(0)
+	var r, l, _, _ = getMockedRouter(0, -1)
 	var hf = r.GetHandleFunc()
 	hf(nil, nil)
-	if len(l.CallRequests) != 1 {
-		t.Error("Logger CallCount expected 1, got", len(l.CallRequests))
-	}
+	l.AssertCalled(t, "Log", mock.Anything)
 }
 
 func Test_Router_HandleFunc_Handlers_LoggerCalled(t *testing.T) {
-	var r, l, _, _ = getMockedRouter(3)
+	var r, l, _, _ = getMockedRouter(3, -1)
 	var hf = r.GetHandleFunc()
 	hf(nil, nil)
 	hf(nil, nil)
-	if len(l.CallRequests) != 2 {
-		t.Error("Logger CallCount expected 2, got", len(l.CallRequests))
-	}
+	l.AssertNumberOfCalls(t, "Log", 2)
 }
 
 func Test_Router_HandleFunc_LoggerCalled_RightRequest(t *testing.T) {
-	var r, l, _, _ = getMockedRouter(3)
+	var r, l, _, _ = getMockedRouter(3, -1)
 	var hf = r.GetHandleFunc()
 	request1 := http.Request{}
 	request2 := http.Request{}
 	hf(nil, &request1)
 	hf(nil, &request2)
-	if l.CallRequests[0] != &request1 {
-		t.Error("Did not pass correct request to logger at first call.")
-	}
-	if l.CallRequests[1] != &request2 {
-		t.Error("Did not pass correct request to logger at second call.")
-	}
+
+	l.AssertNumberOfCalls(t, "Log", 2)
+	l.AssertCalled(t, "Log", &request1)
+	l.AssertCalled(t, "Log", &request2)
 }
 
 func Test_Router_HandleFunc_ShouldGo_AllCalled(t *testing.T) {
-	var r, _, h, _ = getMockedRouter(4)
+	var r, _, h, _ = getMockedRouter(4, -1)
 	var hf = r.GetHandleFunc()
 	hf(nil, nil)
 	hf(nil, nil)
 	hf(nil, nil)
-	for i, handler := range h {
-		if len(handler.HandleRequests) != 3 {
-			t.Error("Logger CallCount expected 3, got", len(handler.HandleRequests),
-				"on handler", i)
-		}
+	for _, handler := range h {
+		handler.AssertNumberOfCalls(t, "Handle", 3)
 	}
 }
 
 func Test_Router_HandleFunc_ShouldNotContinue_LoopBreaks(t *testing.T) {
-	var r, _, h, _ = getMockedRouter(4)
-	h[1].Result.Continue = false
+	var r, _, h, _ = getMockedRouter(4, 1)
+	hRes := HandleResult{Continue: false, ResponseWritten: false}
+	h[1].On("Handle", mock.Anything, mock.Anything, mock.Anything).Return(hRes)
+	h[1].On("ShouldHandle", mock.Anything, mock.Anything, mock.Anything).Return(true)
 	var hf = r.GetHandleFunc()
 	hf(nil, nil)
 	hf(nil, nil)
 	hf(nil, nil)
 
-	for i, handler := range h[:1] {
-		if len(handler.HandleRequests) != 3 {
-			t.Error("Logger CallCount expected 3, got", len(handler.HandleRequests),
-				"on handler", i)
-		}
+	for _, handler := range h[:1] {
+		handler.AssertNumberOfCalls(t, "Handle", 3)
 	}
 
-	for i, handler := range h[2:] {
-		if len(handler.HandleRequests) != 0 {
-			t.Error("Logger CallCount expected 0, got", len(handler.HandleRequests),
-				"on handler", i+2)
-		}
+	for _, handler := range h[2:] {
+		handler.AssertNotCalled(t, "Handle")
 	}
 }
 
 func Test_Router_HandleFunc_ResponseWritten_PassedCorrectly(t *testing.T) {
-	var r, _, h, _ = getMockedRouter(4)
-	h[1].Result.ResponseWritten = true
+	var r, _, h, _ = getMockedRouter(4, 1)
+	hRes := HandleResult{Continue: true, ResponseWritten: true}
+	h[1].On("Handle", mock.Anything, mock.Anything, mock.Anything).Return(hRes)
+	h[1].On("ShouldHandle", mock.Anything, mock.Anything, mock.Anything).Return(true)
 	var hf = r.GetHandleFunc()
 	hf(nil, nil)
 	hf(nil, nil)
 
-	for i, handler := range h[:1] {
-		if handler.ShouldWritten[0] || handler.ShouldWritten[1] {
-			t.Error("Should written should not be true on handler", i)
-		}
+	for _, handler := range h[:1] {
+		handler.AssertCalled(t, "ShouldHandle", mock.Anything, mock.Anything, false)
 	}
 
-	for i, handler := range h[2:] {
-		if !(handler.ShouldWritten[0] && handler.ShouldWritten[1]) {
-			t.Error("Should written should be true on handler", i)
-		}
+	for _, handler := range h[2:] {
+		handler.AssertCalled(t, "ShouldHandle", mock.Anything, mock.Anything, true)
 	}
 }
 
 func Test_Router_HandleFunc_ShouldNotHandle_DoesNotHandle(t *testing.T) {
-	var r, _, h, _ = getMockedRouter(4)
-	h[0].DoHandle = false
+	var r, _, h, _ = getMockedRouter(4, 0)
+	hRes := HandleResult{Continue: true, ResponseWritten: false}
+	h[0].On("Handle", mock.Anything, mock.Anything, mock.Anything).Return(hRes)
+	h[0].On("ShouldHandle", mock.Anything, mock.Anything, mock.Anything).Return(false)
 	var hf = r.GetHandleFunc()
 	hf(nil, nil)
 	hf(nil, nil)
 	hf(nil, nil)
 
-	if len(h[0].HandleRequests) != 0 {
-		t.Error("Logger CallCount expected 0, got", len(h[0].HandleRequests),
-			"on handler 0")
-	}
+	h[0].AssertNumberOfCalls(t, "Handle", 0)
 
-	for i, handler := range h[1:] {
-		if len(handler.HandleRequests) != 3 {
-			t.Error("Logger CallCount expected 3, got", len(handler.HandleRequests),
-				"on handler", i+1)
-		}
+	for _, handler := range h[1:] {
+		handler.AssertNumberOfCalls(t, "Handle", 3)
 	}
 }
 
 func Test_Router_HandleFunc_HandlerReceives_CorrectRequest(t *testing.T) {
-	var r, _, h, _ = getMockedRouter(4)
+	var r, _, h, _ = getMockedRouter(4, -1)
 	var hf = r.GetHandleFunc()
 	request1 := http.Request{}
 	request2 := http.Request{}
 	hf(nil, &request1)
 	hf(nil, &request2)
-	for i, handler := range h {
-		if handler.HandleRequests[0] != &request1 {
-			t.Error("Did not get correct value for first request on handler", i)
-		}
-		if handler.HandleRequests[1] != &request2 {
-			t.Error("Did not get correct value for second request on handler", i)
-		}
+	for _, handler := range h {
+		handler.AssertNumberOfCalls(t, "Handle", 2)
+		handler.AssertCalled(t, "Handle", mock.Anything, &request1, mock.Anything)
+		handler.AssertCalled(t, "Handle", mock.Anything, &request2, mock.Anything)
 	}
 }
 
 func Test_Router_HandleFunc_HandlerReceives_CorrectWriter(t *testing.T) {
-	var r, _, h, _ = getMockedRouter(4)
+	var r, _, h, _ = getMockedRouter(4, -1)
 	var hf = r.GetHandleFunc()
 	writer1 := new(http.ResponseWriter)
 	writer2 := new(http.ResponseWriter)
 	hf(*writer1, nil)
 	hf(*writer2, nil)
-	for i, handler := range h {
-		if handler.HandleWriters[0] != *writer1 {
-			t.Error("Did not get correct value for first writer on handler", i)
-		}
-		if handler.HandleWriters[1] != *writer2 {
-			t.Error("Did not get correct value for second writer on handler", i)
-		}
+	for _, handler := range h {
+		handler.AssertNumberOfCalls(t, "Handle", 2)
+		handler.AssertCalled(t, "Handle", *writer1, mock.Anything, mock.Anything)
+		handler.AssertCalled(t, "Handle", *writer2, mock.Anything, mock.Anything)
 	}
 }
 
 func Test_Router_HandleFunc_HandlerReceives_CorrectUser(t *testing.T) {
-	var r, _, h, a = getMockedRouter(4)
+	var r, _, h, _ = getMockedRouter(4, -1)
 	var hf = r.GetHandleFunc()
-	a.AuthenticatedUser.FirstName = "Kyle"
+	testUser := pbuf.User{FirstName: "Kyle"}
+	testAuth := &MockAuthenticator{}
+	testAuth.On("AuthenticateUser", mock.Anything).Return(testUser)
+	r.Authenticator = testAuth
 	hf(nil, nil)
 	hf(nil, nil)
-	for i, handler := range h {
-		if handler.HandleUsers[0].FirstName != a.AuthenticatedUser.FirstName {
-			t.Error("Authenticated user for first call first name was", handler.HandleUsers[0].FirstName,
-				"expected", a.AuthenticatedUser.FirstName, "for handler", i)
-		}
-		if handler.HandleUsers[1].FirstName != a.AuthenticatedUser.FirstName {
-			t.Error("Authenticated user for first call first name was", handler.HandleUsers[1].FirstName,
-				"expected", a.AuthenticatedUser.FirstName, "for handler", i)
-		}
+	for _, handler := range h {
+		handler.AssertNumberOfCalls(t, "Handle", 2)
+		handler.AssertCalled(t, "Handle", mock.Anything, mock.Anything,
+			mock.MatchedBy(func(u pbuf.User) bool { return proto.Equal(&u, &testUser) }))
+
 	}
 }
 
 func Test_Router_HandleFunc_HandlerShould_CorrectUser(t *testing.T) {
-	var r, _, h, a = getMockedRouter(4)
+	var r, _, h, _ = getMockedRouter(4, -1)
 	var hf = r.GetHandleFunc()
-	a.AuthenticatedUser.FirstName = "Kyle"
+	testUser := pbuf.User{FirstName: "Kyle"}
+	testAuth := &MockAuthenticator{}
+	testAuth.On("AuthenticateUser", mock.Anything).Return(testUser)
+	r.Authenticator = testAuth
 	hf(nil, nil)
 	hf(nil, nil)
-	for i, handler := range h {
-		if handler.ShouldUsers[0].FirstName != a.AuthenticatedUser.FirstName {
-			t.Error("Authenticated user for first call first name was", handler.ShouldUsers[0].FirstName,
-				"expected", a.AuthenticatedUser.FirstName, "for handler", i)
-		}
-		if handler.ShouldUsers[1].FirstName != a.AuthenticatedUser.FirstName {
-			t.Error("Authenticated user for second call first name was", handler.ShouldUsers[1].FirstName,
-				"expected", a.AuthenticatedUser.FirstName, "for handler", i)
-		}
+	for _, handler := range h {
+		handler.AssertNumberOfCalls(t, "ShouldHandle", 2)
+		handler.AssertCalled(t, "ShouldHandle", mock.Anything, mock.MatchedBy(func(u pbuf.User) bool {
+			return proto.Equal(&u, &testUser)
+		}), mock.Anything)
 	}
 }
 
 func Test_Router_HandleFunc_HandlerShould_CorrectRequest(t *testing.T) {
-	var r, _, h, _ = getMockedRouter(4)
+	var r, _, h, _ = getMockedRouter(4, -1)
 	var hf = r.GetHandleFunc()
-	request1 := http.Request{}
-	request2 := http.Request{}
-	hf(nil, &request1)
-	hf(nil, &request2)
-	for i, handler := range h {
-		if handler.ShouldRequests[0] != &request1 {
-			t.Error("Did not get correct value for first request on handler", i)
-		}
-		if handler.ShouldRequests[1] != &request2 {
-			t.Error("Did not get correct value for second request on handler", i)
-		}
+	request1 := &http.Request{}
+	request2 := &http.Request{}
+	hf(nil, request1)
+	hf(nil, request2)
+	for _, handler := range h {
+		handler.AssertNumberOfCalls(t, "ShouldHandle", 2)
+		handler.AssertCalled(t, "ShouldHandle", request2, mock.Anything, mock.Anything)
+		handler.AssertCalled(t, "ShouldHandle", request1, mock.Anything, mock.Anything)
 	}
 }
 
 func Test_Router_HandleFunc_AuthCorrectCount(t *testing.T) {
-	var r, _, _, a = getMockedRouter(4)
+	var r, _, _, a = getMockedRouter(4, -1)
 	var hf = r.GetHandleFunc()
 	hf(nil, nil)
 	hf(nil, nil)
 	hf(nil, nil)
-	if len(a.CallRequests) != 3 {
-		t.Error("For auth calls expected 3 got", len(a.CallRequests))
-	}
+	a.AssertNumberOfCalls(t, "AuthenticateUser", 3)
 }
 
 func Test_Router_HandleFunc_AuthCorrectRequest(t *testing.T) {
-	var r, _, _, a = getMockedRouter(4)
+	var r, _, _, a = getMockedRouter(4, -1)
 	var hf = r.GetHandleFunc()
-	request1 := http.Request{}
-	request2 := http.Request{}
-	hf(nil, &request1)
-	hf(nil, &request2)
-	if a.CallRequests[0] != &request1 {
-		t.Error("Request to first call of auth is incrrect.")
-	}
-
-	if a.CallRequests[1] != &request2 {
-		t.Error("Request to second call of auth is incrrect.")
-	}
+	request1 := &http.Request{}
+	request2 := &http.Request{}
+	hf(nil, request1)
+	hf(nil, request2)
+	a.AssertCalled(t, "AuthenticateUser", request1)
+	a.AssertCalled(t, "AuthenticateUser", request2)
 }
