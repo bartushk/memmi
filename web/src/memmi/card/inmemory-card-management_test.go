@@ -3,6 +3,7 @@ package card
 import (
 	"github.com/golang/protobuf/proto"
 	"memmi/pbuf"
+	"memmi/test"
 	"testing"
 )
 
@@ -44,11 +45,7 @@ func Test_InMemoryCardManagement_GetCardSetById_GoodKey_CardReturned(t *testing.
 
 	result, err := newMan.GetCardSetById(testId)
 
-	if !proto.Equal(&result, &testCardSet) {
-		t.Error("Wrong result returned",
-			"Expected:", testCardSet,
-			"Got:", result)
-	}
+	test.AssertProtoEq(t, &testCardSet, &result, "Wrong result returned.")
 
 	if err != nil {
 		t.Error("Error should have been returned:", err)
