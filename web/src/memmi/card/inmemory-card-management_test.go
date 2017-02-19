@@ -1,7 +1,7 @@
 package card
 
 import (
-	"github.com/golang/protobuf/proto"
+	"github.com/stretchr/testify/assert"
 	"memmi/pbuf"
 	"memmi/test"
 	"testing"
@@ -25,13 +25,8 @@ func Test_InMemoryCardManagement_GetCardSetById_NoKey_BlankReturned(t *testing.T
 
 	result, err := newMan.GetCardSetById(testId)
 
-	if !proto.Equal(&result, &blankSet) {
-		t.Error("Empty CardSet was not returned when no key is present.")
-	}
-
-	if err == nil {
-		t.Error("Error should have been returned.")
-	}
+	test.AssertProtoEq(t, &result, &blankSet, "Should have returned empty CardSet")
+	assert.NotNil(t, err)
 }
 
 func Test_InMemoryCardManagement_GetCardSetById_GoodKey_CardReturned(t *testing.T) {
@@ -46,10 +41,7 @@ func Test_InMemoryCardManagement_GetCardSetById_GoodKey_CardReturned(t *testing.
 	result, err := newMan.GetCardSetById(testId)
 
 	test.AssertProtoEq(t, &testCardSet, &result, "Wrong result returned.")
-
-	if err != nil {
-		t.Error("Error should have been returned:", err)
-	}
+	assert.Nil(t, err)
 }
 
 func Test_InMemoryCardManagement_GetCardById_NoKey_BlankReturned(t *testing.T) {
@@ -59,13 +51,8 @@ func Test_InMemoryCardManagement_GetCardById_NoKey_BlankReturned(t *testing.T) {
 
 	result, err := newMan.GetCardById(testId)
 
-	if !proto.Equal(&result, &blankCard) {
-		t.Error("Empty Card was not returned when no key is present.")
-	}
-
-	if err == nil {
-		t.Error("Error should have been returned.")
-	}
+	test.AssertProtoEq(t, &result, &blankCard, "Should have returned empty Card")
+	assert.NotNil(t, err)
 }
 
 func Test_InMemoryCardManagement_GetCardById_GoodKey_CardReturned(t *testing.T) {
@@ -79,15 +66,8 @@ func Test_InMemoryCardManagement_GetCardById_GoodKey_CardReturned(t *testing.T) 
 
 	result, err := newMan.GetCardById(testId)
 
-	if !proto.Equal(&result, &testCard) {
-		t.Error("Wrong result returned",
-			"Expected:", testCard,
-			"Got:", result)
-	}
-
-	if err != nil {
-		t.Error("Error should have been returned:", err)
-	}
+	test.AssertProtoEq(t, &testCard, &result, "Wrong result returned.")
+	assert.Nil(t, err)
 }
 
 func Test_InMemoryCardManagement_DeleteCardSet_BadKey_ErrorReturned(t *testing.T) {
@@ -95,9 +75,7 @@ func Test_InMemoryCardManagement_DeleteCardSet_BadKey_ErrorReturned(t *testing.T
 
 	result := newMan.DeleteCardSet(int64(3))
 
-	if result == nil {
-		t.Error("Error was not returned, it should have been.")
-	}
+	assert.NotNil(t, result)
 }
 
 func Test_InMemoryCardManagement_DeleteCardSet_GoodKey_CardSetRemoved(t *testing.T) {
@@ -114,15 +92,8 @@ func Test_InMemoryCardManagement_DeleteCardSet_GoodKey_CardSetRemoved(t *testing
 	result := newMan.DeleteCardSet(testId)
 	mapResult := newMan.cardSets[testId]
 
-	if result != nil {
-		t.Error("No error should have been returned by delete operation.")
-	}
-
-	if !proto.Equal(&mapResult, &blankSet) {
-		t.Error("Wrong result returned",
-			"Expected:", blankSet,
-			"Got:", mapResult)
-	}
+	test.AssertProtoEq(t, &mapResult, &blankSet, "Wrong result returned.")
+	assert.Nil(t, result)
 }
 
 func Test_InMemoryCardManagement_DeleteCard_BadKey_ErrorReturned(t *testing.T) {
@@ -130,9 +101,7 @@ func Test_InMemoryCardManagement_DeleteCard_BadKey_ErrorReturned(t *testing.T) {
 
 	result := newMan.DeleteCard(int64(3))
 
-	if result == nil {
-		t.Error("Error was not returned, it should have been.")
-	}
+	assert.NotNil(t, result)
 }
 
 func Test_InMemoryCardManagement_DeleteCard_GoodKey_CardRemoved(t *testing.T) {
@@ -149,15 +118,8 @@ func Test_InMemoryCardManagement_DeleteCard_GoodKey_CardRemoved(t *testing.T) {
 	result := newMan.DeleteCard(testId)
 	mapResult := newMan.cards[testId]
 
-	if result != nil {
-		t.Error("No error should have been returned by delete operation.")
-	}
-
-	if !proto.Equal(&mapResult, &blankCard) {
-		t.Error("Wrong result returned",
-			"Expected:", blankCard,
-			"Got:", mapResult)
-	}
+	test.AssertProtoEq(t, &mapResult, &blankCard, "Wrong result returned.")
+	assert.Nil(t, result)
 }
 
 func Test_InMemoryCardManagement_SaveCardSet_PassedNil_ErrorReturned(t *testing.T) {
@@ -165,9 +127,7 @@ func Test_InMemoryCardManagement_SaveCardSet_PassedNil_ErrorReturned(t *testing.
 
 	_, result := newMan.SaveCardSet(nil)
 
-	if result == nil {
-		t.Error("Error should be returned when passed nil.")
-	}
+	assert.NotNil(t, result)
 }
 
 func Test_InMemoryCardManagement_SaveCardSet_DuplicateKey_ErrorReturned(t *testing.T) {
@@ -176,9 +136,7 @@ func Test_InMemoryCardManagement_SaveCardSet_DuplicateKey_ErrorReturned(t *testi
 	newMan.cardSets[id] = pbuf.CardSet{}
 	_, result := newMan.SaveCardSet(&pbuf.CardSet{})
 
-	if result == nil {
-		t.Error("Error should be returned when passed nil.")
-	}
+	assert.NotNil(t, result)
 }
 
 func Test_InMemoryCardManagement_SaveCardSet_MultipleSaves_SavedCorrectly(t *testing.T) {
@@ -194,38 +152,14 @@ func Test_InMemoryCardManagement_SaveCardSet_MultipleSaves_SavedCorrectly(t *tes
 	test1 := newMan.cardSets[id1]
 	test2 := newMan.cardSets[id2]
 
-	if err1 != nil {
-		t.Error("First save returned an error, should have returned nil:", err1)
-	}
+	assert.Nil(t, err1)
+	assert.Nil(t, err2)
 
-	if err2 != nil {
-		t.Error("Second save returned an error, should have returned nil:", err2)
-	}
+	assert.Equal(t, id1, result1, "Wrong id1 returned.")
+	assert.Equal(t, id2, result2, "Wrong id2 returned.")
 
-	if id1 != result1 {
-		t.Error("Wrong id1 returned",
-			"Expected:", id1,
-			"Got:", result1)
-	}
-
-	if id2 != result2 {
-		t.Error("Wrong id2 returned",
-			"Expected:", id2,
-			"Got:", result2)
-	}
-
-	if !proto.Equal(&test1, &set1) {
-		t.Error("Wrong card set saved to dictionary for first save.",
-			"Expected:", set1,
-			"Got:", test1)
-	}
-
-	if !proto.Equal(&test2, &set2) {
-		t.Error("Wrong card set saved to dictionary for second save.",
-			"Expected:", set2,
-			"Got:", test2)
-	}
-
+	test.AssertProtoEq(t, &test1, &set1, "Wrong card set saved to dictionary for first save.")
+	test.AssertProtoEq(t, &test2, &set2, "Wrong card set saved to dictionary for second save.")
 }
 
 func Test_InMemoryCardManagement_SaveCard_PassedNil_ErrorReturned(t *testing.T) {
@@ -233,9 +167,7 @@ func Test_InMemoryCardManagement_SaveCard_PassedNil_ErrorReturned(t *testing.T) 
 
 	_, result := newMan.SaveCard(nil)
 
-	if result == nil {
-		t.Error("Error should be returned when passed nil.")
-	}
+	assert.NotNil(t, result)
 }
 
 func Test_InMemoryCardManagement_SaveCard_DuplicateKey_ErrorReturned(t *testing.T) {
@@ -244,9 +176,7 @@ func Test_InMemoryCardManagement_SaveCard_DuplicateKey_ErrorReturned(t *testing.
 	newMan.cards[id] = pbuf.Card{}
 	_, result := newMan.SaveCard(&pbuf.Card{})
 
-	if result == nil {
-		t.Error("Error should be returned when new id is taken.")
-	}
+	assert.NotNil(t, result)
 }
 
 func Test_InMemoryCardManagement_SaveCard_MultipleSaves_SavedCorrectly(t *testing.T) {
@@ -262,36 +192,12 @@ func Test_InMemoryCardManagement_SaveCard_MultipleSaves_SavedCorrectly(t *testin
 	test1 := newMan.cards[id1]
 	test2 := newMan.cards[id2]
 
-	if err1 != nil {
-		t.Error("First save returned an error, should have returned nil:", err1)
-	}
+	assert.Nil(t, err1)
+	assert.Nil(t, err2)
 
-	if err2 != nil {
-		t.Error("Second save returned an error, should have returned nil:", err2)
-	}
+	assert.Equal(t, id1, result1, "Wrong id1 returned.")
+	assert.Equal(t, id2, result2, "Wrong id2 returned.")
 
-	if id1 != result1 {
-		t.Error("Wrong id1 returned",
-			"Expected:", id1,
-			"Got:", result1)
-	}
-
-	if id2 != result2 {
-		t.Error("Wrong id2 returned",
-			"Expected:", id2,
-			"Got:", result2)
-	}
-
-	if !proto.Equal(&test1, &card1) {
-		t.Error("Wrong card set saved to dictionary for first save.",
-			"Expected:", card1,
-			"Got:", test1)
-	}
-
-	if !proto.Equal(&test2, &card2) {
-		t.Error("Wrong card set saved to dictionary for second save.",
-			"Expected:", card2,
-			"Got:", test2)
-	}
-
+	test.AssertProtoEq(t, &test1, &card1, "Wrong card saved to dictionary for first save.")
+	test.AssertProtoEq(t, &test2, &card2, "Wrong card saved to dictionary for second save.")
 }

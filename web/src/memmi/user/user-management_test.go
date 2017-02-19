@@ -32,7 +32,7 @@ func Test_UserManagement_Suite(t *testing.T) {
 func (suite *UserManagementTestSuite) Test_UserManagement_GetHistory_BadId_ReturnError() {
 	t := suite.T()
 	testMan := suite.New()
-	testUser := getTestUser()
+	testUser := test.GetTestUser()
 	blank := pbuf.UserHistory{}
 
 	result, err := testMan.GetHistory(testUser, 0)

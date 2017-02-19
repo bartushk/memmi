@@ -1,8 +1,9 @@
 package card
 
 import (
+	"github.com/stretchr/testify/assert"
 	"memmi/pbuf"
-	"reflect"
+	"memmi/test"
 	"testing"
 )
 
@@ -33,11 +34,7 @@ func Test_RandomCardSelection_WhenPassedNill_ReturnsZero(t *testing.T) {
 
 	result := randSel.SelectCard(nil, 0)
 
-	if expected != result {
-		t.Error("Wrong card id returned",
-			"Expected:", expected,
-			"Got:", result)
-	}
+	assert.Equal(t, expected, result, "Wrong card id returned.")
 }
 
 func Test_RandomCardSelection_WhenHistoryIsEmpty_ReturnsZero(t *testing.T) {
@@ -47,39 +44,27 @@ func Test_RandomCardSelection_WhenHistoryIsEmpty_ReturnsZero(t *testing.T) {
 
 	result := randSel.SelectCard(input, 0)
 
-	if result != expected {
-		t.Error("Wrong card id returned",
-			"Expected:", expected,
-			"Got:", result)
-	}
+	assert.Equal(t, expected, result, "Wrong card id returned.")
 }
 
 func Test_RandomCardSelection_ReturnsCorrectItem(t *testing.T) {
-	testHistory := getTestHistory()
+	testHistory := test.GetTestHistory()
 	mockSource := &MockSource{returnVal: 1}
 	randSel := RandomCardSelection{src: mockSource}
 	expected := testHistory.History[1].CardId
 
 	result := randSel.SelectCard(&testHistory, 0)
 
-	if !reflect.DeepEqual(expected, result) {
-		t.Error("Wrong card id returned",
-			"Expected:", expected,
-			"Got:", result)
-	}
+	assert.Equal(t, expected, result, "Wrong card id returned.")
 }
 
 func Tetst_RandomCardSelectoin_HandlesOverflow(t *testing.T) {
-	testHistory := getTestHistory()
+	testHistory := test.GetTestHistory()
 	mockSource := &MockSource{returnVal: 4}
 	randSel := RandomCardSelection{src: mockSource}
 	expected := testHistory.History[1].CardId
 
 	result := randSel.SelectCard(&testHistory, 0)
 
-	if !reflect.DeepEqual(expected, result) {
-		t.Error("Wrong card id returned",
-			"Expected:", expected,
-			"Got:", result)
-	}
+	assert.Equal(t, expected, result, "Wrong card id returned.")
 }

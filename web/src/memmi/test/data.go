@@ -1,19 +1,39 @@
-package card
+package test
 
 import (
 	"memmi/pbuf"
 )
 
-func getTestHistory() pbuf.UserHistory {
+func GetTestUser() pbuf.User {
+	return pbuf.User{
+		Id:              int64(3),
+		UserName:        "bartushk",
+		FirstName:       "Kyle",
+		LastName:        "Bartush",
+		Email:           "bartushk@gmail.com",
+		IsAuthenticated: false,
+		IsAnon:          false,
+	}
+}
+
+func GetFakeAuthInfo() pbuf.UserAuthInfo {
+	return pbuf.UserAuthInfo{
+		UserId:   int64(3),
+		UserName: "bartushk",
+		PassHash: "48175AC",
+	}
+}
+
+func GetTestHistory() pbuf.UserHistory {
 	ret := pbuf.UserHistory{
-		UserId:    3,
-		CardSetId: 3,
+		UserId:    int64(3),
+		CardSetId: int64(3),
 		PlayIndex: 4,
 		History:   []*pbuf.CardHistory{},
 	}
 
 	history1 := &pbuf.CardHistory{
-		CardId:       0,
+		CardId:       int64(0),
 		CurrentScore: 2,
 		CardIndex:    0,
 		Scores:       []int32{1, 1},
@@ -21,7 +41,7 @@ func getTestHistory() pbuf.UserHistory {
 	}
 
 	history2 := &pbuf.CardHistory{
-		CardId:       1,
+		CardId:       int64(2),
 		CurrentScore: -1,
 		CardIndex:    1,
 		Scores:       []int32{-1},
@@ -29,7 +49,7 @@ func getTestHistory() pbuf.UserHistory {
 	}
 
 	history3 := &pbuf.CardHistory{
-		CardId:       3,
+		CardId:       int64(12),
 		CurrentScore: 0,
 		CardIndex:    0,
 		Scores:       []int32{0},
