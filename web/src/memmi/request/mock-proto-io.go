@@ -2,63 +2,41 @@ package request
 
 import (
 	"github.com/golang/protobuf/proto"
+	"github.com/stretchr/testify/mock"
 	"memmi/pbuf"
 	"net/http"
 )
 
 type MockProtoIO struct {
-	MessageWrites   []proto.Message
-	ResponseWriters []http.ResponseWriter
-	WriteReturn     error
-
-	NextCardRequests []*http.Request
-	NextCardReturn   pbuf.NextCardRequest
-	NextCardError    error
-
-	ReportRequests []*http.Request
-	ReportReturn   pbuf.CardScoreReport
-	ReportError    error
-
-	ReportNextRequests []*http.Request
-	ReportNextReturn   pbuf.ReportAndNext
-	ReportNextError    error
-
-	CardSetRequests []*http.Request
-	CardSetReturn   pbuf.CardSetRequest
-	CardSetError    error
-
-	CardRequests []*http.Request
-	CardReturn   pbuf.CardRequest
-	CardError    error
+	mock.Mock
 }
 
 func (io *MockProtoIO) WriteProtoResponse(w http.ResponseWriter, message proto.Message) error {
-	io.ResponseWriters = append(io.ResponseWriters, w)
-	io.MessageWrites = append(io.MessageWrites, message)
-	return io.WriteReturn
+	args := io.Called(w, message)
+	return args.Error(0)
 }
 
 func (io *MockProtoIO) ReadNextCardRequest(r *http.Request) (pbuf.NextCardRequest, error) {
-	io.NextCardRequests = append(io.NextCardRequests, r)
-	return io.NextCardReturn, io.NextCardError
+	args := io.Called(r)
+	return args.Get(0).(pbuf.NextCardRequest), args.Error(1)
 }
 
 func (io *MockProtoIO) ReadCardScoreReport(r *http.Request) (pbuf.CardScoreReport, error) {
-	io.ReportRequests = append(io.ReportRequests, r)
-	return io.ReportReturn, io.ReportError
+	args := io.Called(r)
+	return args.Get(0).(pbuf.CardScoreReport), args.Error(1)
 }
 
 func (io *MockProtoIO) ReadReportAndNext(r *http.Request) (pbuf.ReportAndNext, error) {
-	io.ReportNextRequests = append(io.ReportNextRequests, r)
-	return io.ReportNextReturn, io.ReportNextError
+	args := io.Called(r)
+	return args.Get(0).(pbuf.ReportAndNext), args.Error(1)
 }
 
 func (io *MockProtoIO) ReadCardSetRequest(r *http.Request) (pbuf.CardSetRequest, error) {
-	io.CardSetRequests = append(io.CardSetRequests, r)
-	return io.CardSetReturn, io.CardSetError
+	args := io.Called(r)
+	return args.Get(0).(pbuf.CardSetRequest), args.Error(1)
 }
 
 func (io *MockProtoIO) ReadCardRequest(r *http.Request) (pbuf.CardRequest, error) {
-	io.CardRequests = append(io.CardRequests, r)
-	return io.CardReturn, io.CardError
+	args := io.Called(r)
+	return args.Get(0).(pbuf.CardRequest), args.Error(1)
 }

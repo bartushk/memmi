@@ -13,6 +13,7 @@ import (
 func getMockedHandler() (RequestHandler, *MockProtoIO, *card.MockCardSelection, *user.MockUserManagement, *card.MockCardManagement) {
 	handler := &CardRequestHandler{}
 	pio := &MockProtoIO{}
+	pio.On("WriteProtoResponse", mock.Anything, mock.Anything).Return(nil)
 	cardSel := &card.MockCardSelection{}
 	cardMan := &card.MockCardManagement{}
 	userMan := &user.MockUserManagement{}
@@ -68,18 +69,15 @@ func Test_CardHandler_AnyDifferentPrefix_ShouldNotHanlde(t *testing.T) {
 
 func Test_CardHandler_HandleNext_ProtoReadError_WriteError(t *testing.T) {
 	var handler, pio, cs, um, cm = getMockedHandler()
-
 	var req = RequestFromURL(CARD_NEXT_URL)
-	pio.NextCardError = errors.New("")
+
+	pio.On("ReadNextCardRequest", req).Return(pbuf.NextCardRequest{}, errors.New(""))
+
 	handler.Handle(nil, req, pbuf.User{})
-	if len(pio.MessageWrites) != 1 {
-		t.Fatal("There should be one write to proto io, got:", len(pio.MessageWrites))
-	}
-	if pio.MessageWrites[0] != BODY_READ_ERROR {
-		t.Error("Wrong error type written to proto io.",
-			"Expected:", BODY_READ_ERROR,
-			"Got:", pio.MessageWrites[0])
-	}
+
+	pio.AssertCalled(t, "WriteProtoResponse", mock.Anything, mock.MatchedBy(func(m proto.Message) bool {
+		return proto.Equal(m, BODY_READ_ERROR)
+	}))
 
 	um.AssertNotCalled(t, "UpdateHistory", mock.Anything)
 	um.AssertNotCalled(t, "GetHistory", mock.Anything)
@@ -99,19 +97,13 @@ func Test_CardHandler_HandleNext_ProtoReadGood_HandledCorrectly(t *testing.T) {
 	cm.On("GetCardById", mock.Anything).Return(nextCard, nil)
 	cs.On("SelectCard", mock.Anything, mock.Anything).Return(csReturn)
 	um.On("GetHistory", mock.Anything, mock.Anything).Return(testHistory, nil)
-	pio.NextCardReturn = nextCardRequest
+	pio.On("ReadNextCardRequest", req).Return(nextCardRequest, nil)
 
 	handler.Handle(nil, req, testUser)
 
-	if len(pio.MessageWrites) != 1 {
-		t.Fatal("There should be one write to proto io, got:", len(pio.MessageWrites))
-	}
-
-	if pio.MessageWrites[0].String() != nextCard.String() {
-		t.Error("Next card should have been written to proto io",
-			"Expected:", nextCard.String(),
-			"Got:", pio.MessageWrites[0].String())
-	}
+	pio.AssertCalled(t, "WriteProtoResponse", mock.Anything, mock.MatchedBy(func(m proto.Message) bool {
+		return proto.Equal(m, &nextCard)
+	}))
 
 	um.AssertCalled(t, "GetHistory", mock.MatchedBy(func(u pbuf.User) bool {
 		return proto.Equal(&u, &testUser)
@@ -127,16 +119,13 @@ func Test_CardHandler_HandleNext_ProtoReadGood_HandledCorrectly(t *testing.T) {
 func Test_CardHandler_Report_ProtoReadError_WriteError(t *testing.T) {
 	var handler, pio, cs, um, cm = getMockedHandler()
 	var req = RequestFromURL(CARD_REPORT_URL)
-	pio.ReportError = errors.New("")
+	pio.On("ReadCardScoreReport", req).Return(pbuf.CardScoreReport{}, errors.New(""))
+
 	handler.Handle(nil, req, pbuf.User{})
-	if len(pio.MessageWrites) != 1 {
-		t.Fatal("There should be one write to proto io, got:", len(pio.MessageWrites))
-	}
-	if pio.MessageWrites[0] != BODY_READ_ERROR {
-		t.Error("Wrong error type written to proto io.",
-			"Expected:", BODY_READ_ERROR,
-			"Got:", pio.MessageWrites[0])
-	}
+
+	pio.AssertCalled(t, "WriteProtoResponse", mock.Anything, mock.MatchedBy(func(m proto.Message) bool {
+		return proto.Equal(m, BODY_READ_ERROR)
+	}))
 
 	um.AssertNotCalled(t, "UpdateHistory", mock.Anything)
 	um.AssertNotCalled(t, "GetHistory", mock.Anything)
@@ -151,20 +140,15 @@ func Test_CardHandler_Report_UpdateError_WriteError(t *testing.T) {
 	testUpdate := pbuf.CardUpdate{CardId: int64(3)}
 	testCardReport := pbuf.CardScoreReport{CardSetId: int64(3)}
 	testCardReport.Update = &testUpdate
-	pio.ReportReturn = testCardReport
 
 	um.On("UpdateHistory", mock.Anything, mock.Anything, mock.Anything).Return(errors.New(""))
+	pio.On("ReadCardScoreReport", req).Return(testCardReport, nil)
 
 	handler.Handle(nil, req, testUser)
 
-	if len(pio.MessageWrites) != 1 {
-		t.Fatal("There should be one write to proto io, got:", len(pio.MessageWrites))
-	}
-	if pio.MessageWrites[0] != USER_HISTORY_UPDATE_ERROR {
-		t.Error("Wrong error type written to proto io.",
-			"Expected:", USER_HISTORY_UPDATE_ERROR,
-			"Got:", pio.MessageWrites[0])
-	}
+	pio.AssertCalled(t, "WriteProtoResponse", mock.Anything, mock.MatchedBy(func(m proto.Message) bool {
+		return proto.Equal(m, USER_HISTORY_UPDATE_ERROR)
+	}))
 
 	um.AssertCalled(t, "UpdateHistory", mock.MatchedBy(func(u pbuf.User) bool {
 		return proto.Equal(&u, &testUser)
@@ -184,20 +168,15 @@ func Test_CardHandler_Report_Success_HandledCorrectly(t *testing.T) {
 	testUpdate := pbuf.CardUpdate{CardId: int64(3)}
 	testCardReport := pbuf.CardScoreReport{CardSetId: int64(3)}
 	testCardReport.Update = &testUpdate
-	pio.ReportReturn = testCardReport
 
 	um.On("UpdateHistory", mock.Anything, mock.Anything, mock.Anything).Return(nil)
+	pio.On("ReadCardScoreReport", req).Return(testCardReport, nil)
 
 	handler.Handle(nil, req, testUser)
-	if len(pio.MessageWrites) != 1 {
-		t.Fatal("There should be one write to proto io, got:", len(pio.MessageWrites))
-	}
 
-	if pio.MessageWrites[0].String() != expectedResponseWrite.String() {
-		t.Error("Wrong error type written to proto io.",
-			"Expected:", expectedResponseWrite,
-			"Got:", pio.MessageWrites[0])
-	}
+	pio.AssertCalled(t, "WriteProtoResponse", mock.Anything, mock.MatchedBy(func(m proto.Message) bool {
+		return proto.Equal(m, &expectedResponseWrite)
+	}))
 
 	um.AssertCalled(t, "UpdateHistory", mock.MatchedBy(func(u pbuf.User) bool {
 		return proto.Equal(&u, &testUser)
@@ -212,16 +191,14 @@ func Test_CardHandler_Report_Success_HandledCorrectly(t *testing.T) {
 func Test_CardHandler_ReportNext_ProtoIO_ErrorWritten(t *testing.T) {
 	var handler, pio, cs, um, cm = getMockedHandler()
 	var req = RequestFromURL(CARD_REPORT_NEXT_URL)
-	pio.ReportNextError = errors.New("")
+	pio.On("ReadReportAndNext", req).Return(pbuf.ReportAndNext{}, errors.New(""))
+
 	handler.Handle(nil, req, pbuf.User{})
-	if len(pio.MessageWrites) != 1 {
-		t.Fatal("There should be one write to proto io, got:", len(pio.MessageWrites))
-	}
-	if pio.MessageWrites[0] != BODY_READ_ERROR {
-		t.Error("Wrong error type written to proto io.",
-			"Expected:", BODY_READ_ERROR,
-			"Got:", pio.MessageWrites[0])
-	}
+
+	pio.AssertCalled(t, "WriteProtoResponse", mock.Anything, mock.MatchedBy(func(m proto.Message) bool {
+		return proto.Equal(m, BODY_READ_ERROR)
+	}))
+
 	um.AssertNotCalled(t, "UpdateHistory", mock.Anything)
 	um.AssertNotCalled(t, "GetHistory", mock.Anything)
 	cs.AssertNotCalled(t, "SelectCard", mock.Anything)
@@ -245,19 +222,13 @@ func Test_CardHandler_ReportNext_HandledCorrectly(t *testing.T) {
 	um.On("GetHistory", mock.Anything, mock.Anything).Return(testHistory, nil)
 	cm.On("GetCardById", mock.Anything).Return(nextCard, nil)
 	cs.On("SelectCard", mock.Anything, mock.Anything).Return(csReturn)
-	pio.ReportNextReturn = reportAndNext
+	pio.On("ReadReportAndNext", req).Return(reportAndNext, nil)
 
 	handler.Handle(nil, req, testUser)
 
-	if len(pio.MessageWrites) != 1 {
-		t.Fatal("There should be one write to proto io, got:", len(pio.MessageWrites))
-	}
-
-	if pio.MessageWrites[0].String() != nextCard.String() {
-		t.Error("Next card should have been written to proto io",
-			"Expected:", nextCard.String(),
-			"Got:", pio.MessageWrites[0].String())
-	}
+	pio.AssertCalled(t, "WriteProtoResponse", mock.Anything, mock.MatchedBy(func(m proto.Message) bool {
+		return proto.Equal(m, &nextCard)
+	}))
 
 	um.AssertCalled(t, "UpdateHistory", mock.MatchedBy(func(u pbuf.User) bool {
 		return proto.Equal(&u, &testUser)
@@ -293,19 +264,13 @@ func Test_CardHandler_ReportNext_WithUpdateError_ErrorSilent(t *testing.T) {
 	um.On("UpdateHistory", mock.Anything, mock.Anything, mock.Anything).Return(errors.New(""))
 	cm.On("GetCardById", mock.Anything).Return(nextCard, nil)
 	cs.On("SelectCard", mock.Anything, mock.Anything).Return(csReturn)
-	pio.ReportNextReturn = reportAndNext
+	pio.On("ReadReportAndNext", req).Return(reportAndNext, nil)
 
 	handler.Handle(nil, req, testUser)
 
-	if len(pio.MessageWrites) != 1 {
-		t.Fatal("There should be one write to proto io, got:", len(pio.MessageWrites))
-	}
-
-	if pio.MessageWrites[0].String() != nextCard.String() {
-		t.Error("Next card should have been written to proto io",
-			"Expected:", nextCard.String(),
-			"Got:", pio.MessageWrites[0].String())
-	}
+	pio.AssertCalled(t, "WriteProtoResponse", mock.Anything, mock.MatchedBy(func(m proto.Message) bool {
+		return proto.Equal(m, &nextCard)
+	}))
 
 	um.AssertCalled(t, "UpdateHistory", mock.MatchedBy(func(u pbuf.User) bool {
 		return proto.Equal(&u, &testUser)
