@@ -10,7 +10,7 @@ dependencies:
     - wget https://github.com/google/protobuf/releases/download/v3.1.0/protoc-3.1.0-linux-x86_64.zip
     - unzip protoc-3.1.0-linux-x86_64.zip
     - npm install -g protobufjs
-    - go get -u github.com/golang/protobuf/proto 
+    - go get -u github.com/golang/protobuf/proto
     - go get -u github.com/golang/protobuf/protoc-gen-go
     - cd ./proto && ../bin/protoc --go_out=../web/src/memmi/pbuf ./*.proto && cd ..
     - ./pbuf.sh
@@ -21,5 +21,8 @@ dependencies:
 
 test:
   override:
-    - go test -v ./web/src/...
+    - go test -v ./web/src/card/...
+    - go test -v ./web/src/user/...
+    - go test -v ./web/src/request/...
+    - go test -v ./web/src/factory/...
     - cd ./client-side && npm test && cd ..

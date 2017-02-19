@@ -8,7 +8,8 @@ const fakeUser = {
   firstName:            'Doodie',
   lastName:             'Cat',
   email:                'Dooie@cat.com',
-  isAuthenticated:      false
+  isAuthenticated:      false,
+  joinedDate:  util.Long.fromValue(10),
 }
 
 const fakeCardOne = {
@@ -46,11 +47,11 @@ const fakeHistoryTwo = {
 const fakeCardSet = {
   id:           util.Long.fromValue(0),
   version:      0,
-  createdDate:  Date.now().toString(),
+  createdDate:  util.Long.fromValue(10),
   authorId:     util.Long.fromValue(0),
   setName:      'CatSet',
   title:        'Cat Cards',
-  cardIds:        [fakeCardOne.id, fakeCardTwo.id]
+  cardIds:        [fakeCardOne.id, fakeCardTwo.id],
 }
 
 const fakeCardUpdate = {
