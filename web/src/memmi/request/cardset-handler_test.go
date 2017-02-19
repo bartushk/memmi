@@ -2,6 +2,7 @@ package request
 
 import (
 	"errors"
+	"github.com/stretchr/testify/mock"
 	"memmi/card"
 	"memmi/pbuf"
 	"testing"
@@ -69,16 +70,14 @@ func Test_CardSetHandler_GetCardSet_ProtoIOReadError_WriteError(t *testing.T) {
 			"Got:", pio.MessageWrites[0])
 	}
 
-	if cm.TotalCalls() != 0 {
-		t.Error("Expected total calls to card management to be zero. Got: ", cm.TotalCalls())
-	}
-
+	cm.AssertNotCalled(t, "GetCardSetById", mock.Anything)
 }
 
 func Test_CardSetHandler_GetCardSet_RequestPassed(t *testing.T) {
-	var handler, pio, _ = getCardSetMocked()
+	var handler, pio, cm = getCardSetMocked()
 	var req = RequestFromURL(GET_CARDSET_URL)
 	testUser := pbuf.User{}
+	cm.On("GetCardSetById", mock.Anything).Return(pbuf.CardSet{}, nil)
 	handler.Handle(nil, req, testUser)
 
 	if len(pio.CardSetRequests) != 1 {
@@ -99,7 +98,7 @@ func Test_CardSetHandler_GetCardSet_NoError_HandledCorrectly(t *testing.T) {
 	testCardSetRequest := pbuf.CardSetRequest{Id: int64(7)}
 	testCardSet := pbuf.CardSet{SetName: "TestCard"}
 
-	cm.ReturnCardSet = testCardSet
+	cm.On("GetCardSetById", mock.Anything).Return(testCardSet, nil)
 	pio.CardSetReturn = testCardSetRequest
 	handler.Handle(nil, req, testUser)
 
@@ -113,15 +112,7 @@ func Test_CardSetHandler_GetCardSet_NoError_HandledCorrectly(t *testing.T) {
 			"Got:", pio.MessageWrites[0].String())
 	}
 
-	if cm.TotalCalls() != 1 {
-		t.Fatal("Expected total calls to card management to be one. Got: ", cm.TotalCalls())
-	}
-
-	if testCardSetRequest.Id != cm.GetCardSetIds[0] {
-		t.Error("Wrong cardSetId passed to card management.",
-			"Expected:", testCardSetRequest.Id,
-			"Got:", cm.GetCardSetIds[0])
-	}
+	cm.AssertCalled(t, "GetCardSetById", testCardSetRequest.Id)
 }
 
 func Test_CardSetHandler_GetCard_ProtoIOReadError_WriteError(t *testing.T) {
@@ -142,15 +133,15 @@ func Test_CardSetHandler_GetCard_ProtoIOReadError_WriteError(t *testing.T) {
 			"Got:", pio.MessageWrites[0])
 	}
 
-	if cm.TotalCalls() != 0 {
-		t.Error("Expected total calls to card management to be zero. Got: ", cm.TotalCalls())
-	}
+	cm.AssertNotCalled(t, "GetCardById", mock.Anything)
 }
 
 func Test_CardSetHandler_GetCard_RequestPassed(t *testing.T) {
-	var handler, pio, _ = getCardSetMocked()
+	var handler, pio, cm = getCardSetMocked()
 	var req = RequestFromURL(GET_CARD_URL)
 	testUser := pbuf.User{}
+	cm.On("GetCardById", mock.Anything).Return(pbuf.Card{}, nil)
+
 	handler.Handle(nil, req, testUser)
 
 	if len(pio.CardRequests) != 1 {
@@ -171,7 +162,7 @@ func Test_CardSetHandler_GetCard_NoError_HandledCorrectly(t *testing.T) {
 	testCardRequest := pbuf.CardRequest{Id: int64(7)}
 	testCard := pbuf.Card{Title: "TestCard"}
 
-	cm.ReturnCard = testCard
+	cm.On("GetCardById", mock.Anything).Return(testCard, nil)
 	pio.CardReturn = testCardRequest
 	handler.Handle(nil, req, testUser)
 
@@ -185,13 +176,5 @@ func Test_CardSetHandler_GetCard_NoError_HandledCorrectly(t *testing.T) {
 			"Got:", pio.MessageWrites[0].String())
 	}
 
-	if cm.TotalCalls() != 1 {
-		t.Fatal("Expected total calls to card management to be one. Got: ", cm.TotalCalls())
-	}
-
-	if testCardRequest.Id != cm.GetCardIds[0] {
-		t.Error("Wrong cardId passed to card management.",
-			"Expected:", testCardRequest.Id,
-			"Got:", cm.GetCardIds[0])
-	}
+	cm.AssertCalled(t, "GetCardById", testCardRequest.Id)
 }
