@@ -6,7 +6,7 @@ import (
 
 func getTestUser() pbuf.User {
 	return pbuf.User{
-		Id:              []byte{2, 5, 9},
+		Id:              int64(3),
 		UserName:        "bartushk",
 		FirstName:       "Kyle",
 		LastName:        "Bartush",
@@ -18,22 +18,22 @@ func getTestUser() pbuf.User {
 
 func getFakeAuthInfo() pbuf.UserAuthInfo {
 	return pbuf.UserAuthInfo{
-		UserId:   []byte{2, 5, 9},
+		UserId:   int64(3),
 		UserName: "bartushk",
-		PassHash: []byte{3, 4, 6, 11},
+		PassHash: "48175AC",
 	}
 }
 
 func getTestHistory() pbuf.UserHistory {
 	ret := pbuf.UserHistory{
-		UserId:    []byte{2, 5, 9},
-		CardSetId: []byte{5, 1, 9},
+		UserId:    int64(3),
+		CardSetId: int64(3),
 		PlayIndex: 4,
 		History:   []*pbuf.CardHistory{},
 	}
 
 	history1 := &pbuf.CardHistory{
-		CardId:       []byte{1, 1, 1},
+		CardId:       int64(0),
 		CurrentScore: 2,
 		CardIndex:    0,
 		Scores:       []int32{1, 1},
@@ -41,7 +41,7 @@ func getTestHistory() pbuf.UserHistory {
 	}
 
 	history2 := &pbuf.CardHistory{
-		CardId:       []byte{1, 2, 1},
+		CardId:       int64(2),
 		CurrentScore: -1,
 		CardIndex:    1,
 		Scores:       []int32{-1},
@@ -49,7 +49,7 @@ func getTestHistory() pbuf.UserHistory {
 	}
 
 	history3 := &pbuf.CardHistory{
-		CardId:       []byte{1, 1, 1},
+		CardId:       int64(12),
 		CurrentScore: 0,
 		CardIndex:    0,
 		Scores:       []int32{0},

@@ -6,18 +6,6 @@ import (
 	"net/http"
 )
 
-func CompareByteSlices(first []byte, second []byte) bool {
-	if len(first) != len(second) {
-		return false
-	}
-	for i, _ := range first {
-		if first[i] != second[i] {
-			return false
-		}
-	}
-	return true
-}
-
 func RequestFromURL(url_string string) *http.Request {
 	req, _ := http.NewRequest(http.MethodPost, url_string, nil)
 	req.Body = ioutil.NopCloser(bytes.NewReader([]byte{}))

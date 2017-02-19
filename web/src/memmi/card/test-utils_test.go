@@ -6,14 +6,14 @@ import (
 
 func getTestHistory() pbuf.UserHistory {
 	ret := pbuf.UserHistory{
-		UserId:    []byte{2, 5, 9},
-		CardSetId: []byte{5, 1, 9},
+		UserId:    3,
+		CardSetId: 3,
 		PlayIndex: 4,
 		History:   []*pbuf.CardHistory{},
 	}
 
 	history1 := &pbuf.CardHistory{
-		CardId:       []byte{1, 1, 1},
+		CardId:       0,
 		CurrentScore: 2,
 		CardIndex:    0,
 		Scores:       []int32{1, 1},
@@ -21,7 +21,7 @@ func getTestHistory() pbuf.UserHistory {
 	}
 
 	history2 := &pbuf.CardHistory{
-		CardId:       []byte{1, 2, 1},
+		CardId:       1,
 		CurrentScore: -1,
 		CardIndex:    1,
 		Scores:       []int32{-1},
@@ -29,7 +29,7 @@ func getTestHistory() pbuf.UserHistory {
 	}
 
 	history3 := &pbuf.CardHistory{
-		CardId:       []byte{1, 1, 1},
+		CardId:       3,
 		CurrentScore: 0,
 		CardIndex:    0,
 		Scores:       []int32{0},

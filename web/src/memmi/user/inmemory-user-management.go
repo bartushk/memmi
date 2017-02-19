@@ -3,17 +3,15 @@ package user
 import (
 	"errors"
 	"fmt"
-	"hash/fnv"
 	"memmi/card"
 	"memmi/pbuf"
-	"reflect"
 )
 
 func NewInMemoryManagement() *InMemoryUserManagement {
 	newMan := &InMemoryUserManagement{
-		userIds:       make(map[string][]byte),
-		authInfo:      make(map[string]pbuf.UserAuthInfo),
-		users:         make(map[string]pbuf.User),
+		userIds:       make(map[string]int64),
+		authInfo:      make(map[int64]pbuf.UserAuthInfo),
+		users:         make(map[int64]pbuf.User),
 		userHistories: make(map[string]pbuf.UserHistory),
 		CardMan:       card.NewInMemoryManagement(),
 	}
@@ -21,28 +19,21 @@ func NewInMemoryManagement() *InMemoryUserManagement {
 }
 
 type InMemoryUserManagement struct {
-	userIds       map[string][]byte
-	authInfo      map[string]pbuf.UserAuthInfo
-	users         map[string]pbuf.User
+	userIds       map[string]int64
+	authInfo      map[int64]pbuf.UserAuthInfo
+	users         map[int64]pbuf.User
 	userHistories map[string]pbuf.UserHistory
-	userCounter   uint32
+	userCounter   int64
 	CardMan       card.CardManagement
 }
 
-func (manager *InMemoryUserManagement) getKey(id []byte) string {
-	return fmt.Sprintf("%x", id)
+func (manager *InMemoryUserManagement) getHistoryKey(id1 int64, id2 int64) string {
+	return fmt.Sprintf("%x:%x", id1, id2)
 }
 
-func (manager *InMemoryUserManagement) getId(input uint32) []byte {
-	hash := fnv.New64()
-	hash.Write([]byte(fmt.Sprintf("%x", input)))
-	return hash.Sum(nil)
-}
-
-func (manager *InMemoryUserManagement) GetHistory(user pbuf.User, cardSetId []byte) (pbuf.UserHistory, error) {
-	fullId := append(user.Id, cardSetId...)
-	key := manager.getKey(fullId)
-	savedHistory, ok := manager.userHistories[key]
+func (manager *InMemoryUserManagement) GetHistory(user pbuf.User, cardSetId int64) (pbuf.UserHistory, error) {
+	fullId := manager.getHistoryKey(user.Id, cardSetId)
+	savedHistory, ok := manager.userHistories[fullId]
 	set, err := manager.CardMan.GetCardSetById(cardSetId)
 
 	if err != nil {
@@ -56,14 +47,14 @@ func (manager *InMemoryUserManagement) GetHistory(user pbuf.User, cardSetId []by
 	// If not okay, generate a new blank set for this user
 	if !ok {
 		newHistory := card.GenerateEmptyHistory(&set)
-		manager.userHistories[key] = newHistory
+		manager.userHistories[fullId] = newHistory
 		return newHistory, nil
 	}
 
 	// Check if the history is the correct version, generate a new one if it isn't
 	if savedHistory.SetVersion != set.Version {
 		updatedHistory := card.GenerateEmptyHistory(&set)
-		manager.userHistories[key] = updatedHistory
+		manager.userHistories[fullId] = updatedHistory
 		return updatedHistory, nil
 	}
 
@@ -78,9 +69,8 @@ func (manager *InMemoryUserManagement) GetAuthInfoByUserName(userName string) (p
 	return manager.GetAuthInfoById(userId)
 }
 
-func (manager *InMemoryUserManagement) GetAuthInfoById(userId []byte) (pbuf.UserAuthInfo, error) {
-	key := manager.getKey(userId)
-	result, ok := manager.authInfo[key]
+func (manager *InMemoryUserManagement) GetAuthInfoById(userId int64) (pbuf.UserAuthInfo, error) {
+	result, ok := manager.authInfo[userId]
 	if !ok {
 		return pbuf.UserAuthInfo{}, errors.New("No auth info found.")
 	}
@@ -95,24 +85,22 @@ func (manager *InMemoryUserManagement) GetUserByUserName(userName string) (pbuf.
 	return manager.GetUserById(userId)
 }
 
-func (manager *InMemoryUserManagement) GetUserById(userId []byte) (pbuf.User, error) {
-	key := manager.getKey(userId)
-	result, ok := manager.users[key]
+func (manager *InMemoryUserManagement) GetUserById(userId int64) (pbuf.User, error) {
+	result, ok := manager.users[userId]
 	if !ok {
 		return pbuf.User{}, errors.New("No user found.")
 	}
 	return result, nil
 }
 
-func (manager *InMemoryUserManagement) UpdateHistory(user pbuf.User, cardSetId []byte, update pbuf.CardUpdate) error {
-	fullId := append(user.Id, cardSetId...)
-	key := manager.getKey(fullId)
-	history, ok := manager.userHistories[key]
+func (manager *InMemoryUserManagement) UpdateHistory(user pbuf.User, cardSetId int64, update pbuf.CardUpdate) error {
+	fullId := manager.getHistoryKey(user.Id, cardSetId)
+	history, ok := manager.userHistories[fullId]
 	if !ok {
 		return errors.New("Could not find history to update.")
 	}
 	for _, cardHistory := range history.History {
-		if reflect.DeepEqual(cardHistory.CardId, update.CardId) {
+		if cardHistory.CardId == update.CardId {
 			cardHistory.CurrentScore += update.Score
 			cardHistory.Scores = append(cardHistory.Scores, update.Score)
 			cardHistory.Indicies = append(cardHistory.Indicies, history.PlayIndex)
@@ -128,24 +116,22 @@ func (management *InMemoryUserManagement) AddUser(user pbuf.User, authInfo pbuf.
 			return errors.New("UserNames must be unique.")
 		}
 	}
-	id := management.getId(management.userCounter)
+	id := management.userCounter
 	user.Id = id
-	key := management.getKey(id)
-	management.users[key] = user
+	management.users[id] = user
 	management.userIds[user.UserName] = id
-	management.authInfo[key] = authInfo
+	management.authInfo[id] = authInfo
 	management.userCounter += 1
 	return nil
 }
 
-func (management *InMemoryUserManagement) DeleteUser(userId []byte) error {
-	key := management.getKey(userId)
-	user, ok := management.users[key]
+func (management *InMemoryUserManagement) DeleteUser(userId int64) error {
+	user, ok := management.users[userId]
 	if !ok {
 		return errors.New("User did not exisst and could not be deleted,")
 	}
 	delete(management.userIds, user.UserName)
-	delete(management.authInfo, key)
-	delete(management.users, key)
+	delete(management.authInfo, userId)
+	delete(management.users, userId)
 	return nil
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"io/ioutil"
 	"memmi/pbuf"
+	"reflect"
 	"testing"
 )
 
@@ -49,7 +50,7 @@ func Test_ProtoIO_WriteProtoResponse_GoodMessage_WrittenCorrectly(t *testing.T) 
 		t.Fatal("Expeceted one write to responsewriter got:", len(writer.WriteInputs))
 	}
 
-	if !CompareByteSlices(writer.WriteInputs[0], testData) {
+	if !reflect.DeepEqual(writer.WriteInputs[0], testData) {
 		t.Error("Did not write the correct data. Expected:", testData,
 			"Received:", writer.WriteInputs[0])
 	}
@@ -69,7 +70,7 @@ func Test_ProtoIO_ReadNextCardRequest_EmptyRequestBody_GetError(t *testing.T) {
 func Test_ProtoIO_ReadNextCardRequest_BadRequestBody_GetError(t *testing.T) {
 	pio := ProtoIoImpl{}
 	req := RequestFromURL("sadf")
-	req.Body = ioutil.NopCloser(bytes.NewReader([]byte{2, 3, 5}))
+	req.Body = ioutil.NopCloser(bytes.NewReader([]byte{2, 11, 21}))
 	_, err := pio.ReadNextCardRequest(req)
 	if err == nil {
 		t.Error("Expected error from bad request type.")
@@ -79,7 +80,7 @@ func Test_ProtoIO_ReadNextCardRequest_BadRequestBody_GetError(t *testing.T) {
 func Test_ProtoIO_ReadNextCardRequest_GoodRequestBody_ReadCorrectly(t *testing.T) {
 	pio := ProtoIoImpl{}
 	req := RequestFromURL("sadf")
-	goodMessage := &pbuf.NextCardRequest{CardSetId: []byte{5, 10, 3}}
+	goodMessage := &pbuf.NextCardRequest{CardSetId: int64(7)}
 	goodData, _ := proto.Marshal(goodMessage)
 	req.Body = ioutil.NopCloser(bytes.NewReader(goodData))
 	result, err := pio.ReadNextCardRequest(req)
@@ -87,7 +88,7 @@ func Test_ProtoIO_ReadNextCardRequest_GoodRequestBody_ReadCorrectly(t *testing.T
 		t.Error("Expected no error.")
 	}
 
-	if !CompareByteSlices(goodMessage.CardSetId, result.CardSetId) {
+	if goodMessage.CardSetId != result.CardSetId {
 		t.Error("Did not read request body correctly. Expected:", goodMessage,
 			"Received:", result)
 	}
@@ -107,7 +108,7 @@ func Test_ProtoIO_ReadCardRequest_EmptyRequestBody_GetError(t *testing.T) {
 func Test_ProtoIO_ReadCardRequest_BadRequestBody_GetError(t *testing.T) {
 	pio := ProtoIoImpl{}
 	req := RequestFromURL("sadf")
-	req.Body = ioutil.NopCloser(bytes.NewReader([]byte{2, 3, 5}))
+	req.Body = ioutil.NopCloser(bytes.NewReader([]byte{2, 11, 21}))
 	_, err := pio.ReadCardRequest(req)
 	if err == nil {
 		t.Error("Expected error from bad request type")
@@ -117,7 +118,7 @@ func Test_ProtoIO_ReadCardRequest_BadRequestBody_GetError(t *testing.T) {
 func Test_ProtoIO_ReadCardRequest_GoodRequestBody_ReadCorrectly(t *testing.T) {
 	pio := ProtoIoImpl{}
 	req := RequestFromURL("sadf")
-	goodMessage := &pbuf.CardRequest{Id: []byte{2, 3, 6}}
+	goodMessage := &pbuf.CardRequest{Id: int64(7)}
 	goodData, _ := proto.Marshal(goodMessage)
 	req.Body = ioutil.NopCloser(bytes.NewReader(goodData))
 	result, err := pio.ReadCardRequest(req)
@@ -125,7 +126,7 @@ func Test_ProtoIO_ReadCardRequest_GoodRequestBody_ReadCorrectly(t *testing.T) {
 		t.Error("Expected no error.")
 	}
 
-	if !CompareByteSlices(goodMessage.Id, result.Id) {
+	if goodMessage.Id != result.Id {
 		t.Error("Did not read request body correctly. Expected:", goodMessage,
 			"Received:", result)
 	}
@@ -145,7 +146,7 @@ func Test_ProtoIO_ReadCardSetRequest_EmptyRequestBody_GetError(t *testing.T) {
 func Test_ProtoIO_ReadCardSetRequest_BadRequestBody_GetError(t *testing.T) {
 	pio := ProtoIoImpl{}
 	req := RequestFromURL("sadf")
-	req.Body = ioutil.NopCloser(bytes.NewReader([]byte{2, 3, 5}))
+	req.Body = ioutil.NopCloser(bytes.NewReader([]byte{2, 11, 21}))
 	_, err := pio.ReadCardSetRequest(req)
 	if err == nil {
 		t.Error("Expected error from bad request type")
@@ -155,7 +156,7 @@ func Test_ProtoIO_ReadCardSetRequest_BadRequestBody_GetError(t *testing.T) {
 func Test_ProtoIO_ReadCardSetRequest_GoodRequestBody_ReadCorrectly(t *testing.T) {
 	pio := ProtoIoImpl{}
 	req := RequestFromURL("sadf")
-	goodMessage := &pbuf.CardSetRequest{Id: []byte{2, 3, 6}}
+	goodMessage := &pbuf.CardSetRequest{Id: int64(7)}
 	goodData, _ := proto.Marshal(goodMessage)
 	req.Body = ioutil.NopCloser(bytes.NewReader(goodData))
 	result, err := pio.ReadCardSetRequest(req)
@@ -163,7 +164,7 @@ func Test_ProtoIO_ReadCardSetRequest_GoodRequestBody_ReadCorrectly(t *testing.T)
 		t.Error("Expected no error.")
 	}
 
-	if !CompareByteSlices(goodMessage.Id, result.Id) {
+	if goodMessage.Id != result.Id {
 		t.Error("Did not read request body correctly. Expected:", goodMessage,
 			"Received:", result)
 	}
@@ -183,7 +184,7 @@ func Test_ProtoIO_ReadReportAndNext_EmptyRequestBody_GetError(t *testing.T) {
 func Test_ProtoIO_ReadReportAndNext_BadRequestBody_GetError(t *testing.T) {
 	pio := ProtoIoImpl{}
 	req := RequestFromURL("sadf")
-	req.Body = ioutil.NopCloser(bytes.NewReader([]byte{2, 3, 5}))
+	req.Body = ioutil.NopCloser(bytes.NewReader([]byte{2, 11, 21}))
 	_, err := pio.ReadReportAndNext(req)
 	if err == nil {
 		t.Error("Expected error from bad request type")
@@ -194,7 +195,7 @@ func Test_ProtoIO_ReadReportAndNext_GoodRequestBody_ReadCorrectly(t *testing.T) 
 	pio := ProtoIoImpl{}
 	req := RequestFromURL("sadf")
 	goodMessage := &pbuf.ReportAndNext{}
-	goodNextRequest := &pbuf.NextCardRequest{CardSetId: []byte{8, 78, 3}}
+	goodNextRequest := &pbuf.NextCardRequest{CardSetId: int64(7)}
 	goodMessage.NextRequest = goodNextRequest
 	goodData, _ := proto.Marshal(goodMessage)
 	req.Body = ioutil.NopCloser(bytes.NewReader(goodData))
@@ -203,7 +204,7 @@ func Test_ProtoIO_ReadReportAndNext_GoodRequestBody_ReadCorrectly(t *testing.T) 
 		t.Error("Expected no error.")
 	}
 
-	if !CompareByteSlices(goodMessage.NextRequest.CardSetId, result.NextRequest.CardSetId) {
+	if goodMessage.NextRequest.CardSetId != result.NextRequest.CardSetId {
 		t.Error("Did not read request body correctly. Expected:", goodMessage,
 			"Received:", result)
 	}
@@ -223,7 +224,7 @@ func Test_ProtoIO_ReadCardScoreReport_EmptyRequestBody_GetError(t *testing.T) {
 func Test_ProtoIO_ReadCardScoreReport_BadRequestBody_GetError(t *testing.T) {
 	pio := ProtoIoImpl{}
 	req := RequestFromURL("sadf")
-	req.Body = ioutil.NopCloser(bytes.NewReader([]byte{2, 3, 5}))
+	req.Body = ioutil.NopCloser(bytes.NewReader([]byte{2, 11, 21}))
 	_, err := pio.ReadCardScoreReport(req)
 	if err == nil {
 		t.Error("Expected error from bad request type")
@@ -233,7 +234,7 @@ func Test_ProtoIO_ReadCardScoreReport_BadRequestBody_GetError(t *testing.T) {
 func Test_ProtoIO_ReadCardScoreReport_GoodRequestBody_ReadCorrectly(t *testing.T) {
 	pio := ProtoIoImpl{}
 	req := RequestFromURL("sadf")
-	goodMessage := &pbuf.CardScoreReport{CardSetId: []byte{66, 23, 12}}
+	goodMessage := &pbuf.CardScoreReport{CardSetId: int64(7)}
 	goodData, _ := proto.Marshal(goodMessage)
 	req.Body = ioutil.NopCloser(bytes.NewReader(goodData))
 	result, err := pio.ReadCardScoreReport(req)
@@ -241,7 +242,7 @@ func Test_ProtoIO_ReadCardScoreReport_GoodRequestBody_ReadCorrectly(t *testing.T
 		t.Error("Expected no error.")
 	}
 
-	if !CompareByteSlices(goodMessage.CardSetId, result.CardSetId) {
+	if goodMessage.CardSetId != result.CardSetId {
 		t.Error("Did not read request body correctly. Expected:", goodMessage,
 			"Received:", result)
 	}

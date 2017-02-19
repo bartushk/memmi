@@ -27,27 +27,27 @@ func Test_NewRandomCardSlection(t *testing.T) {
 	}
 }
 
-func Test_RandomCardSelection_WhenPassedNill_ReturnsEmptyId(t *testing.T) {
+func Test_RandomCardSelection_WhenPassedNill_ReturnsZero(t *testing.T) {
 	randSel := RandomCardSelection{}
-	expected := []byte{}
+	expected := int64(0)
 
-	result := randSel.SelectCard(nil, nil)
+	result := randSel.SelectCard(nil, 0)
 
-	if !reflect.DeepEqual(expected, result) {
+	if expected != result {
 		t.Error("Wrong card id returned",
 			"Expected:", expected,
 			"Got:", result)
 	}
 }
 
-func Test_RandomCardSelection_WhenHistoryIsEmpty_ReturnEMptyId(t *testing.T) {
+func Test_RandomCardSelection_WhenHistoryIsEmpty_ReturnsZero(t *testing.T) {
 	randSel := RandomCardSelection{}
 	input := &pbuf.UserHistory{}
-	expected := []byte{}
+	expected := int64(0)
 
-	result := randSel.SelectCard(input, nil)
+	result := randSel.SelectCard(input, 0)
 
-	if !reflect.DeepEqual(expected, result) {
+	if result != expected {
 		t.Error("Wrong card id returned",
 			"Expected:", expected,
 			"Got:", result)
@@ -60,7 +60,7 @@ func Test_RandomCardSelection_ReturnsCorrectItem(t *testing.T) {
 	randSel := RandomCardSelection{src: mockSource}
 	expected := testHistory.History[1].CardId
 
-	result := randSel.SelectCard(&testHistory, nil)
+	result := randSel.SelectCard(&testHistory, 0)
 
 	if !reflect.DeepEqual(expected, result) {
 		t.Error("Wrong card id returned",
@@ -75,7 +75,7 @@ func Tetst_RandomCardSelectoin_HandlesOverflow(t *testing.T) {
 	randSel := RandomCardSelection{src: mockSource}
 	expected := testHistory.History[1].CardId
 
-	result := randSel.SelectCard(&testHistory, nil)
+	result := randSel.SelectCard(&testHistory, 0)
 
 	if !reflect.DeepEqual(expected, result) {
 		t.Error("Wrong card id returned",

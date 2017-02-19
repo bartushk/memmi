@@ -5,14 +5,14 @@ import (
 )
 
 type CardSelection interface {
-	SelectCard(history *pbuf.UserHistory, previousCardId []byte) []byte
+	SelectCard(history *pbuf.UserHistory, previousCardId int64) int64
 }
 
 type CardManagement interface {
-	GetCardSetById(id []byte) (pbuf.CardSet, error)
-	GetCardById(id []byte) (pbuf.Card, error)
-	SaveCardSet(*pbuf.CardSet) ([]byte, error)
-	SaveCard(*pbuf.Card) ([]byte, error)
-	DeleteCardSet(id []byte) error
-	DeleteCard(id []byte) error
+	GetCardSetById(id int64) (pbuf.CardSet, error)
+	GetCardById(id int64) (pbuf.Card, error)
+	SaveCardSet(*pbuf.CardSet) (int64, error)
+	SaveCard(*pbuf.Card) (int64, error)
+	DeleteCardSet(id int64) error
+	DeleteCard(id int64) error
 }

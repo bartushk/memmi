@@ -96,7 +96,7 @@ func Test_CardSetHandler_GetCardSet_NoError_HandledCorrectly(t *testing.T) {
 	var handler, pio, cm = getCardSetMocked()
 	var req = RequestFromURL(GET_CARDSET_URL)
 	testUser := pbuf.User{}
-	testCardSetRequest := pbuf.CardSetRequest{Id: []byte{3, 7, 9}}
+	testCardSetRequest := pbuf.CardSetRequest{Id: int64(7)}
 	testCardSet := pbuf.CardSet{SetName: "TestCard"}
 
 	cm.ReturnCardSet = testCardSet
@@ -117,7 +117,7 @@ func Test_CardSetHandler_GetCardSet_NoError_HandledCorrectly(t *testing.T) {
 		t.Fatal("Expected total calls to card management to be one. Got: ", cm.TotalCalls())
 	}
 
-	if !CompareByteSlices(testCardSetRequest.Id, cm.GetCardSetIds[0]) {
+	if testCardSetRequest.Id != cm.GetCardSetIds[0] {
 		t.Error("Wrong cardSetId passed to card management.",
 			"Expected:", testCardSetRequest.Id,
 			"Got:", cm.GetCardSetIds[0])
@@ -168,7 +168,7 @@ func Test_CardSetHandler_GetCard_NoError_HandledCorrectly(t *testing.T) {
 	var handler, pio, cm = getCardSetMocked()
 	var req = RequestFromURL(GET_CARD_URL)
 	testUser := pbuf.User{}
-	testCardRequest := pbuf.CardRequest{Id: []byte{3, 7, 9}}
+	testCardRequest := pbuf.CardRequest{Id: int64(7)}
 	testCard := pbuf.Card{Title: "TestCard"}
 
 	cm.ReturnCard = testCard
@@ -189,7 +189,7 @@ func Test_CardSetHandler_GetCard_NoError_HandledCorrectly(t *testing.T) {
 		t.Fatal("Expected total calls to card management to be one. Got: ", cm.TotalCalls())
 	}
 
-	if !CompareByteSlices(testCardRequest.Id, cm.GetCardIds[0]) {
+	if testCardRequest.Id != cm.GetCardIds[0] {
 		t.Error("Wrong cardId passed to card management.",
 			"Expected:", testCardRequest.Id,
 			"Got:", cm.GetCardIds[0])

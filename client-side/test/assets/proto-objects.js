@@ -1,8 +1,9 @@
 import pbuf from '../../src/pbuf/pbuf'
+import {util} from 'protobufjs'
 const proto = pbuf.pbuf
 
 const fakeUser = {
-  id:                   new Buffer('testUser'),
+  id:                   util.Long.fromValue(0),
   userName:             'd_cat',
   firstName:            'Doodie',
   lastName:             'Cat',
@@ -11,7 +12,7 @@ const fakeUser = {
 }
 
 const fakeCardOne = {
-  id:           new Buffer('cardOne'),
+  id:           util.Long.fromValue(0),
   cardIndex:    0,
   title:        'Card One',
   front:        {type: 'html', value: '<h1>Hello</h1>'},
@@ -19,7 +20,7 @@ const fakeCardOne = {
 }
 
 const fakeHistoryOne = {
-  cardId:       new Buffer('cardOne'),
+  cardId:       util.Long.fromValue(0),
   currentScore: 1,
   cardIndex:    0,
   scores:       [1],
@@ -27,7 +28,7 @@ const fakeHistoryOne = {
 }
 
 const fakeCardTwo = {
-  id:           new Buffer('cardTwo'),
+  id:           util.Long.fromValue(1),
   cardIndex:    1,
   title:        'Card Two',
   front:        {type: 'html', value: '<h1>Ni Hao</h1>'},
@@ -35,7 +36,7 @@ const fakeCardTwo = {
 }
 
 const fakeHistoryTwo = {
-  cardId:       new Buffer('cardTwo'),
+  cardId:       util.Long.fromValue(1),
   currentScore: -2,
   cardIndex:    1,
   scores:       [-2],
@@ -43,23 +44,23 @@ const fakeHistoryTwo = {
 }
 
 const fakeCardSet = {
-  id:           new Buffer('testCardSet'),
+  id:           util.Long.fromValue(0),
   version:      0,
   createdDate:  Date.now().toString(),
-  authorId:     new Buffer('testUser'),
+  authorId:     util.Long.fromValue(0),
   setName:      'CatSet',
   title:        'Cat Cards',
   cardIds:        [fakeCardOne.id, fakeCardTwo.id]
 }
 
 const fakeCardUpdate = {
-  cardId:       new Buffer('coolCard'),
+  cardId:       util.Long.fromValue(0),
   score:        2
 }
 
 const fakeUserHistory = {
-  userId:     new Buffer('d_cat'),
-  cardSetId:    new Buffer('testCardSet'),
+  userId:     util.Long.fromValue(0),
+  cardSetId:    util.Long.fromValue(0),
   playIndex:    0,
   history:      [fakeHistoryOne, fakeHistoryTwo]
 }

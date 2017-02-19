@@ -91,10 +91,10 @@ func Test_CardHandler_HandleNext_ProtoReadError_WriteError(t *testing.T) {
 func Test_CardHandler_HandleNext_ProtoReadGood_HandledCorrectly(t *testing.T) {
 	var handler, pio, cs, um, cm = getMockedHandler()
 	var req = RequestFromURL(CARD_NEXT_URL)
-	nextCardRequest := pbuf.NextCardRequest{CardSetId: []byte{0, 1, 2}}
+	nextCardRequest := pbuf.NextCardRequest{CardSetId: int64(3)}
 	nextCard := pbuf.Card{Title: "TestCard"}
 	cm.ReturnCard = nextCard
-	cs.NextCard = []byte{4, 5, 6}
+	cs.NextCard = int64(3)
 	pio.NextCardReturn = nextCardRequest
 	testHistory := pbuf.UserHistory{PlayIndex: 123}
 	um.GetHistoryReturn = testHistory
@@ -125,7 +125,7 @@ func Test_CardHandler_HandleNext_ProtoReadGood_HandledCorrectly(t *testing.T) {
 		t.Fatal("User managment should be called once. Times called:", um.TotalCalls)
 	}
 
-	if !CompareByteSlices(um.GetHistoryCardSetIds[0], nextCardRequest.CardSetId) {
+	if um.GetHistoryCardSetIds[0] != nextCardRequest.CardSetId {
 		t.Error("Wrong card set Id passed to GetHistory",
 			"Expected:", um.GetHistoryCardSetIds[0],
 			"Got:", nextCardRequest.CardSetId)
@@ -135,7 +135,7 @@ func Test_CardHandler_HandleNext_ProtoReadGood_HandledCorrectly(t *testing.T) {
 		t.Fatal("Card management should only be called once. Times called: ", cm.TotalCalls())
 	}
 
-	if !CompareByteSlices(cm.GetCardIds[0], cs.NextCard) {
+	if cm.GetCardIds[0] != cs.NextCard {
 		t.Error("Wrong card Id passed to card management.",
 			"Expected:", cm.GetCardIds[0],
 			"Got:", cs.NextCard)
@@ -170,8 +170,8 @@ func Test_CardHandler_Report_ProtoReadError_WriteError(t *testing.T) {
 func Test_CardHandler_Report_UpdateError_WriteError(t *testing.T) {
 	var handler, pio, cs, um, cm = getMockedHandler()
 	var req = RequestFromURL(CARD_REPORT_URL)
-	testUser := pbuf.User{Id: []byte{2, 3, 7}}
-	testCardReport := pbuf.CardScoreReport{CardSetId: []byte{1, 2, 10}}
+	testUser := pbuf.User{Id: int64(3)}
+	testCardReport := pbuf.CardScoreReport{CardSetId: int64(3)}
 	testCardReport.Update = &pbuf.CardUpdate{}
 	um.UpdateHistoryReturn = errors.New("")
 	pio.ReportReturn = testCardReport
@@ -192,13 +192,13 @@ func Test_CardHandler_Report_UpdateError_WriteError(t *testing.T) {
 		t.Fatal("User managment should be called once. Times called:", um.TotalCalls)
 	}
 
-	if !CompareByteSlices(um.UpdateHistoryUsers[0].Id, testUser.Id) {
+	if um.UpdateHistoryUsers[0].Id != testUser.Id {
 		t.Error("Wrong user passed to update history.",
 			"Expected:", um.UpdateHistoryUsers[0].Id,
 			"Got:", testUser.Id)
 	}
 
-	if !CompareByteSlices(um.UpdateHistoryCardSetIds[0], testCardReport.CardSetId) {
+	if um.UpdateHistoryCardSetIds[0] != testCardReport.CardSetId {
 		t.Error("Wrong user passed to update history.",
 			"Expected:", um.UpdateHistoryCardSetIds[0],
 			"Got:", testCardReport.CardSetId)
@@ -214,8 +214,8 @@ func Test_CardHandler_Report_Success_HandledCorrectly(t *testing.T) {
 	var handler, pio, cs, um, cm = getMockedHandler()
 	var req = RequestFromURL(CARD_REPORT_URL)
 	expectedResponseWrite := pbuf.UpdateResponse{Status: 1}
-	testUser := pbuf.User{Id: []byte{2, 3, 7}}
-	testCardReport := pbuf.CardScoreReport{CardSetId: []byte{1, 2, 10}}
+	testUser := pbuf.User{Id: int64(3)}
+	testCardReport := pbuf.CardScoreReport{CardSetId: int64(3)}
 	testCardReport.Update = &pbuf.CardUpdate{}
 	pio.ReportReturn = testCardReport
 	handler.Handle(nil, req, testUser)
@@ -237,13 +237,13 @@ func Test_CardHandler_Report_Success_HandledCorrectly(t *testing.T) {
 		t.Fatal("User managment should be called once. Times called:", um.TotalCalls)
 	}
 
-	if !CompareByteSlices(um.UpdateHistoryUsers[0].Id, testUser.Id) {
+	if um.UpdateHistoryUsers[0].Id != testUser.Id {
 		t.Error("Wrong user passed to update history.",
 			"Expected:", um.UpdateHistoryUsers[0].Id,
 			"Got:", testUser.Id)
 	}
 
-	if !CompareByteSlices(um.UpdateHistoryCardSetIds[0], testCardReport.CardSetId) {
+	if um.UpdateHistoryCardSetIds[0] != testCardReport.CardSetId {
 		t.Error("Wrong user passed to update history.",
 			"Expected:", um.UpdateHistoryCardSetIds[0],
 			"Got:", testCardReport.CardSetId)
@@ -280,10 +280,10 @@ func Test_CardHandler_ReportNext_ProtoIO_ErrorWritten(t *testing.T) {
 func Test_CardHandler_ReportNext_HandledCorrectly(t *testing.T) {
 	var handler, pio, cs, um, cm = getMockedHandler()
 	var req = RequestFromURL(CARD_NEXT_URL)
-	nextCardRequest := pbuf.NextCardRequest{CardSetId: []byte{0, 1, 2}}
+	nextCardRequest := pbuf.NextCardRequest{CardSetId: int64(3)}
 	nextCard := pbuf.Card{Title: "TestCard"}
 	cm.ReturnCard = nextCard
-	cs.NextCard = []byte{4, 5, 6}
+	cs.NextCard = int64(3)
 	pio.NextCardReturn = nextCardRequest
 	testHistory := pbuf.UserHistory{PlayIndex: 123}
 	um.GetHistoryReturn = testHistory
@@ -314,7 +314,7 @@ func Test_CardHandler_ReportNext_HandledCorrectly(t *testing.T) {
 		t.Fatal("User managment should be called once. Times called:", um.TotalCalls)
 	}
 
-	if !CompareByteSlices(um.GetHistoryCardSetIds[0], nextCardRequest.CardSetId) {
+	if um.GetHistoryCardSetIds[0] != nextCardRequest.CardSetId {
 		t.Error("Wrong card set Id passed to GetHistory",
 			"Expected:", um.GetHistoryCardSetIds[0],
 			"Got:", nextCardRequest.CardSetId)
@@ -324,7 +324,7 @@ func Test_CardHandler_ReportNext_HandledCorrectly(t *testing.T) {
 		t.Fatal("Card management should only be called once. Times called: ", cm.TotalCalls())
 	}
 
-	if !CompareByteSlices(cm.GetCardIds[0], cs.NextCard) {
+	if cm.GetCardIds[0] != cs.NextCard {
 		t.Error("Wrong card Id passed to card management.",
 			"Expected:", cm.GetCardIds[0],
 			"Got:", cs.NextCard)
@@ -335,10 +335,10 @@ func Test_CardHandler_ReportNext_HandledCorrectly(t *testing.T) {
 func Test_CardHandler_ReportNext_WithUpdateError_ErrorSilent(t *testing.T) {
 	var handler, pio, cs, um, cm = getMockedHandler()
 	var req = RequestFromURL(CARD_NEXT_URL)
-	nextCardRequest := pbuf.NextCardRequest{CardSetId: []byte{0, 1, 2}}
+	nextCardRequest := pbuf.NextCardRequest{CardSetId: int64(3)}
 	nextCard := pbuf.Card{Title: "TestCard"}
 	cm.ReturnCard = nextCard
-	cs.NextCard = []byte{4, 5, 6}
+	cs.NextCard = int64(3)
 	pio.NextCardReturn = nextCardRequest
 	testHistory := pbuf.UserHistory{PlayIndex: 123}
 	um.GetHistoryReturn = testHistory
@@ -371,7 +371,7 @@ func Test_CardHandler_ReportNext_WithUpdateError_ErrorSilent(t *testing.T) {
 		t.Fatal("User managment should be called once. Times called:", um.TotalCalls)
 	}
 
-	if !CompareByteSlices(um.GetHistoryCardSetIds[0], nextCardRequest.CardSetId) {
+	if um.GetHistoryCardSetIds[0] != nextCardRequest.CardSetId {
 		t.Error("Wrong card set Id passed to GetHistory",
 			"Expected:", um.GetHistoryCardSetIds[0],
 			"Got:", nextCardRequest.CardSetId)
@@ -381,7 +381,7 @@ func Test_CardHandler_ReportNext_WithUpdateError_ErrorSilent(t *testing.T) {
 		t.Fatal("Card management should only be called once. Times called: ", cm.TotalCalls())
 	}
 
-	if !CompareByteSlices(cm.GetCardIds[0], cs.NextCard) {
+	if cm.GetCardIds[0] != cs.NextCard {
 		t.Error("Wrong card Id passed to card management.",
 			"Expected:", cm.GetCardIds[0],
 			"Got:", cs.NextCard)
