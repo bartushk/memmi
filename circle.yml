@@ -12,7 +12,8 @@ dependencies:
     - npm install -g protobufjs
     - go get -u github.com/golang/protobuf/proto
     - go get -u github.com/golang/protobuf/protoc-gen-go
-    - cd ./proto && ../bin/protoc --go_out=../web/src/memmi/pbuf ./*.proto && cd ..
+    - cd ./proto && ../bin/protoc --go_out=../web/src/memmi/pbuf ./memmi.proto && cd ..
+    - cd ./proto && ../bin/protoc --go_out=../web/src/memmi/config ./config.proto && cd ..
     - ./pbuf.sh
 
   override:
