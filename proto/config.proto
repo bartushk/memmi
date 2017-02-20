@@ -17,14 +17,21 @@ message App {
 message Router {
   LoggingType logType = 1;
   string logEndpoint = 2;
+  repeated string handlers = 3;
 }
 
 message CardManagement {
   ManagementType type = 1;
   string endpoint = 2;
+  bool seed = 3;
 }
 
 message UserManagement {
   ManagementType type = 1;
   string endpoint = 2;
+  bool seed = 3;
+}
+
+message Factory {
+  bool UseSingletons = 1;
 }

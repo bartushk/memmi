@@ -8,6 +8,7 @@ var cMan CardManagement
 var uMan UserManagement
 var router Router
 var app App
+var fact Factory
 
 func LoadFromFile(directory, filename string) {
 	SetDefaults()
@@ -19,6 +20,7 @@ func LoadFromFile(directory, filename string) {
 	cMan = genCardManagement()
 	uMan = genUserManagement()
 	router = genRouter()
+	fact = genFactory()
 }
 
 func Load() {
@@ -39,4 +41,8 @@ func RouterConfig() Router {
 
 func AppConfig() App {
 	return app
+}
+
+func FactoryCOnfig() Factory {
+	return fact
 }

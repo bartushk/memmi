@@ -75,7 +75,7 @@ func Test_CardSetHandler_GetCardSet_NoError_HandledCorrectly(t *testing.T) {
 	var req = RequestFromURL(GET_CARDSET_URL)
 	testUser := pbuf.User{}
 	testCardSetRequest := pbuf.CardSetRequest{Id: int64(7)}
-	testCardSet := pbuf.CardSet{SetName: "TestCard"}
+	testCardSet := pbuf.CardSet{Title: "TestCard"}
 
 	cm.On("GetCardSetById", mock.Anything).Return(testCardSet, nil)
 	pio.On("ReadCardSetRequest", req).Return(testCardSetRequest, nil)

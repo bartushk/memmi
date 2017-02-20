@@ -27,18 +27,18 @@ message CardSet {
   int32 version = 2;
   int64 createdDate = 3;
   int64 authorId = 4;
-  string setName = 5;
-  string title = 6;
-  repeated int64 cardIds = 7;
+  string title = 5;
+  repeated int64 cardIds = 6;
+  repeated string tags = 7;
 }
 
 message Card {
   int64 id = 1;
-  int32 cardIndex = 2;
-  string title = 3;
-  CardInfo front = 4;
-  CardInfo back = 5;
-  int64 createdDate = 6;
+  string title = 2;
+  CardInfo front = 3;
+  CardInfo back = 4;
+  int64 createdDate = 5;
+  repeated string tags = 6;
 }
 
 message CardInfo {

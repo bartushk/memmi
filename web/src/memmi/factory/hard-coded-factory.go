@@ -11,8 +11,9 @@ type HardCodedFactory struct {
 
 func (fact *HardCodedFactory) GetRouter() request.Router {
 	router := request.Router{}
-	cMan := fact.GetCardManagement()
-	uMan := fact.GetUserManagement()
+	cMan := card.NewInMemoryManagement()
+	uMan := user.NewInMemoryManagement()
+	uMan.CardMan = cMan
 	pio := &request.ProtoIoImpl{}
 	auth := &request.AnonAuthenticator{}
 

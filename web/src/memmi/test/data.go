@@ -30,10 +30,40 @@ func GetFakeCardSet() pbuf.CardSet {
 		Version:     int32(6),
 		CreatedDate: int64(12),
 		AuthorId:    int64(3),
-		SetName:     "Cool Set",
 		Title:       "This set is cool.",
 		CardIds:     []int64{0, 2, 12},
+		Tags:        []string{"Cool", "Funny", "Test"},
 	}
+}
+
+func GetFakeCards() []pbuf.Card {
+	card1 := pbuf.Card{
+		Id:          int64(0),
+		Title:       "First Card",
+		Front:       &pbuf.CardInfo{Type: "html", Value: "<h1> First Card Front </h1>"},
+		Back:        &pbuf.CardInfo{Type: "html", Value: "<h1> First Card Back </h1>"},
+		CreatedDate: int64(0),
+		Tags:        []string{"First", "Card"},
+	}
+
+	card2 := pbuf.Card{
+		Id:          int64(1),
+		Title:       "Second Card",
+		Front:       &pbuf.CardInfo{Type: "html", Value: "<h1> Second Card Front </h1>"},
+		Back:        &pbuf.CardInfo{Type: "html", Value: "<h1> Second Card Back </h1>"},
+		CreatedDate: int64(0),
+		Tags:        []string{"Second", "Card"},
+	}
+
+	card3 := pbuf.Card{
+		Id:          int64(2),
+		Title:       "Third Card",
+		Front:       &pbuf.CardInfo{Type: "html", Value: "<h1> Third Card Front </h1>"},
+		Back:        &pbuf.CardInfo{Type: "html", Value: "<h1> Third Card Back </h1>"},
+		CreatedDate: int64(0),
+		Tags:        []string{"Third", "Card"},
+	}
+	return []pbuf.Card{card1, card2, card3}
 }
 
 func GetFakeHistory() pbuf.UserHistory {

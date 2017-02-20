@@ -3,9 +3,15 @@ server = ":80"
 
 [router]
 logType = "console"
+handlers = ["cardSet", "card"]
 
 [cardManagement]
 type = "inmemory"
+seed = false
 
 [userManagement]
 type = "inmemory"
+seed = false
+
+[factory]
+useSingletons = true

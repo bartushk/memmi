@@ -14,10 +14,10 @@ const fakeUser = {
 
 const fakeCardOne = {
   id:           util.Long.fromValue(0),
-  cardIndex:    0,
   title:        'Card One',
   front:        {type: 'html', value: '<h1>Hello</h1>'},
-  back:         {type: 'html', value: '<h1>GoodBye</h1>'}
+  back:         {type: 'html', value: '<h1>GoodBye</h1>'},
+  tags:         ["Cooler", "Nerder"],
 }
 
 const fakeHistoryOne = {
@@ -30,10 +30,10 @@ const fakeHistoryOne = {
 
 const fakeCardTwo = {
   id:           util.Long.fromValue(1),
-  cardIndex:    1,
   title:        'Card Two',
   front:        {type: 'html', value: '<h1>Ni Hao</h1>'},
-  back:         {type: 'html', value: '<h1>Zai Jian</h1>'}
+  back:         {type: 'html', value: '<h1>Zai Jian</h1>'},
+  tags:         ["Coolest", "Nerdest"],
 }
 
 const fakeHistoryTwo = {
@@ -49,9 +49,9 @@ const fakeCardSet = {
   version:      0,
   createdDate:  util.Long.fromValue(10),
   authorId:     util.Long.fromValue(0),
-  setName:      'CatSet',
   title:        'Cat Cards',
-  cardIds:        [fakeCardOne.id, fakeCardTwo.id],
+  cardIds:      [fakeCardOne.id, fakeCardTwo.id],
+  tags:         ["Cool", "Nerd"],
 }
 
 const fakeCardUpdate = {
