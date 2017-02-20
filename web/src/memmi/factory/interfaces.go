@@ -8,7 +8,6 @@ import (
 
 type Factory interface {
 	GetRouter() request.Router
-	GetCardManagment() card.CardManagement
-	GetCardSelection() card.CardSelection
+	GetCardManagement() card.CardManagement
 	GetUserManagement() user.UserManagement
 }
