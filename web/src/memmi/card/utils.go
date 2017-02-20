@@ -24,5 +24,6 @@ func GenerateEmptyHistory(cardSet *pbuf.CardSet) pbuf.UserHistory {
 		}
 		history.History = append(history.History, cardHistory)
 	}
+	history.SetVersion = cardSet.Version
 	return history
 }

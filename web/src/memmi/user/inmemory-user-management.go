@@ -107,6 +107,7 @@ func (manager *InMemoryUserManagement) UpdateHistory(user pbuf.User, cardSetId i
 			history.PlayIndex += 1
 		}
 	}
+	manager.userHistories[fullId] = history
 	return nil
 }
 

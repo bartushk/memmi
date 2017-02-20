@@ -246,6 +246,7 @@ func Test_InMemoryUserManagement_UpdateHistory_HistoryExists_GetsUpdated(t *test
 	fullId := uMan.getHistoryKey(testUser.Id, testCardSet.Id)
 	uMan.userHistories[fullId] = testHistory
 	expected := test.GetFakeHistory()
+	expected.PlayIndex += 1
 	expected.History[2].CurrentScore += testUpdate.Score
 	expected.History[2].Scores = append(expected.History[2].Scores, testUpdate.Score)
 	expected.History[2].Indicies = append(expected.History[2].Indicies, testHistory.PlayIndex)
