@@ -1,0 +1,11 @@
+[app]
+server = ":8081"
+
+[router]
+logType = "console"
+
+[cardManagement]
+type = "inmemory"
+
+[userManagement]
+type = "inmemory"

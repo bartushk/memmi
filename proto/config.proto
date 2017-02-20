@@ -1,0 +1,30 @@
+syntax = "proto3";
+package config;
+
+
+enum ManagementType {
+  inmemory = 0;
+}
+ 
+enum LoggingType {
+  console = 0;
+}
+
+message App {
+  string server = 1;
+}
+
+message Router {
+  LoggingType logType = 1;
+  string logEndpoint = 2;
+}
+
+message CardManagement {
+  ManagementType type = 1;
+  string endpoint = 2;
+}
+
+message UserManagement {
+  ManagementType type = 1;
+  string endpoint = 2;
+}
