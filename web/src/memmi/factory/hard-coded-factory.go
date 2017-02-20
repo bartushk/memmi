@@ -3,6 +3,7 @@ package factory
 import (
 	"memmi/card"
 	"memmi/request"
+	"memmi/test"
 	"memmi/user"
 )
 
@@ -33,6 +34,16 @@ func (fact *HardCodedFactory) GetRouter() request.Router {
 
 	router.AddHandler(cHandler)
 	router.AddHandler(csHandler)
+
+	// Seed some data.
+	cardSet := test.GetFakeCardSet()
+	cardSet.CardIds = []int64{}
+	cards := test.GetFakeCards()
+	for _, card := range cards {
+		id, _ := cMan.SaveCard(&card)
+		cardSet.CardIds = append(cardSet.CardIds, id)
+	}
+	cMan.SaveCardSet(&cardSet)
 
 	return router
 }
