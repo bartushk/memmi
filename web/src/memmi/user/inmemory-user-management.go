@@ -110,19 +110,23 @@ func (manager *InMemoryUserManagement) UpdateHistory(user pbuf.User, cardSetId i
 	return nil
 }
 
-func (management *InMemoryUserManagement) AddUser(user pbuf.User, authInfo pbuf.UserAuthInfo) error {
+func (management *InMemoryUserManagement) AddUser(user pbuf.User, authInfo pbuf.UserAuthInfo) (int64, error) {
 	for _, savedUser := range management.users {
 		if savedUser.UserName == user.UserName {
-			return errors.New("UserNames must be unique.")
+			return 0, errors.New("Tried adding a user that already exists userNames must be unique.")
 		}
 	}
 	id := management.userCounter
+	_, ok := management.users[id]
+	if ok {
+		return 0, errors.New("Tried adding a user at an occupied id.")
+	}
 	user.Id = id
 	management.users[id] = user
 	management.userIds[user.UserName] = id
 	management.authInfo[id] = authInfo
 	management.userCounter += 1
-	return nil
+	return id, nil
 }
 
 func (management *InMemoryUserManagement) DeleteUser(userId int64) error {

@@ -11,6 +11,6 @@ type UserManagement interface {
 	GetUserByUserName(userName string) (pbuf.User, error)
 	GetUserById(userId int64) (pbuf.User, error)
 	UpdateHistory(user pbuf.User, cardSetId int64, update pbuf.CardUpdate) error
-	AddUser(user pbuf.User, authInfo pbuf.UserAuthInfo) error
+	AddUser(user pbuf.User, authInfo pbuf.UserAuthInfo) (int64, error)
 	DeleteUser(userId int64) error
 }

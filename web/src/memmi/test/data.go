@@ -4,7 +4,7 @@ import (
 	"memmi/pbuf"
 )
 
-func GetTestUser() pbuf.User {
+func GetFakeUser() pbuf.User {
 	return pbuf.User{
 		Id:              int64(3),
 		UserName:        "bartushk",
@@ -25,15 +25,24 @@ func GetFakeAuthInfo() pbuf.UserAuthInfo {
 }
 
 func GetFakeCardSet() pbuf.CardSet {
-	return pbuf.CardSet{}
+	return pbuf.CardSet{
+		Id:          int64(3),
+		Version:     int32(6),
+		CreatedDate: int64(12),
+		AuthorId:    int64(3),
+		SetName:     "Cool Set",
+		Title:       "This set is cool.",
+		CardIds:     []int64{0, 2, 12},
+	}
 }
 
-func GetTestHistory() pbuf.UserHistory {
+func GetFakeHistory() pbuf.UserHistory {
 	ret := pbuf.UserHistory{
-		UserId:    int64(3),
-		CardSetId: int64(3),
-		PlayIndex: 4,
-		History:   []*pbuf.CardHistory{},
+		UserId:     int64(3),
+		CardSetId:  int64(3),
+		SetVersion: int32(6),
+		PlayIndex:  4,
+		History:    []*pbuf.CardHistory{},
 	}
 
 	history1 := &pbuf.CardHistory{

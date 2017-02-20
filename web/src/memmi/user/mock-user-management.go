@@ -39,12 +39,12 @@ func (management *MockUserManagement) UpdateHistory(user pbuf.User, cardSetId in
 	return args.Error(0)
 }
 
-func (management *MockUserManagement) AddUser(user pbuf.User, authInfo pbuf.UserAuthInfo) error {
+func (management *MockUserManagement) AddUser(user pbuf.User, authInfo pbuf.UserAuthInfo) (int64, error) {
 	args := management.Called(user, authInfo)
-	return args.Error(1)
+	return args.Get(0).(int64), args.Error(1)
 }
 
 func (management *MockUserManagement) DeleteUser(userId int64) error {
 	args := management.Called(userId)
-	return args.Error(1)
+	return args.Error(0)
 }

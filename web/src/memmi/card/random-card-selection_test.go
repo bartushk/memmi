@@ -48,7 +48,7 @@ func Test_RandomCardSelection_WhenHistoryIsEmpty_ReturnsZero(t *testing.T) {
 }
 
 func Test_RandomCardSelection_ReturnsCorrectItem(t *testing.T) {
-	testHistory := test.GetTestHistory()
+	testHistory := test.GetFakeHistory()
 	mockSource := &MockSource{returnVal: 1}
 	randSel := RandomCardSelection{src: mockSource}
 	expected := testHistory.History[1].CardId
@@ -59,7 +59,7 @@ func Test_RandomCardSelection_ReturnsCorrectItem(t *testing.T) {
 }
 
 func Tetst_RandomCardSelectoin_HandlesOverflow(t *testing.T) {
-	testHistory := test.GetTestHistory()
+	testHistory := test.GetFakeHistory()
 	mockSource := &MockSource{returnVal: 4}
 	randSel := RandomCardSelection{src: mockSource}
 	expected := testHistory.History[1].CardId
