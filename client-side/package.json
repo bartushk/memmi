@@ -16,7 +16,7 @@
     "url": "https://github.com/bartushk/memmi"
   },
   "scripts": {
-    "start": "webpack-dev-server --inline --hot --history-api-fallback",
+    "start": "webpack-dev-server --inline --hot --history-api-fallback --host 0.0.0.0",
     "build-dev": "webpack --config webpack.dev.config.js",
     "build-prod": "webpack -p --config webpack.prod.config.js",
     "test": "babel-tape-runner ./test/**/*.js | tap-spec",

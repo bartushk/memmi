@@ -21,6 +21,8 @@ function decode(data, type) {
     return protos.CardUpdate.decode(data)
   case 'player-history':
     return protos.UserHistory.decode(data)
+  case 'next-card-request':
+    return protos.NextCardRequest.decode(data)
   default:
     return {}
   }
@@ -38,6 +40,8 @@ function encode(proto, type) {
     return protos.CardUpdate.encode(proto).finish()
   case 'player-history':
     return protos.UserHistory.encode(proto).finish()
+  case 'next-card-request':
+    return protos.NextCardRequest.encode(proto).finish()
   default:
     throw exception('Invalid type to decode with: ' + type)
   }

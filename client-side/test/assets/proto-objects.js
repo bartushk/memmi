@@ -9,7 +9,7 @@ const fakeUser = {
   lastName:             'Cat',
   email:                'Dooie@cat.com',
   isAuthenticated:      false,
-  joinedDate:  util.Long.fromValue(10),
+  joinedDate:  util.Long.fromValue(10)
 }
 
 const fakeCardOne = {
@@ -17,7 +17,7 @@ const fakeCardOne = {
   title:        'Card One',
   front:        {type: 'html', value: '<h1>Hello</h1>'},
   back:         {type: 'html', value: '<h1>GoodBye</h1>'},
-  tags:         ["Cooler", "Nerder"],
+  tags:         ['Cooler', 'Nerder']
 }
 
 const fakeHistoryOne = {
@@ -33,7 +33,7 @@ const fakeCardTwo = {
   title:        'Card Two',
   front:        {type: 'html', value: '<h1>Ni Hao</h1>'},
   back:         {type: 'html', value: '<h1>Zai Jian</h1>'},
-  tags:         ["Coolest", "Nerdest"],
+  tags:         ['Coolest', 'Nerdest']
 }
 
 const fakeHistoryTwo = {
@@ -51,7 +51,7 @@ const fakeCardSet = {
   authorId:     util.Long.fromValue(0),
   title:        'Cat Cards',
   cardIds:      [fakeCardOne.id, fakeCardTwo.id],
-  tags:         ["Cool", "Nerd"],
+  tags:         ['Cool', 'Nerd']
 }
 
 const fakeCardUpdate = {
@@ -60,17 +60,24 @@ const fakeCardUpdate = {
 }
 
 const fakeUserHistory = {
-  userId:     util.Long.fromValue(0),
+  userId:       util.Long.fromValue(0),
   cardSetId:    util.Long.fromValue(0),
   playIndex:    0,
   history:      [fakeHistoryOne, fakeHistoryTwo]
 }
 
+const nextCardRequest = {
+  cardSetId: util.Long.fromValue(1),
+  previousCardId: util.Long.fromValue(1),
+  algorithm: 0
+}
+
 export default {
   getFakeCardSet:       () => { return proto.CardSet.create(fakeCardSet) },
-  getFakeUserHistory: () => { return proto.UserHistory.create(fakeUserHistory) },
+  getFakeUserHistory:   () => { return proto.UserHistory.create(fakeUserHistory) },
   getFakeCardUpdate:    () => { return proto.CardUpdate.create(fakeCardUpdate) },
   getFakeUser:          () => { return proto.User.create(fakeUser) },
   getFakeCardOne:       () => { return proto.Card.create(fakeCardOne) },
-  getFakeCardTwo:       () => { return proto.Card.create(fakeCardTwo) }
+  getFakeCardTwo:       () => { return proto.Card.create(fakeCardTwo) },
+  getNextCardRequest:   () => { return proto.NextCardRequest.create(nextCardRequest)}
 }
