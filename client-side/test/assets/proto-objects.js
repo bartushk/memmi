@@ -2,7 +2,7 @@ import pbuf from '../../src/pbuf/pbuf'
 import {util} from 'protobufjs'
 const proto = pbuf.pbuf
 
-const fakeUser = {
+const user = {
   id:                   util.Long.fromValue(0),
   userName:             'd_cat',
   firstName:            'Doodie',
@@ -12,7 +12,7 @@ const fakeUser = {
   joinedDate:  util.Long.fromValue(10)
 }
 
-const fakeCardOne = {
+const cardOne = {
   id:           util.Long.fromValue(0),
   title:        'Card One',
   front:        {type: 'html', value: '<h1>Hello</h1>'},
@@ -20,7 +20,7 @@ const fakeCardOne = {
   tags:         ['Cooler', 'Nerder']
 }
 
-const fakeHistoryOne = {
+const historyOne = {
   cardId:       util.Long.fromValue(0),
   currentScore: 1,
   cardIndex:    0,
@@ -28,7 +28,7 @@ const fakeHistoryOne = {
   indicies:     [0]
 }
 
-const fakeCardTwo = {
+const cardTwo = {
   id:           util.Long.fromValue(1),
   title:        'Card Two',
   front:        {type: 'html', value: '<h1>Ni Hao</h1>'},
@@ -36,7 +36,7 @@ const fakeCardTwo = {
   tags:         ['Coolest', 'Nerdest']
 }
 
-const fakeHistoryTwo = {
+const historyTwo = {
   cardId:       util.Long.fromValue(1),
   currentScore: -2,
   cardIndex:    1,
@@ -44,26 +44,26 @@ const fakeHistoryTwo = {
   indicies:     [1]
 }
 
-const fakeCardSet = {
+const cardSet = {
   id:           util.Long.fromValue(0),
   version:      0,
   createdDate:  util.Long.fromValue(10),
   authorId:     util.Long.fromValue(0),
   title:        'Cat Cards',
-  cardIds:      [fakeCardOne.id, fakeCardTwo.id],
+  cardIds:      [cardOne.id, cardTwo.id],
   tags:         ['Cool', 'Nerd']
 }
 
-const fakeCardUpdate = {
+const cardUpdate = {
   cardId:       util.Long.fromValue(0),
   score:        2
 }
 
-const fakeUserHistory = {
+const userHistory = {
   userId:       util.Long.fromValue(0),
   cardSetId:    util.Long.fromValue(0),
   playIndex:    0,
-  history:      [fakeHistoryOne, fakeHistoryTwo]
+  history:      [historyOne, historyTwo]
 }
 
 const nextCardRequest = {
@@ -72,12 +72,44 @@ const nextCardRequest = {
   algorithm: 0
 }
 
+const cardScoreReport  = {
+  cardSetId: util.Long.fromValue(1),
+  update: cardUpdate
+}
+
+const reportAndNext = {
+  nextRequest: nextCardRequest,
+  report: cardScoreReport
+}
+
+const requestError = {
+  reason: 'Just didn\'t work'
+}
+
+const updateResponse = {
+  status: 0
+}
+
+const cardSetRequest = {
+  id: util.Long.fromValue(0)
+}
+
+const cardRequest = {
+  id: util.Long.fromValue(0)
+}
+
 export default {
-  getFakeCardSet:       () => { return proto.CardSet.create(fakeCardSet) },
-  getFakeUserHistory:   () => { return proto.UserHistory.create(fakeUserHistory) },
-  getFakeCardUpdate:    () => { return proto.CardUpdate.create(fakeCardUpdate) },
-  getFakeUser:          () => { return proto.User.create(fakeUser) },
-  getFakeCardOne:       () => { return proto.Card.create(fakeCardOne) },
-  getFakeCardTwo:       () => { return proto.Card.create(fakeCardTwo) },
-  getNextCardRequest:   () => { return proto.NextCardRequest.create(nextCardRequest)}
+  getCardSet:           () => { return proto.CardSet.create(cardSet) },
+  getUserHistory:       () => { return proto.UserHistory.create(userHistory) },
+  getCardUpdate:        () => { return proto.CardUpdate.create(cardUpdate) },
+  getUser:              () => { return proto.User.create(user) },
+  getCardOne:           () => { return proto.Card.create(cardOne) },
+  getCardTwo:           () => { return proto.Card.create(cardTwo) },
+  getNextCardRequest:   () => { return proto.NextCardRequest.create(nextCardRequest)},
+  getCardScoreReport:   () => { return proto.CardScoreReport.create(cardScoreReport)},
+  getReportAndNext:     () => { return proto.ReportAndNext.create(reportAndNext)},
+  getRequestError:      () => { return proto.RequestError.create(requestError)},
+  getUpdateResponse:    () => { return proto.UpdateResponse.create(updateResponse)},
+  getCardSetRequest:    () => { return proto.CardSetRequest.create(cardSetRequest)},
+  getCardRequest:       () => { return proto.CardRequest.create(cardRequest)}
 }

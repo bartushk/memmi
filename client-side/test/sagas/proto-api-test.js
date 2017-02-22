@@ -12,7 +12,7 @@ SetFetch(mockFetch)
 
 test('Request with card type.', (assert) => {
   const url = '/api'
-  let result = api(url, data.getFakeCardOne(), 'card', null)
+  let result = api(url, data.getCardOne(), 'card', null)
 
   assert.equal(result.url, url, 'Correct url passed to fetch.')
   assert.equal(result.args.method, 'POST', 'Method should be post.')
@@ -31,7 +31,7 @@ test('Request with card type.', (assert) => {
 
   assert.deepEqual(
     result.decode,
-    data.getFakeCardOne(),
+    data.getCardOne(),
     'Decoded value should match input.'
   )
 
@@ -40,7 +40,7 @@ test('Request with card type.', (assert) => {
 
 test('Request with user type.', (assert) => {
   const url = 'api'
-  let result = api(url, data.getFakeUser(), 'user', null)
+  let result = api(url, data.getUser(), 'user', null)
 
   assert.equal(result.url, url, 'Correct url passed to fetch.')
   assert.equal(result.args.method, 'POST', 'Method should be post.')
@@ -59,7 +59,7 @@ test('Request with user type.', (assert) => {
 
   assert.deepEqual(
     result.decode,
-    data.getFakeUser(),
+    data.getUser(),
     'Decoded value should match input.'
   )
 
@@ -68,7 +68,7 @@ test('Request with user type.', (assert) => {
 
 test('Request with cardset type.', (assert) => {
   const url = 'api'
-  let result = api(url, data.getFakeCardSet(), 'card-set', null)
+  let result = api(url, data.getCardSet(), 'card-set', null)
 
   assert.equal(result.url, url, 'Correct url passed to fetch.')
   assert.equal(result.args.method, 'POST', 'Method should be post.')
@@ -87,7 +87,7 @@ test('Request with cardset type.', (assert) => {
 
   assert.deepEqual(
     result.decode,
-    data.getFakeCardSet(),
+    data.getCardSet(),
     'Decoded value should match input.'
   )
 
@@ -96,7 +96,7 @@ test('Request with cardset type.', (assert) => {
 
 test('Request with card-update type.', (assert) => {
   const url = 'api'
-  let result = api(url, data.getFakeCardUpdate(), 'card-update', null)
+  let result = api(url, data.getCardUpdate(), 'card-update', null)
 
   assert.equal(result.url, url, 'Correct url passed to fetch.')
   assert.equal(result.args.method, 'POST', 'Method should be post.')
@@ -115,7 +115,7 @@ test('Request with card-update type.', (assert) => {
 
   assert.deepEqual(
     result.decode,
-    data.getFakeCardUpdate(),
+    data.getCardUpdate(),
     'Decoded value should match input.'
   )
 
@@ -124,7 +124,7 @@ test('Request with card-update type.', (assert) => {
 
 test('Request with player-history type.', (assert) => {
   const url = 'api'
-  let result = api(url, data.getFakeUserHistory(), 'player-history', null)
+  let result = api(url, data.getUserHistory(), 'player-history', null)
 
   assert.equal(result.url, url, 'Correct url passed to fetch.')
   assert.equal(result.args.method, 'POST', 'Method should be post.')
@@ -143,7 +143,7 @@ test('Request with player-history type.', (assert) => {
 
   assert.deepEqual(
     result.decode,
-    data.getFakeUserHistory(),
+    data.getUserHistory(),
     'Decoded value should match input.'
   )
 
@@ -172,6 +172,174 @@ test('Request with NextCardRequest type.', (assert) => {
   assert.deepEqual(
     result.decode,
     data.getNextCardRequest(),
+    'Decoded value should match input.'
+  )
+
+  assert.end()
+})
+
+test('Request with CardScoreReport type.', (assert) => {
+  const url = 'api'
+  let result = api(url, data.getCardScoreReport(), 'card-score-report', null)
+
+  assert.equal(result.url, url, 'Correct url passed to fetch.')
+  assert.equal(result.args.method, 'POST', 'Method should be post.')
+
+  assert.equal(
+    result.args.headers['Content-Type'],
+    'application/x-protobuf',
+    'Content type should be "application/x-protobuf"'
+  )
+
+  assert.deepEqual(
+    result.encode,
+    result.args.body,
+    'Request body should be encoded protobuf.'
+  )
+
+  assert.deepEqual(
+    result.decode,
+    data.getCardScoreReport(),
+    'Decoded value should match input.'
+  )
+
+  assert.end()
+})
+
+test('Request with ReportAndNext type.', (assert) => {
+  const url = 'api'
+  let result = api(url, data.getReportAndNext(), 'report-and-next', null)
+
+  assert.equal(result.url, url, 'Correct url passed to fetch.')
+  assert.equal(result.args.method, 'POST', 'Method should be post.')
+
+  assert.equal(
+    result.args.headers['Content-Type'],
+    'application/x-protobuf',
+    'Content type should be "application/x-protobuf"'
+  )
+
+  assert.deepEqual(
+    result.encode,
+    result.args.body,
+    'Request body should be encoded protobuf.'
+  )
+
+  assert.deepEqual(
+    result.decode,
+    data.getReportAndNext(),
+    'Decoded value should match input.'
+  )
+
+  assert.end()
+})
+
+test('Request with RequestError type.', (assert) => {
+  const url = 'api'
+  let result = api(url, data.getRequestError(), 'request-error', null)
+
+  assert.equal(result.url, url, 'Correct url passed to fetch.')
+  assert.equal(result.args.method, 'POST', 'Method should be post.')
+
+  assert.equal(
+    result.args.headers['Content-Type'],
+    'application/x-protobuf',
+    'Content type should be "application/x-protobuf"'
+  )
+
+  assert.deepEqual(
+    result.encode,
+    result.args.body,
+    'Request body should be encoded protobuf.'
+  )
+
+  assert.deepEqual(
+    result.decode,
+    data.getRequestError(),
+    'Decoded value should match input.'
+  )
+
+  assert.end()
+})
+
+test('Request with UpdateResponse type.', (assert) => {
+  const url = 'api'
+  let result = api(url, data.getUpdateResponse(), 'update-response', null)
+
+  assert.equal(result.url, url, 'Correct url passed to fetch.')
+  assert.equal(result.args.method, 'POST', 'Method should be post.')
+
+  assert.equal(
+    result.args.headers['Content-Type'],
+    'application/x-protobuf',
+    'Content type should be "application/x-protobuf"'
+  )
+
+  assert.deepEqual(
+    result.encode,
+    result.args.body,
+    'Request body should be encoded protobuf.'
+  )
+
+  assert.deepEqual(
+    result.decode,
+    data.getUpdateResponse(),
+    'Decoded value should match input.'
+  )
+
+  assert.end()
+})
+
+test('Request with CardSetRequest type.', (assert) => {
+  const url = 'api'
+  let result = api(url, data.getCardSetRequest(), 'card-set-request', null)
+
+  assert.equal(result.url, url, 'Correct url passed to fetch.')
+  assert.equal(result.args.method, 'POST', 'Method should be post.')
+
+  assert.equal(
+    result.args.headers['Content-Type'],
+    'application/x-protobuf',
+    'Content type should be "application/x-protobuf"'
+  )
+
+  assert.deepEqual(
+    result.encode,
+    result.args.body,
+    'Request body should be encoded protobuf.'
+  )
+
+  assert.deepEqual(
+    result.decode,
+    data.getCardSetRequest(),
+    'Decoded value should match input.'
+  )
+
+  assert.end()
+})
+
+test('Request with CardRequest type.', (assert) => {
+  const url = 'api'
+  let result = api(url, data.getCardRequest(), 'card-request', null)
+
+  assert.equal(result.url, url, 'Correct url passed to fetch.')
+  assert.equal(result.args.method, 'POST', 'Method should be post.')
+
+  assert.equal(
+    result.args.headers['Content-Type'],
+    'application/x-protobuf',
+    'Content type should be "application/x-protobuf"'
+  )
+
+  assert.deepEqual(
+    result.encode,
+    result.args.body,
+    'Request body should be encoded protobuf.'
+  )
+
+  assert.deepEqual(
+    result.decode,
+    data.getCardRequest(),
     'Decoded value should match input.'
   )
 

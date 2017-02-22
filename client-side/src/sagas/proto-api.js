@@ -23,6 +23,18 @@ function decode(data, type) {
     return protos.UserHistory.decode(data)
   case 'next-card-request':
     return protos.NextCardRequest.decode(data)
+  case 'card-score-report':
+    return protos.CardScoreReport.decode(data)
+  case 'report-and-next':
+    return protos.ReportAndNext.decode(data)
+  case 'request-error':
+    return protos.RequestError.decode(data)
+  case 'update-response':
+    return protos.UpdateResponse.decode(data)
+  case 'card-set-request':
+    return protos.CardSetRequest.decode(data)
+  case 'card-request':
+    return protos.CardRequest.decode(data)
   default:
     return {}
   }
@@ -42,6 +54,18 @@ function encode(proto, type) {
     return protos.UserHistory.encode(proto).finish()
   case 'next-card-request':
     return protos.NextCardRequest.encode(proto).finish()
+  case 'card-score-report':
+    return protos.CardScoreReport.encode(proto).finish()
+  case 'report-and-next':
+    return protos.ReportAndNext.encode(proto).finish()
+  case 'request-error':
+    return protos.RequestError.encode(proto).finish()
+  case 'update-response':
+    return protos.UpdateResponse.encode(proto).finish()
+  case 'card-set-request':
+    return protos.CardSetRequest.encode(proto).finish()
+  case 'card-request':
+    return protos.CardRequest.encode(proto).finish()
   default:
     throw exception('Invalid type to decode with: ' + type)
   }
