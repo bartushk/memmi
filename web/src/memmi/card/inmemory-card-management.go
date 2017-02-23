@@ -3,24 +3,25 @@ package card
 import (
 	"errors"
 	"memmi/pbuf"
+	"strconv"
 )
 
 func NewInMemoryManagement() *InMemoryCardManagement {
 	newVal := &InMemoryCardManagement{
-		cardSets: make(map[int64]pbuf.CardSet),
-		cards:    make(map[int64]pbuf.Card),
+		cardSets: make(map[string]pbuf.CardSet),
+		cards:    make(map[string]pbuf.Card),
 	}
 	return newVal
 }
 
 type InMemoryCardManagement struct {
-	cardSets       map[int64]pbuf.CardSet
-	cards          map[int64]pbuf.Card
-	cardCounter    int64
-	cardSetCounter int64
+	cardSets       map[string]pbuf.CardSet
+	cards          map[string]pbuf.Card
+	cardCounter    int
+	cardSetCounter int
 }
 
-func (manager *InMemoryCardManagement) GetCardSetById(id int64) (pbuf.CardSet, error) {
+func (manager *InMemoryCardManagement) GetCardSetById(id string) (pbuf.CardSet, error) {
 	cardSet, ok := manager.cardSets[id]
 	if !ok {
 		return pbuf.CardSet{}, errors.New("Card set not found.")
@@ -28,7 +29,7 @@ func (manager *InMemoryCardManagement) GetCardSetById(id int64) (pbuf.CardSet, e
 	return cardSet, nil
 }
 
-func (manager *InMemoryCardManagement) GetCardById(id int64) (pbuf.Card, error) {
+func (manager *InMemoryCardManagement) GetCardById(id string) (pbuf.Card, error) {
 	card, ok := manager.cards[id]
 	if !ok {
 		return pbuf.Card{}, errors.New("Card not found.")
@@ -36,7 +37,7 @@ func (manager *InMemoryCardManagement) GetCardById(id int64) (pbuf.Card, error) 
 	return card, nil
 }
 
-func (manager *InMemoryCardManagement) DeleteCardSet(id int64) error {
+func (manager *InMemoryCardManagement) DeleteCardSet(id string) error {
 	_, ok := manager.cardSets[id]
 	if !ok {
 		return errors.New("CardSet with that ID does not exist and could not be deleted.")
@@ -45,7 +46,7 @@ func (manager *InMemoryCardManagement) DeleteCardSet(id int64) error {
 	return nil
 }
 
-func (manager *InMemoryCardManagement) DeleteCard(id int64) error {
+func (manager *InMemoryCardManagement) DeleteCard(id string) error {
 	_, ok := manager.cards[id]
 	if !ok {
 		return errors.New("Card with that ID does not exist and could not be deleted.")
@@ -54,14 +55,14 @@ func (manager *InMemoryCardManagement) DeleteCard(id int64) error {
 	return nil
 }
 
-func (manager *InMemoryCardManagement) SaveCardSet(set *pbuf.CardSet) (int64, error) {
+func (manager *InMemoryCardManagement) SaveCardSet(set *pbuf.CardSet) (string, error) {
 	if set == nil {
-		return 0, errors.New("Cannot save nil.")
+		return "", errors.New("Cannot save nil.")
 	}
-	id := manager.cardSetCounter
+	id := strconv.Itoa(manager.cardSetCounter)
 	_, ok := manager.cardSets[id]
 	if ok {
-		return 0, errors.New("There was a key collision and your card set could not be saved.")
+		return "", errors.New("There was a key collision and your card set could not be saved.")
 	}
 	set.Id = id
 	manager.cardSets[id] = *set
@@ -69,14 +70,14 @@ func (manager *InMemoryCardManagement) SaveCardSet(set *pbuf.CardSet) (int64, er
 	return id, nil
 }
 
-func (manager *InMemoryCardManagement) SaveCard(card *pbuf.Card) (int64, error) {
+func (manager *InMemoryCardManagement) SaveCard(card *pbuf.Card) (string, error) {
 	if card == nil {
-		return 0, errors.New("Cannot save nil.")
+		return "", errors.New("Cannot save nil.")
 	}
-	id := manager.cardCounter
+	id := strconv.Itoa(manager.cardCounter)
 	_, ok := manager.cards[id]
 	if ok {
-		return 0, errors.New("There was a key collision and your card could not be saved.")
+		return "", errors.New("There was a key collision and your card could not be saved.")
 	}
 	card.Id = id
 	manager.cards[id] = *card

@@ -9,7 +9,7 @@ type MockCardSelection struct {
 	mock.Mock
 }
 
-func (selection *MockCardSelection) SelectCard(history *pbuf.UserHistory, previousCard int64) int64 {
+func (selection *MockCardSelection) SelectCard(history *pbuf.UserHistory, previousCard string) string {
 	args := selection.Called(history, previousCard)
-	return args.Get(0).(int64)
+	return args.String(0)
 }

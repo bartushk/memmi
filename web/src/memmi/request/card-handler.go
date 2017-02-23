@@ -1,6 +1,7 @@
 package request
 
 import (
+	"fmt"
 	"memmi/card"
 	"memmi/pbuf"
 	"memmi/user"
@@ -39,6 +40,8 @@ func (handler *CardRequestHandler) Handle(w http.ResponseWriter, r *http.Request
 
 func (handler *CardRequestHandler) handleNext(w http.ResponseWriter, r *http.Request, user pbuf.User) bool {
 	nextRequest, err := handler.Pio.ReadNextCardRequest(r)
+	fmt.Println(nextRequest)
+	fmt.Println(err)
 	if err != nil {
 		handler.Pio.WriteProtoResponse(w, BODY_READ_ERROR)
 		return true
@@ -48,6 +51,7 @@ func (handler *CardRequestHandler) handleNext(w http.ResponseWriter, r *http.Req
 	nextCardId := handler.CardSel.SelectCard(&history, nextRequest.PreviousCardId)
 	// TODO: Handle card management errors
 	nextCard, _ := handler.CardMan.GetCardById(nextCardId)
+	fmt.Println(nextCard)
 	handler.Pio.WriteProtoResponse(w, &nextCard)
 	return true
 }

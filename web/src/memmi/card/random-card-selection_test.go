@@ -28,21 +28,21 @@ func Test_NewRandomCardSlection(t *testing.T) {
 	}
 }
 
-func Test_RandomCardSelection_WhenPassedNill_ReturnsZero(t *testing.T) {
+func Test_RandomCardSelection_WhenPassedNill_ReturnsEmpty(t *testing.T) {
 	randSel := RandomCardSelection{}
-	expected := int64(0)
+	expected := ""
 
-	result := randSel.SelectCard(nil, 0)
+	result := randSel.SelectCard(nil, "")
 
 	assert.Equal(t, expected, result, "Wrong card id returned.")
 }
 
-func Test_RandomCardSelection_WhenHistoryIsEmpty_ReturnsZero(t *testing.T) {
+func Test_RandomCardSelection_WhenHistoryIsEmpty_ReturnsEmpty(t *testing.T) {
 	randSel := RandomCardSelection{}
 	input := &pbuf.UserHistory{}
-	expected := int64(0)
+	expected := ""
 
-	result := randSel.SelectCard(input, 0)
+	result := randSel.SelectCard(input, "")
 
 	assert.Equal(t, expected, result, "Wrong card id returned.")
 }
@@ -53,7 +53,7 @@ func Test_RandomCardSelection_ReturnsCorrectItem(t *testing.T) {
 	randSel := RandomCardSelection{src: mockSource}
 	expected := testHistory.History[1].CardId
 
-	result := randSel.SelectCard(&testHistory, 0)
+	result := randSel.SelectCard(&testHistory, "")
 
 	assert.Equal(t, expected, result, "Wrong card id returned.")
 }
@@ -64,7 +64,7 @@ func Tetst_RandomCardSelectoin_HandlesOverflow(t *testing.T) {
 	randSel := RandomCardSelection{src: mockSource}
 	expected := testHistory.History[1].CardId
 
-	result := randSel.SelectCard(&testHistory, 0)
+	result := randSel.SelectCard(&testHistory, "")
 
 	assert.Equal(t, expected, result, "Wrong card id returned.")
 }

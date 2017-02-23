@@ -80,7 +80,7 @@ func Test_ProtoIO_ReadNextCardRequest_BadRequestBody_GetError(t *testing.T) {
 func Test_ProtoIO_ReadNextCardRequest_GoodRequestBody_ReadCorrectly(t *testing.T) {
 	pio := ProtoIoImpl{}
 	req := RequestFromURL("sadf")
-	goodMessage := &pbuf.NextCardRequest{CardSetId: int64(7)}
+	goodMessage := &pbuf.NextCardRequest{CardSetId: "setId"}
 	goodData, _ := proto.Marshal(goodMessage)
 	req.Body = ioutil.NopCloser(bytes.NewReader(goodData))
 	result, err := pio.ReadNextCardRequest(req)
@@ -118,7 +118,7 @@ func Test_ProtoIO_ReadCardRequest_BadRequestBody_GetError(t *testing.T) {
 func Test_ProtoIO_ReadCardRequest_GoodRequestBody_ReadCorrectly(t *testing.T) {
 	pio := ProtoIoImpl{}
 	req := RequestFromURL("sadf")
-	goodMessage := &pbuf.CardRequest{Id: int64(7)}
+	goodMessage := &pbuf.CardRequest{Id: "setId"}
 	goodData, _ := proto.Marshal(goodMessage)
 	req.Body = ioutil.NopCloser(bytes.NewReader(goodData))
 	result, err := pio.ReadCardRequest(req)
@@ -156,7 +156,7 @@ func Test_ProtoIO_ReadCardSetRequest_BadRequestBody_GetError(t *testing.T) {
 func Test_ProtoIO_ReadCardSetRequest_GoodRequestBody_ReadCorrectly(t *testing.T) {
 	pio := ProtoIoImpl{}
 	req := RequestFromURL("sadf")
-	goodMessage := &pbuf.CardSetRequest{Id: int64(7)}
+	goodMessage := &pbuf.CardSetRequest{Id: "setId"}
 	goodData, _ := proto.Marshal(goodMessage)
 	req.Body = ioutil.NopCloser(bytes.NewReader(goodData))
 	result, err := pio.ReadCardSetRequest(req)
@@ -195,7 +195,7 @@ func Test_ProtoIO_ReadReportAndNext_GoodRequestBody_ReadCorrectly(t *testing.T) 
 	pio := ProtoIoImpl{}
 	req := RequestFromURL("sadf")
 	goodMessage := &pbuf.ReportAndNext{}
-	goodNextRequest := &pbuf.NextCardRequest{CardSetId: int64(7)}
+	goodNextRequest := &pbuf.NextCardRequest{CardSetId: "setId"}
 	goodMessage.NextRequest = goodNextRequest
 	goodData, _ := proto.Marshal(goodMessage)
 	req.Body = ioutil.NopCloser(bytes.NewReader(goodData))
@@ -234,7 +234,7 @@ func Test_ProtoIO_ReadCardScoreReport_BadRequestBody_GetError(t *testing.T) {
 func Test_ProtoIO_ReadCardScoreReport_GoodRequestBody_ReadCorrectly(t *testing.T) {
 	pio := ProtoIoImpl{}
 	req := RequestFromURL("sadf")
-	goodMessage := &pbuf.CardScoreReport{CardSetId: int64(7)}
+	goodMessage := &pbuf.CardScoreReport{CardSetId: "setId"}
 	goodData, _ := proto.Marshal(goodMessage)
 	req.Body = ioutil.NopCloser(bytes.NewReader(goodData))
 	result, err := pio.ReadCardScoreReport(req)

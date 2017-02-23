@@ -89,10 +89,10 @@ func Test_CardHandler_HandleNext_ProtoReadGood_HandledCorrectly(t *testing.T) {
 	var handler, pio, cs, um, cm = getMockedHandler()
 	var req = RequestFromURL(CARD_NEXT_URL)
 	testUser := pbuf.User{UserName: "bartushk"}
-	nextCardRequest := pbuf.NextCardRequest{CardSetId: int64(3), PreviousCardId: int64(7)}
+	nextCardRequest := pbuf.NextCardRequest{CardSetId: "setId", PreviousCardId: "prevCard"}
 	nextCard := pbuf.Card{Title: "TestCard"}
 	testHistory := pbuf.UserHistory{PlayIndex: 123}
-	csReturn := int64(3)
+	csReturn := "setId"
 
 	cm.On("GetCardById", mock.Anything).Return(nextCard, nil)
 	cs.On("SelectCard", mock.Anything, mock.Anything).Return(csReturn)
@@ -136,9 +136,9 @@ func Test_CardHandler_Report_ProtoReadError_WriteError(t *testing.T) {
 func Test_CardHandler_Report_UpdateError_WriteError(t *testing.T) {
 	var handler, pio, cs, um, cm = getMockedHandler()
 	var req = RequestFromURL(CARD_REPORT_URL)
-	testUser := pbuf.User{Id: int64(3)}
-	testUpdate := pbuf.CardUpdate{CardId: int64(3)}
-	testCardReport := pbuf.CardScoreReport{CardSetId: int64(3)}
+	testUser := pbuf.User{Id: "userId"}
+	testUpdate := pbuf.CardUpdate{CardId: "cardId"}
+	testCardReport := pbuf.CardScoreReport{CardSetId: "setId"}
 	testCardReport.Update = &testUpdate
 
 	um.On("UpdateHistory", mock.Anything, mock.Anything, mock.Anything).Return(errors.New(""))
@@ -164,9 +164,9 @@ func Test_CardHandler_Report_Success_HandledCorrectly(t *testing.T) {
 	var handler, pio, cs, um, cm = getMockedHandler()
 	var req = RequestFromURL(CARD_REPORT_URL)
 	expectedResponseWrite := pbuf.UpdateResponse{Status: 1}
-	testUser := pbuf.User{Id: int64(3)}
-	testUpdate := pbuf.CardUpdate{CardId: int64(3)}
-	testCardReport := pbuf.CardScoreReport{CardSetId: int64(3)}
+	testUser := pbuf.User{Id: "userId"}
+	testUpdate := pbuf.CardUpdate{CardId: "cardId"}
+	testCardReport := pbuf.CardScoreReport{CardSetId: "setId"}
 	testCardReport.Update = &testUpdate
 
 	um.On("UpdateHistory", mock.Anything, mock.Anything, mock.Anything).Return(nil)
@@ -208,15 +208,15 @@ func Test_CardHandler_ReportNext_ProtoIO_ErrorWritten(t *testing.T) {
 func Test_CardHandler_ReportNext_HandledCorrectly(t *testing.T) {
 	var handler, pio, cs, um, cm = getMockedHandler()
 	var req = RequestFromURL(CARD_REPORT_NEXT_URL)
-	testUpdate := pbuf.CardUpdate{CardId: int64(3)}
+	testUpdate := pbuf.CardUpdate{CardId: "cardId"}
 	reportAndNext := pbuf.ReportAndNext{
-		NextRequest: &pbuf.NextCardRequest{CardSetId: int64(10), PreviousCardId: int64(18)},
-		Report:      &pbuf.CardScoreReport{CardSetId: int64(10), Update: &testUpdate},
+		NextRequest: &pbuf.NextCardRequest{CardSetId: "setId", PreviousCardId: "cardId"},
+		Report:      &pbuf.CardScoreReport{CardSetId: "setId", Update: &testUpdate},
 	}
 	nextCard := pbuf.Card{Title: "TestCard"}
 	testHistory := pbuf.UserHistory{PlayIndex: 123}
-	testUser := pbuf.User{Id: int64(3)}
-	csReturn := int64(3)
+	testUser := pbuf.User{Id: "suerId"}
+	csReturn := "setId"
 
 	um.On("UpdateHistory", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 	um.On("GetHistory", mock.Anything, mock.Anything).Return(testHistory, nil)
@@ -250,15 +250,15 @@ func Test_CardHandler_ReportNext_HandledCorrectly(t *testing.T) {
 func Test_CardHandler_ReportNext_WithUpdateError_ErrorSilent(t *testing.T) {
 	var handler, pio, cs, um, cm = getMockedHandler()
 	var req = RequestFromURL(CARD_REPORT_NEXT_URL)
-	testUpdate := pbuf.CardUpdate{CardId: int64(3)}
+	testUpdate := pbuf.CardUpdate{CardId: "cardId"}
 	reportAndNext := pbuf.ReportAndNext{
-		NextRequest: &pbuf.NextCardRequest{CardSetId: int64(10), PreviousCardId: int64(18)},
-		Report:      &pbuf.CardScoreReport{CardSetId: int64(10), Update: &testUpdate},
+		NextRequest: &pbuf.NextCardRequest{CardSetId: "setId", PreviousCardId: "cardId"},
+		Report:      &pbuf.CardScoreReport{CardSetId: "setId", Update: &testUpdate},
 	}
 	nextCard := pbuf.Card{Title: "TestCard"}
-	testUser := pbuf.User{Id: int64(3)}
+	testUser := pbuf.User{Id: "userId"}
 	testHistory := pbuf.UserHistory{PlayIndex: 123}
-	csReturn := int64(3)
+	csReturn := "setId"
 
 	um.On("GetHistory", mock.Anything, mock.Anything).Return(testHistory, nil)
 	um.On("UpdateHistory", mock.Anything, mock.Anything, mock.Anything).Return(errors.New(""))

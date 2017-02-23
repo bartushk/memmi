@@ -13,12 +13,12 @@ type RandomCardSelection struct {
 	src rand.Source
 }
 
-func (selection *RandomCardSelection) SelectCard(history *pbuf.UserHistory, previousCard int64) int64 {
+func (selection *RandomCardSelection) SelectCard(history *pbuf.UserHistory, previousCard string) string {
 	if history == nil {
-		return 0
+		return ""
 	}
 	if len(history.History) == 0 {
-		return 0
+		return ""
 	}
 	i := selection.src.Int63() % int64(len(history.History))
 	return history.History[i].CardId

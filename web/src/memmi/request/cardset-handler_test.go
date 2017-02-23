@@ -74,7 +74,7 @@ func Test_CardSetHandler_GetCardSet_NoError_HandledCorrectly(t *testing.T) {
 	var handler, pio, cm = getCardSetMocked()
 	var req = RequestFromURL(GET_CARDSET_URL)
 	testUser := pbuf.User{}
-	testCardSetRequest := pbuf.CardSetRequest{Id: int64(7)}
+	testCardSetRequest := pbuf.CardSetRequest{Id: "asdf"}
 	testCardSet := pbuf.CardSet{Title: "TestCard"}
 
 	cm.On("GetCardSetById", mock.Anything).Return(testCardSet, nil)
@@ -107,7 +107,7 @@ func Test_CardSetHandler_GetCard_NoError_HandledCorrectly(t *testing.T) {
 	var handler, pio, cm = getCardSetMocked()
 	var req = RequestFromURL(GET_CARD_URL)
 	testUser := pbuf.User{}
-	testCardRequest := pbuf.CardRequest{Id: int64(7)}
+	testCardRequest := pbuf.CardRequest{Id: "asdf"}
 	testCard := pbuf.Card{Title: "TestCard"}
 
 	cm.On("GetCardById", mock.Anything).Return(testCard, nil)

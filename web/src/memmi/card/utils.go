@@ -9,7 +9,7 @@ func GenerateEmptyHistory(cardSet *pbuf.CardSet) pbuf.UserHistory {
 		return pbuf.UserHistory{}
 	}
 	history := pbuf.UserHistory{
-		UserId:    3,
+		UserId:    "",
 		CardSetId: cardSet.Id,
 		PlayIndex: 0,
 		History:   []*pbuf.CardHistory{},

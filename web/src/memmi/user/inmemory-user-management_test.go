@@ -7,6 +7,7 @@ import (
 	"memmi/card"
 	"memmi/pbuf"
 	"memmi/test"
+	"strconv"
 	"testing"
 )
 
@@ -37,7 +38,7 @@ func Test_InMemoryUserManagement_GetHistory_CardSetError_ErrorReturned(t *testin
 
 	cMan.On("GetCardSetById", mock.Anything).Return(pbuf.CardSet{}, errors.New(""))
 
-	result, err := uMan.GetHistory(testUser, 0)
+	result, err := uMan.GetHistory(testUser, "")
 
 	test.AssertProtoEq(t, &blankHistory, &result, "Should have returned blank Card Set.")
 	assert.NotNil(t, err)
@@ -50,7 +51,7 @@ func Test_InMemoryUserManagement_GetHistory_UserIsAnon_ReturnGeneratedHistory(t 
 	fakeSet := test.GetFakeCardSet()
 	expectedResult := card.GenerateEmptyHistory(&fakeSet)
 
-	result, err := uMan.GetHistory(testUser, 0)
+	result, err := uMan.GetHistory(testUser, "")
 
 	test.AssertProtoEq(t, &expectedResult, &result, "Should generate empty history for anon.")
 	assert.Nil(t, err)
@@ -61,8 +62,9 @@ func Test_InMemoryUserManagement_GetHistory_NoSavedHistory_ReturnGeneratedHistor
 	testUser := test.GetFakeUser()
 	fakeSet := test.GetFakeCardSet()
 	expectedResult := card.GenerateEmptyHistory(&fakeSet)
+	expectedResult.UserId = testUser.Id
 
-	result, err := uMan.GetHistory(testUser, 0)
+	result, err := uMan.GetHistory(testUser, "")
 
 	test.AssertProtoEq(t, &expectedResult, &result, "Should generate empty history when none is saved.")
 	assert.Nil(t, err)
@@ -88,6 +90,7 @@ func Test_InMemoryUserManagement_GetHistory_MismatchingVersion_ReturnGeneratedHi
 	testUser := test.GetFakeUser()
 	fakeSet := test.GetFakeCardSet()
 	expectedResult := card.GenerateEmptyHistory(&fakeSet)
+	expectedResult.UserId = testUser.Id
 	historyKey := uMan.getHistoryKey(testUser.Id, fakeSet.Id)
 	fakeHistory := test.GetFakeHistory()
 	fakeHistory.PlayIndex = 123
@@ -114,7 +117,7 @@ func Test_InMemoryUserManagement_GetAuthInfoByUserName_NoIdInfo_ReturnsError(t *
 	uMan, _ := getMockedUserManagement()
 	expected := pbuf.UserAuthInfo{}
 	userName := "I don't exist :D"
-	uMan.userIds[userName] = 12
+	uMan.userIds[userName] = "kbart"
 
 	result, err := uMan.GetAuthInfoByUserName(userName)
 
@@ -126,8 +129,8 @@ func Test_InMemoryUserManagement_GetAuthInfoByUserName_GoodInfo_ReturnsInfo(t *t
 	uMan, _ := getMockedUserManagement()
 	expected := pbuf.UserAuthInfo{PassHash: "asda4we4as"}
 	userName := "I do exist :P"
-	uMan.userIds[userName] = 12
-	uMan.authInfo[12] = expected
+	uMan.userIds[userName] = "Asdf"
+	uMan.authInfo["Asdf"] = expected
 
 	result, err := uMan.GetAuthInfoByUserName(userName)
 
@@ -139,7 +142,7 @@ func Test_InMemoryUserManagement_GetAuthInfoById_NoInfo_ReturnsError(t *testing.
 	uMan, _ := getMockedUserManagement()
 	expected := pbuf.UserAuthInfo{}
 
-	result, err := uMan.GetAuthInfoById(123)
+	result, err := uMan.GetAuthInfoById("asdf")
 
 	test.AssertProtoEq(t, &expected, &result, "Should return blank info")
 	assert.NotNil(t, err)
@@ -148,9 +151,9 @@ func Test_InMemoryUserManagement_GetAuthInfoById_NoInfo_ReturnsError(t *testing.
 func Test_InMemoryUserManagement_GetAuthInfoById_HasInfo_ReturnsInfo(t *testing.T) {
 	uMan, _ := getMockedUserManagement()
 	expected := pbuf.UserAuthInfo{PassHash: "asda4we4as"}
-	uMan.authInfo[123] = expected
+	uMan.authInfo["asdf"] = expected
 
-	result, err := uMan.GetAuthInfoById(123)
+	result, err := uMan.GetAuthInfoById("asdf")
 
 	test.AssertProtoEq(t, &expected, &result, "Should return saved info")
 	assert.Nil(t, err)
@@ -170,7 +173,7 @@ func Test_InMemoryUserManagement_GetUserByUserName_NoIdInfo_ReturnsError(t *test
 	uMan, _ := getMockedUserManagement()
 	expected := pbuf.User{}
 	userName := "I don't exist :D"
-	uMan.userIds[userName] = 12
+	uMan.userIds[userName] = "RASDR"
 
 	result, err := uMan.GetUserByUserName(userName)
 
@@ -182,8 +185,8 @@ func Test_InMemoryUserManagement_GetUserByUserName_GoodInfo_ReturnsInfo(t *testi
 	uMan, _ := getMockedUserManagement()
 	expected := pbuf.User{FirstName: "Kyle"}
 	userName := "I do exist :P"
-	uMan.userIds[userName] = 12
-	uMan.users[12] = expected
+	uMan.userIds[userName] = "Rasdr"
+	uMan.users["Rasdr"] = expected
 
 	result, err := uMan.GetUserByUserName(userName)
 
@@ -195,7 +198,7 @@ func Test_InMemoryUserManagement_GetUserById_NoInfo_ReturnsError(t *testing.T) {
 	uMan, _ := getMockedUserManagement()
 	expected := pbuf.User{}
 
-	result, err := uMan.GetUserById(123)
+	result, err := uMan.GetUserById("qqq")
 
 	test.AssertProtoEq(t, &expected, &result, "Should return blank user")
 	assert.NotNil(t, err)
@@ -204,9 +207,9 @@ func Test_InMemoryUserManagement_GetUserById_NoInfo_ReturnsError(t *testing.T) {
 func Test_InMemoryUserManagement_GetUserById_HasInfo_ReturnsInfo(t *testing.T) {
 	uMan, _ := getMockedUserManagement()
 	expected := pbuf.User{FirstName: "Kyle"}
-	uMan.users[123] = expected
+	uMan.users["kb"] = expected
 
-	result, err := uMan.GetUserById(123)
+	result, err := uMan.GetUserById("kb")
 
 	test.AssertProtoEq(t, &expected, &result, "Should return saved user")
 	assert.Nil(t, err)
@@ -214,7 +217,7 @@ func Test_InMemoryUserManagement_GetUserById_HasInfo_ReturnsInfo(t *testing.T) {
 
 func Test_InMemoryUserManagement_UpdateHistory_NoHistoryFound_ReturnsError(t *testing.T) {
 	uMan, _ := getMockedUserManagement()
-	testUpdate := pbuf.CardUpdate{CardId: int64(12), Score: int32(1)}
+	testUpdate := pbuf.CardUpdate{CardId: "cardId", Score: int32(1)}
 	testUser := test.GetFakeUser()
 	testCardSet := test.GetFakeCardSet()
 
@@ -225,13 +228,14 @@ func Test_InMemoryUserManagement_UpdateHistory_NoHistoryFound_ReturnsError(t *te
 
 func Test_InMemoryUserManagement_UpdateHistory_HistoryExists_GetsUpdated(t *testing.T) {
 	uMan, _ := getMockedUserManagement()
-	testUpdate := pbuf.CardUpdate{CardId: int64(12), Score: int32(1)}
+	testUpdate := pbuf.CardUpdate{CardId: "c3", Score: int32(1)}
 	testUser := test.GetFakeUser()
 	testCardSet := test.GetFakeCardSet()
 	testHistory := test.GetFakeHistory()
 	fullId := uMan.getHistoryKey(testUser.Id, testCardSet.Id)
 	uMan.userHistories[fullId] = testHistory
 	expected := test.GetFakeHistory()
+	expected.UserId = testUser.Id
 	expected.PlayIndex += 1
 	expected.History[2].CurrentScore += testUpdate.Score
 	expected.History[2].Scores = append(expected.History[2].Scores, testUpdate.Score)
@@ -250,12 +254,12 @@ func Test_InMemoryUserManagement_AddUser_UserNameExists_ReturnError(t *testing.T
 	testUser := test.GetFakeUser()
 	testAuth := test.GetFakeAuthInfo()
 
-	uMan.users[123421] = testUser
+	uMan.users["rea354a4"] = testUser
 
 	id, err := uMan.AddUser(testUser, testAuth)
 
 	assert.NotNil(t, err)
-	assert.Equal(t, id, int64(0))
+	assert.Equal(t, id, "")
 }
 
 func Test_InMemoryUserManagement_AddUser_IdExists_ReturnsError(t *testing.T) {
@@ -263,19 +267,19 @@ func Test_InMemoryUserManagement_AddUser_IdExists_ReturnsError(t *testing.T) {
 	testUser := test.GetFakeUser()
 	testAuth := test.GetFakeAuthInfo()
 
-	uMan.users[0] = pbuf.User{}
+	uMan.users["0"] = pbuf.User{}
 
 	id, err := uMan.AddUser(testUser, testAuth)
 
 	assert.NotNil(t, err)
-	assert.Equal(t, id, int64(0))
+	assert.Equal(t, id, "")
 }
 
 func Test_InMemoryUserManagement_AddUser_NoProblems_UserAdded(t *testing.T) {
 	uMan, _ := getMockedUserManagement()
 	testUser := test.GetFakeUser()
 	testAuth := test.GetFakeAuthInfo()
-	uMan.userCounter = int64(13)
+	uMan.userCounter = 13
 
 	id, err := uMan.AddUser(testUser, testAuth)
 
@@ -283,9 +287,11 @@ func Test_InMemoryUserManagement_AddUser_NoProblems_UserAdded(t *testing.T) {
 	actualUser := uMan.users[id]
 	actualAuth := uMan.authInfo[id]
 
+	expected, _ := strconv.Atoi(id)
+
 	test.AssertProtoEq(t, &testUser, &actualUser, "User not saved in users map")
 	test.AssertProtoEq(t, &testAuth, &actualAuth, "AuthInfo not saved in authInfo map")
-	assert.Equal(t, id+1, uMan.userCounter)
+	assert.Equal(t, expected, uMan.userCounter-1)
 	assert.Equal(t, id, uMan.userIds[testUser.UserName], "Entry not saved in username-id map")
 	assert.Nil(t, err)
 }
@@ -293,7 +299,7 @@ func Test_InMemoryUserManagement_AddUser_NoProblems_UserAdded(t *testing.T) {
 func Test_InMemoryUserManagement_DeleteUser_NoUser_ErrorReturned(t *testing.T) {
 	uMan, _ := getMockedUserManagement()
 
-	err := uMan.DeleteUser(10)
+	err := uMan.DeleteUser("asdf")
 
 	assert.NotNil(t, err)
 }

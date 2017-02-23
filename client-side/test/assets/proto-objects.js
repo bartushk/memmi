@@ -1,19 +1,18 @@
 import pbuf from '../../src/pbuf/pbuf'
-import {util} from 'protobufjs'
 const proto = pbuf.pbuf
 
 const user = {
-  id:                   util.Long.fromValue(0),
+  id:                   'user',
   userName:             'd_cat',
   firstName:            'Doodie',
   lastName:             'Cat',
-  email:                'Dooie@cat.com',
+  email:                'Doodie@cat.com',
   isAuthenticated:      false,
-  joinedDate:  util.Long.fromValue(10)
+  joinedDate:           new Date().toISOString()
 }
 
 const cardOne = {
-  id:           util.Long.fromValue(0),
+  id:           'c1',
   title:        'Card One',
   front:        {type: 'html', value: '<h1>Hello</h1>'},
   back:         {type: 'html', value: '<h1>GoodBye</h1>'},
@@ -21,7 +20,7 @@ const cardOne = {
 }
 
 const historyOne = {
-  cardId:       util.Long.fromValue(0),
+  cardId:       'c1',
   currentScore: 1,
   cardIndex:    0,
   scores:       [1],
@@ -29,7 +28,7 @@ const historyOne = {
 }
 
 const cardTwo = {
-  id:           util.Long.fromValue(1),
+  id:           'c2',
   title:        'Card Two',
   front:        {type: 'html', value: '<h1>Ni Hao</h1>'},
   back:         {type: 'html', value: '<h1>Zai Jian</h1>'},
@@ -37,7 +36,7 @@ const cardTwo = {
 }
 
 const historyTwo = {
-  cardId:       util.Long.fromValue(1),
+  cardId:       'c2',
   currentScore: -2,
   cardIndex:    1,
   scores:       [-2],
@@ -45,35 +44,35 @@ const historyTwo = {
 }
 
 const cardSet = {
-  id:           util.Long.fromValue(0),
+  id:           'cs1',
   version:      0,
-  createdDate:  util.Long.fromValue(10),
-  authorId:     util.Long.fromValue(0),
+  createdDate:  new Date().toISOString(),
+  authorId:     'user',
   title:        'Cat Cards',
   cardIds:      [cardOne.id, cardTwo.id],
   tags:         ['Cool', 'Nerd']
 }
 
 const cardUpdate = {
-  cardId:       util.Long.fromValue(0),
+  cardId:       'c1',
   score:        2
 }
 
 const userHistory = {
-  userId:       util.Long.fromValue(0),
-  cardSetId:    util.Long.fromValue(0),
+  userId:       'user',
+  cardSetId:    'cs1',
   playIndex:    0,
   history:      [historyOne, historyTwo]
 }
 
 const nextCardRequest = {
-  cardSetId: util.Long.fromValue(1),
-  previousCardId: util.Long.fromValue(1),
+  cardSetId: 'cs1',
+  previousCardId: 'c1',
   algorithm: 0
 }
 
 const cardScoreReport  = {
-  cardSetId: util.Long.fromValue(1),
+  cardSetId: 'cs1',
   update: cardUpdate
 }
 
@@ -91,11 +90,11 @@ const updateResponse = {
 }
 
 const cardSetRequest = {
-  id: util.Long.fromValue(0)
+  id: 'cs1'
 }
 
 const cardRequest = {
-  id: util.Long.fromValue(0)
+  id: 'c2'
 }
 
 export default {

@@ -12,32 +12,32 @@ enum UpdateStatus {
 }
 
 message User {
-  int64 id = 1;
+  string id = 1;
   string userName = 2;
   string firstName = 3;
   string lastName = 4;
   string email = 5;
   bool isAuthenticated = 6;
   bool isAnon = 7;
-  int64 joinedDate = 8;
+  string joinedDate = 8;
 }
 
 message CardSet {
-  int64 id = 1;
+  string id = 1;
   int32 version = 2;
-  int64 createdDate = 3;
-  int64 authorId = 4;
+  string createdDate = 3;
+  string authorId = 4;
   string title = 5;
-  repeated int64 cardIds = 6;
+  repeated string cardIds = 6;
   repeated string tags = 7;
 }
 
 message Card {
-  int64 id = 1;
+  string id = 1;
   string title = 2;
   CardInfo front = 3;
   CardInfo back = 4;
-  int64 createdDate = 5;
+  string createdDate = 5;
   repeated string tags = 6;
 }
 
@@ -47,20 +47,20 @@ message CardInfo {
 }
 
 message CardUpdate {
-  int64 cardId = 1;
+  string cardId = 1;
   int32 score = 2;
 }
 
 message UserHistory {
-  int64 userId = 1;
-  int64 cardSetId = 2;
+  string userId = 1;
+  string cardSetId = 2;
   int32 playIndex = 3;
   int32 setVersion = 4;
   repeated CardHistory history = 5;
 }
 
 message CardHistory {
-  int64 cardId = 1;
+  string cardId = 1;
   int32 currentScore = 2;
   int32 cardIndex = 3;
   repeated int32 scores = 4;
@@ -68,19 +68,19 @@ message CardHistory {
 }
 
 message UserAuthInfo {
-  int64 userId = 1;  
+  string userId = 1;  
   string userName = 2;
   string passHash = 3;
 }
 
 message NextCardRequest {
-  int64 cardSetId = 1;
-  int64 previousCardId = 2;
+  string cardSetId = 1;
+  string previousCardId = 2;
   SelectionAlgorithm algorithm = 3;  
 }
 
 message CardScoreReport {
-  int64 cardSetId = 1;
+  string cardSetId = 1;
   CardUpdate update = 2;
 }
 
@@ -98,9 +98,9 @@ message UpdateResponse {
 }
 
 message CardSetRequest {
-  int64 id = 1;
+  string id = 1;
 }
 
 message CardRequest {
-  int64 id = 1;
+  string id = 1;
 }

@@ -37,7 +37,7 @@ func (fact *HardCodedFactory) GetRouter() request.Router {
 
 	// Seed some data.
 	cardSet := test.GetFakeCardSet()
-	cardSet.CardIds = []int64{}
+	cardSet.CardIds = []string{}
 	cards := test.GetFakeCards()
 	for _, card := range cards {
 		id, _ := cMan.SaveCard(&card)

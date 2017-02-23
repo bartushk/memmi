@@ -5,12 +5,12 @@ import (
 )
 
 type UserManagement interface {
-	GetHistory(user pbuf.User, cardSetId int64) (pbuf.UserHistory, error)
+	GetHistory(user pbuf.User, cardSetId string) (pbuf.UserHistory, error)
 	GetAuthInfoByUserName(userName string) (pbuf.UserAuthInfo, error)
-	GetAuthInfoById(userId int64) (pbuf.UserAuthInfo, error)
+	GetAuthInfoById(userId string) (pbuf.UserAuthInfo, error)
 	GetUserByUserName(userName string) (pbuf.User, error)
-	GetUserById(userId int64) (pbuf.User, error)
-	UpdateHistory(user pbuf.User, cardSetId int64, update pbuf.CardUpdate) error
-	AddUser(user pbuf.User, authInfo pbuf.UserAuthInfo) (int64, error)
-	DeleteUser(userId int64) error
+	GetUserById(userId string) (pbuf.User, error)
+	UpdateHistory(user pbuf.User, cardSetId string, update pbuf.CardUpdate) error
+	AddUser(user pbuf.User, authInfo pbuf.UserAuthInfo) (string, error)
+	DeleteUser(userId string) error
 }

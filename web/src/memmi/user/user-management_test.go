@@ -12,8 +12,10 @@ type NewMan func() UserManagement
 
 type UserManagementTestSuite struct {
 	suite.Suite
-	New  NewMan
-	Desc string
+	New         NewMan
+	Desc        string
+	SavedSetId  string
+	SavedCardId string
 }
 
 func NewInMemory() UserManagement {
@@ -28,7 +30,8 @@ func NewInMemory() UserManagement {
 
 func Test_UserManagement_Suite(t *testing.T) {
 	inMemSuite := &UserManagementTestSuite{
-		Desc: "InMemoryManagement", New: NewMan(NewInMemory)}
+		Desc: "InMemoryManagement", New: NewMan(NewInMemory),
+		SavedSetId: "3", SavedCardId: test.GetFakeCardSet().CardIds[0]}
 	suite.Run(t, inMemSuite)
 }
 
@@ -36,10 +39,10 @@ func (suite *UserManagementTestSuite) Test_UserManagement_GetHistory_BadId_Retur
 	t := suite.T()
 	uMan := suite.New()
 	testUser := test.GetFakeUser()
-	testUser.Id = -12
+	testUser.Id = "asdf"
 	blank := pbuf.UserHistory{}
 
-	result, err := uMan.GetHistory(testUser, 12)
+	result, err := uMan.GetHistory(testUser, "12")
 
 	test.AssertProtoEq(t, &blank, &result, suite.Desc)
 
@@ -124,16 +127,15 @@ func (suite *UserManagementTestSuite) Test_UserManagement_GetHistory_UpdateHisto
 	uMan := suite.New()
 	testUser := test.GetFakeUser()
 	testAuth := test.GetFakeAuthInfo()
-	fakeCardSet := test.GetFakeCardSet()
 	testUpdate := pbuf.CardUpdate{
-		CardId: fakeCardSet.CardIds[0],
+		CardId: suite.SavedCardId,
 		Score:  int32(3)}
 
 	id, addErr := uMan.AddUser(testUser, testAuth)
 	testUser.Id = id
-	oldHistory, hisErr := uMan.GetHistory(testUser, fakeCardSet.Id)
-	upErr := uMan.UpdateHistory(testUser, fakeCardSet.Id, testUpdate)
-	newHistory, hisErr := uMan.GetHistory(testUser, fakeCardSet.Id)
+	oldHistory, hisErr := uMan.GetHistory(testUser, suite.SavedSetId)
+	upErr := uMan.UpdateHistory(testUser, suite.SavedSetId, testUpdate)
+	newHistory, hisErr := uMan.GetHistory(testUser, suite.SavedSetId)
 
 	assert.Nil(t, addErr)
 	assert.Nil(t, hisErr)

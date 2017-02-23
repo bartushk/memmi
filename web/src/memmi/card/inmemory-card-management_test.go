@@ -4,6 +4,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"memmi/pbuf"
 	"memmi/test"
+	"strconv"
 	"testing"
 )
 
@@ -20,7 +21,7 @@ func Test_InMemoryCardManagement_NewInMemoryManagement(t *testing.T) {
 
 func Test_InMemoryCardManagement_GetCardSetById_NoKey_BlankReturned(t *testing.T) {
 	newMan := NewInMemoryManagement()
-	testId := int64(3)
+	testId := "setId"
 	blankSet := pbuf.CardSet{}
 
 	result, err := newMan.GetCardSetById(testId)
@@ -31,7 +32,7 @@ func Test_InMemoryCardManagement_GetCardSetById_NoKey_BlankReturned(t *testing.T
 
 func Test_InMemoryCardManagement_GetCardSetById_GoodKey_CardReturned(t *testing.T) {
 	newMan := NewInMemoryManagement()
-	testId := int64(3)
+	testId := "setId"
 	testCardSet := pbuf.CardSet{
 		Id:      testId,
 		Version: 5,
@@ -46,7 +47,7 @@ func Test_InMemoryCardManagement_GetCardSetById_GoodKey_CardReturned(t *testing.
 
 func Test_InMemoryCardManagement_GetCardById_NoKey_BlankReturned(t *testing.T) {
 	newMan := NewInMemoryManagement()
-	testId := int64(3)
+	testId := "cardId"
 	blankCard := pbuf.Card{}
 
 	result, err := newMan.GetCardById(testId)
@@ -57,7 +58,7 @@ func Test_InMemoryCardManagement_GetCardById_NoKey_BlankReturned(t *testing.T) {
 
 func Test_InMemoryCardManagement_GetCardById_GoodKey_CardReturned(t *testing.T) {
 	newMan := NewInMemoryManagement()
-	testId := int64(3)
+	testId := "cardId"
 	testCard := pbuf.Card{
 		Id:    testId,
 		Title: "Hello World!",
@@ -73,14 +74,14 @@ func Test_InMemoryCardManagement_GetCardById_GoodKey_CardReturned(t *testing.T) 
 func Test_InMemoryCardManagement_DeleteCardSet_BadKey_ErrorReturned(t *testing.T) {
 	newMan := NewInMemoryManagement()
 
-	result := newMan.DeleteCardSet(int64(3))
+	result := newMan.DeleteCardSet("setId")
 
 	assert.NotNil(t, result)
 }
 
 func Test_InMemoryCardManagement_DeleteCardSet_GoodKey_CardSetRemoved(t *testing.T) {
 	newMan := NewInMemoryManagement()
-	testId := int64(3)
+	testId := "setId"
 	testCardSet := pbuf.CardSet{
 		Id:      testId,
 		Version: 5,
@@ -99,14 +100,14 @@ func Test_InMemoryCardManagement_DeleteCardSet_GoodKey_CardSetRemoved(t *testing
 func Test_InMemoryCardManagement_DeleteCard_BadKey_ErrorReturned(t *testing.T) {
 	newMan := NewInMemoryManagement()
 
-	result := newMan.DeleteCard(int64(3))
+	result := newMan.DeleteCard("cardId")
 
 	assert.NotNil(t, result)
 }
 
 func Test_InMemoryCardManagement_DeleteCard_GoodKey_CardRemoved(t *testing.T) {
 	newMan := NewInMemoryManagement()
-	testId := int64(3)
+	testId := "cardId"
 	testCard := pbuf.Card{
 		Id:    testId,
 		Title: "Hello World!",
@@ -132,7 +133,7 @@ func Test_InMemoryCardManagement_SaveCardSet_PassedNil_ErrorReturned(t *testing.
 
 func Test_InMemoryCardManagement_SaveCardSet_DuplicateKey_ErrorReturned(t *testing.T) {
 	newMan := NewInMemoryManagement()
-	id := int64(newMan.cardSetCounter)
+	id := strconv.Itoa(newMan.cardSetCounter)
 	newMan.cardSets[id] = pbuf.CardSet{}
 	_, result := newMan.SaveCardSet(&pbuf.CardSet{})
 
@@ -141,8 +142,8 @@ func Test_InMemoryCardManagement_SaveCardSet_DuplicateKey_ErrorReturned(t *testi
 
 func Test_InMemoryCardManagement_SaveCardSet_MultipleSaves_SavedCorrectly(t *testing.T) {
 	newMan := NewInMemoryManagement()
-	id1 := int64(newMan.cardSetCounter)
-	id2 := int64(newMan.cardSetCounter + 1)
+	id1 := strconv.Itoa(newMan.cardSetCounter)
+	id2 := strconv.Itoa(newMan.cardSetCounter + 1)
 	set1 := pbuf.CardSet{Version: 10}
 	set2 := pbuf.CardSet{Version: 30}
 
@@ -172,7 +173,7 @@ func Test_InMemoryCardManagement_SaveCard_PassedNil_ErrorReturned(t *testing.T) 
 
 func Test_InMemoryCardManagement_SaveCard_DuplicateKey_ErrorReturned(t *testing.T) {
 	newMan := NewInMemoryManagement()
-	id := int64(newMan.cardCounter)
+	id := strconv.Itoa(newMan.cardCounter)
 	newMan.cards[id] = pbuf.Card{}
 	_, result := newMan.SaveCard(&pbuf.Card{})
 
@@ -181,8 +182,8 @@ func Test_InMemoryCardManagement_SaveCard_DuplicateKey_ErrorReturned(t *testing.
 
 func Test_InMemoryCardManagement_SaveCard_MultipleSaves_SavedCorrectly(t *testing.T) {
 	newMan := NewInMemoryManagement()
-	id1 := int64(newMan.cardCounter)
-	id2 := int64(newMan.cardCounter + 1)
+	id1 := strconv.Itoa(newMan.cardCounter)
+	id2 := strconv.Itoa(newMan.cardCounter + 1)
 	card1 := pbuf.Card{Title: "Card One"}
 	card2 := pbuf.Card{Title: "Card Two"}
 
