@@ -23,10 +23,6 @@ type RequestHandler interface {
 	Handle(w http.ResponseWriter, r *http.Request, u pbuf.User) HandleResult
 }
 
-type HttpLogger interface {
-	Log(*http.Request)
-}
-
 type HttpRouter interface {
 	AddHandler(RequestHandler)
 	GetHandleFunc() func(http.ResponseWriter, *http.Request)

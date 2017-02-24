@@ -18,7 +18,6 @@ func (fact *HardCodedFactory) GetRouter() request.Router {
 	pio := &request.ProtoIoImpl{}
 	auth := &request.AnonAuthenticator{}
 
-	router.Logger = &request.ConsoleLogger{}
 	router.Authenticator = auth
 
 	csHandler := &request.CardSetRequestHandler{}
@@ -28,7 +27,7 @@ func (fact *HardCodedFactory) GetRouter() request.Router {
 	csHandler.CardMan = cMan
 
 	cHandler.Pio = pio
-	cHandler.CardSel = &card.RandomCardSelection{}
+	cHandler.CardSel = card.NewRandomCardSelection()
 	cHandler.CardMan = cMan
 	cHandler.UserMan = uMan
 

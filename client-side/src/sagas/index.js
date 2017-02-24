@@ -5,9 +5,9 @@ import api from './proto-api'
 const url = 'api/card/get-next'
 const proto = pbuf.pbuf
 const cardRequest = {
-  cardSetId: 'c1',
-  previousCardId: 'c1',
-  algorithm: 0
+  cardSetId: '0',
+  previousCardId: '0',
+  algorithm: 1
 }
 
 export function* sendTest() {
