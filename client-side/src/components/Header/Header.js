@@ -9,7 +9,7 @@ class Header extends React.Component {
   render() {
     const action = getAction()
     return (
-      <AppBar title="Memmi" className="header" onLeftIconButtonTouchTap={() => action('TEST', {test:'test'})}>
+      <AppBar title="Memmi" className="header" onLeftIconButtonTouchTap={() => action('GET_NEXT_CARD', {test:'asdf'})}>
         <img src={logoUrl} />
       </AppBar>
     )

@@ -1,28 +1,22 @@
-import {put, take, call} from 'redux-saga/effects'
+import {put, take, call, select} from 'redux-saga/effects'
 import pbuf from '../../src/pbuf/pbuf'
 import api from './proto-api'
+import {nextCardRequest} from '../reducers/main/selectors'
 
 const url = 'api/card/get-next'
 const proto = pbuf.pbuf
-const cardRequest = {
-  cardSetId: '0',
-  previousCardId: '0',
-  algorithm: 1
-}
 
-export function* sendTest() {
-  while (true) {
-    yield take('TEST')
-    console.log(cardRequest)
+function* getNext() {
+  for (;;) {
+    yield take('GET_NEXT_CARD')
+    const cardRequest = yield select(nextCardRequest)
     const requestBody = proto.NextCardRequest.create(cardRequest)
-    console.log(requestBody)
     const result = yield call(api, url, requestBody, 'next-card-request', 'card')
-    console.log(result)
-    yield put({type: 'TEST_DONE', value: {}})
+    yield put({type: 'PUT_FETCHED_CARD', value: result})
   }
 }
 
 
 export function* sagas() {
-  yield [ sendTest() ]
+  yield [ getNext() ]
 }

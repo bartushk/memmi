@@ -37,6 +37,7 @@
   "license": "MIT",
   "dependencies": {
     "babel-preset-stage-0": "^6.16.0",
+    "flat-combine-reducers": "^0.1.2",
     "lodash": "^4.16.4",
     "material-ui": "^0.16.7",
     "protobufjs": "^6.4.6",
