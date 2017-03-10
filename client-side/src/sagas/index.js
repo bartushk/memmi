@@ -6,7 +6,7 @@ import {nextCardRequest} from '../reducers/main/selectors'
 const url = 'api/card/get-next'
 const proto = pbuf.pbuf
 
-function* getNext() {
+export function* getNext() {
   for (;;) {
     yield take('GET_NEXT_CARD')
     const cardRequest = yield select(nextCardRequest)
