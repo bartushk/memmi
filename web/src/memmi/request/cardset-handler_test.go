@@ -23,7 +23,7 @@ func Test_CardSetHandler_ExactUrl_ShouldHandle(t *testing.T) {
 	var req = RequestFromURL(CARD_SET_API_URL)
 	handler := CardSetRequestHandler{}
 	if !handler.ShouldHandle(req, pbuf.User{}, false) {
-		t.Error("Handler should handle with URL:", CARD_API_URL)
+		t.Error("Handler should handle with URL:", CARD_SET_API_URL)
 	}
 }
 

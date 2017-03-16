@@ -2,7 +2,6 @@ package request
 
 import (
 	"errors"
-	"fmt"
 	"github.com/golang/protobuf/proto"
 	"io/ioutil"
 	"memmi/pbuf"
@@ -25,7 +24,6 @@ func (io *ProtoIoImpl) ReadNextCardRequest(r *http.Request) (pbuf.NextCardReques
 	var retNextCardRequest pbuf.NextCardRequest
 	data, readErr := ioutil.ReadAll(r.Body)
 	if len(data) == 0 {
-		fmt.Println(readErr)
 		return retNextCardRequest, errors.New("Cannot read from empty request body.")
 	}
 	if readErr != nil {

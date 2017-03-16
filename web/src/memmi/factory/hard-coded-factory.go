@@ -21,17 +21,15 @@ func (fact *HardCodedFactory) GetRouter() request.Router {
 	router.Authenticator = auth
 
 	csHandler := &request.CardSetRequestHandler{}
-	cHandler := &request.CardRequestHandler{}
+	reportHandler := &request.ReportRequestHandler{}
 
 	csHandler.Pio = pio
 	csHandler.CardMan = cMan
 
-	cHandler.Pio = pio
-	cHandler.CardSel = card.NewRandomCardSelection()
-	cHandler.CardMan = cMan
-	cHandler.UserMan = uMan
+	reportHandler.Pio = pio
+	reportHandler.UserMan = uMan
 
-	router.AddHandler(cHandler)
+	router.AddHandler(reportHandler)
 	router.AddHandler(csHandler)
 
 	// Seed some data.

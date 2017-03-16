@@ -17,7 +17,7 @@ type CardSetRequestHandler struct {
 }
 
 func (handler *CardSetRequestHandler) ShouldHandle(r *http.Request, user pbuf.User, responseWritten bool) bool {
-	return strings.HasPrefix(r.URL.EscapedPath(), CARD_API_URL) && !responseWritten
+	return strings.HasPrefix(r.URL.EscapedPath(), CARD_SET_API_URL) && !responseWritten
 }
 
 func (handler *CardSetRequestHandler) Handle(w http.ResponseWriter, r *http.Request, user pbuf.User) HandleResult {

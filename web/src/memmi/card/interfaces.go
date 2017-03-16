@@ -4,10 +4,6 @@ import (
 	"memmi/pbuf"
 )
 
-type CardSelection interface {
-	SelectCard(history *pbuf.UserHistory, previousCardId string) string
-}
-
 type CardManagement interface {
 	GetCardSetById(id string) (pbuf.CardSet, error)
 	GetCardById(id string) (pbuf.Card, error)
