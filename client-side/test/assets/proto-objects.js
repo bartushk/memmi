@@ -65,20 +65,9 @@ const userHistory = {
   history:      [historyOne, historyTwo]
 }
 
-const nextCardRequest = {
-  cardSetId: 'cs1',
-  previousCardId: 'c1',
-  algorithm: 0
-}
-
 const cardScoreReport  = {
   cardSetId: 'cs1',
   update: cardUpdate
-}
-
-const reportAndNext = {
-  nextRequest: nextCardRequest,
-  report: cardScoreReport
 }
 
 const requestError = {
@@ -104,9 +93,7 @@ export default {
   getUser:              () => { return proto.User.create(user) },
   getCardOne:           () => { return proto.Card.create(cardOne) },
   getCardTwo:           () => { return proto.Card.create(cardTwo) },
-  getNextCardRequest:   () => { return proto.NextCardRequest.create(nextCardRequest)},
   getCardScoreReport:   () => { return proto.CardScoreReport.create(cardScoreReport)},
-  getReportAndNext:     () => { return proto.ReportAndNext.create(reportAndNext)},
   getRequestError:      () => { return proto.RequestError.create(requestError)},
   getUpdateResponse:    () => { return proto.UpdateResponse.create(updateResponse)},
   getCardSetRequest:    () => { return proto.CardSetRequest.create(cardSetRequest)},

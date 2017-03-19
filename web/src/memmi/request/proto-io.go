@@ -20,19 +20,6 @@ func (io *ProtoIoImpl) WriteProtoResponse(w http.ResponseWriter, message proto.M
 	return wErr
 }
 
-func (io *ProtoIoImpl) ReadNextCardRequest(r *http.Request) (pbuf.NextCardRequest, error) {
-	var retNextCardRequest pbuf.NextCardRequest
-	data, readErr := ioutil.ReadAll(r.Body)
-	if len(data) == 0 {
-		return retNextCardRequest, errors.New("Cannot read from empty request body.")
-	}
-	if readErr != nil {
-		return retNextCardRequest, readErr
-	}
-	marshalError := proto.Unmarshal(data, &retNextCardRequest)
-	return retNextCardRequest, marshalError
-}
-
 func (io *ProtoIoImpl) ReadCardScoreReport(r *http.Request) (pbuf.CardScoreReport, error) {
 	var retReport pbuf.CardScoreReport
 	data, readErr := ioutil.ReadAll(r.Body)
@@ -44,19 +31,6 @@ func (io *ProtoIoImpl) ReadCardScoreReport(r *http.Request) (pbuf.CardScoreRepor
 	}
 	marshalError := proto.Unmarshal(data, &retReport)
 	return retReport, marshalError
-}
-
-func (io *ProtoIoImpl) ReadReportAndNext(r *http.Request) (pbuf.ReportAndNext, error) {
-	var retReportNext pbuf.ReportAndNext
-	data, readErr := ioutil.ReadAll(r.Body)
-	if len(data) == 0 {
-		return retReportNext, errors.New("Cannot read from empty request body.")
-	}
-	if readErr != nil {
-		return retReportNext, readErr
-	}
-	marshalError := proto.Unmarshal(data, &retReportNext)
-	return retReportNext, marshalError
 }
 
 func (io *ProtoIoImpl) ReadCardSetRequest(r *http.Request) (pbuf.CardSetRequest, error) {

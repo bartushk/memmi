@@ -21,12 +21,8 @@ function decode(data, type) {
     return protos.CardUpdate.decode(data)
   case 'player-history':
     return protos.UserHistory.decode(data)
-  case 'next-card-request':
-    return protos.NextCardRequest.decode(data)
   case 'card-score-report':
     return protos.CardScoreReport.decode(data)
-  case 'report-and-next':
-    return protos.ReportAndNext.decode(data)
   case 'request-error':
     return protos.RequestError.decode(data)
   case 'update-response':
@@ -52,12 +48,8 @@ function encode(proto, type) {
     return protos.CardUpdate.encode(proto).finish()
   case 'player-history':
     return protos.UserHistory.encode(proto).finish()
-  case 'next-card-request':
-    return protos.NextCardRequest.encode(proto).finish()
   case 'card-score-report':
     return protos.CardScoreReport.encode(proto).finish()
-  case 'report-and-next':
-    return protos.ReportAndNext.encode(proto).finish()
   case 'request-error':
     return protos.RequestError.encode(proto).finish()
   case 'update-response':

@@ -150,34 +150,6 @@ test('Request with player-history type.', (assert) => {
   assert.end()
 })
 
-test('Request with NextCardRequest type.', (assert) => {
-  const url = 'api'
-  let result = api(url, data.getNextCardRequest(), 'next-card-request', null)
-
-  assert.equal(result.url, url, 'Correct url passed to fetch.')
-  assert.equal(result.args.method, 'POST', 'Method should be post.')
-
-  assert.equal(
-    result.args.headers['Content-Type'],
-    'application/x-protobuf',
-    'Content type should be "application/x-protobuf"'
-  )
-
-  assert.deepEqual(
-    result.encode,
-    result.args.body,
-    'Request body should be encoded protobuf.'
-  )
-
-  assert.deepEqual(
-    result.decode,
-    data.getNextCardRequest(),
-    'Decoded value should match input.'
-  )
-
-  assert.end()
-})
-
 test('Request with CardScoreReport type.', (assert) => {
   const url = 'api'
   let result = api(url, data.getCardScoreReport(), 'card-score-report', null)
@@ -200,34 +172,6 @@ test('Request with CardScoreReport type.', (assert) => {
   assert.deepEqual(
     result.decode,
     data.getCardScoreReport(),
-    'Decoded value should match input.'
-  )
-
-  assert.end()
-})
-
-test('Request with ReportAndNext type.', (assert) => {
-  const url = 'api'
-  let result = api(url, data.getReportAndNext(), 'report-and-next', null)
-
-  assert.equal(result.url, url, 'Correct url passed to fetch.')
-  assert.equal(result.args.method, 'POST', 'Method should be post.')
-
-  assert.equal(
-    result.args.headers['Content-Type'],
-    'application/x-protobuf',
-    'Content type should be "application/x-protobuf"'
-  )
-
-  assert.deepEqual(
-    result.encode,
-    result.args.body,
-    'Request body should be encoded protobuf.'
-  )
-
-  assert.deepEqual(
-    result.decode,
-    data.getReportAndNext(),
     'Decoded value should match input.'
   )
 

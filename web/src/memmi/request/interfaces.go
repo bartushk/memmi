@@ -30,9 +30,7 @@ type HttpRouter interface {
 
 type ProtoIO interface {
 	WriteProtoResponse(w http.ResponseWriter, message proto.Message) error
-	ReadNextCardRequest(r *http.Request) (pbuf.NextCardRequest, error)
 	ReadCardScoreReport(r *http.Request) (pbuf.CardScoreReport, error)
-	ReadReportAndNext(r *http.Request) (pbuf.ReportAndNext, error)
 	ReadCardSetRequest(r *http.Request) (pbuf.CardSetRequest, error)
 	ReadCardRequest(r *http.Request) (pbuf.CardRequest, error)
 }

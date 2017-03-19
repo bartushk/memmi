@@ -73,20 +73,9 @@ message UserAuthInfo {
   string passHash = 3;
 }
 
-message NextCardRequest {
-  string cardSetId = 1;
-  string previousCardId = 2;
-  SelectionAlgorithm algorithm = 3;  
-}
-
 message CardScoreReport {
   string cardSetId = 1;
   CardUpdate update = 2;
-}
-
-message ReportAndNext {
-  NextCardRequest nextRequest = 1;
-  CardScoreReport report = 2;
 }
 
 message RequestError {
