@@ -35,7 +35,9 @@ message Factory {
 }
 
 message Logging {
-  LoggingType logType = 1;
-  string legEndpoint = 2;
-  double logSampling = 3;
+  LoggingType type = 1;
+  string endpoint = 2;
+  double samplingRate = 3;
+  string format = 4;
+  string level = 5;
 }

@@ -2,20 +2,24 @@ package main
 
 import (
 	"flag"
-	"fmt"
+	"github.com/op/go-logging"
 	"memmi/config"
+	"memmi/core"
 	"memmi/factory"
 	"net/http"
 )
+
+var log = logging.MustGetLogger("memmi")
 
 func main() {
 	cDir := flag.String("cDir", "./config", "Config search directory.")
 	cFile := flag.String("cFile", "dev", "Default configuration file name (excluding file extension).")
 	flag.Parse()
 	config.LoadFromFile(*cDir, *cFile)
+	core.InitLogging()
 	fact := factory.HardCodedFactory{}
 	router := fact.GetRouter()
 	http.HandleFunc("/", router.GetHandleFunc())
-	fmt.Printf("Server listening on '%s'\n", config.AppConfig().Server)
+	log.Infof("Server listening on '%s'\n", config.AppConfig().Server)
 	http.ListenAndServe(config.AppConfig().Server, nil)
 }

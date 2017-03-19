@@ -17,6 +17,7 @@ seed = true
 useSingletons = true
 
 [logging]
-logType = "console"
-logEndPoint = ""
-logSampling = 1.0
+type = "console"
+endpoint = ""
+samplingRate = 1.0
+level = "info"

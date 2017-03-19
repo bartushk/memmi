@@ -7,8 +7,6 @@ import (
 func SetDefaults() {
 	viper.SetDefault("app.server", ":8081")
 
-	viper.SetDefault("router.logType", "console")
-	viper.SetDefault("router.logEndpoint", "localhost:9090")
 	viper.SetDefault("router.handlers", []string{"cardSet", "card"})
 
 	viper.SetDefault("cardManagement.type", "inmemory")
@@ -19,4 +17,10 @@ func SetDefaults() {
 	viper.SetDefault("userManagement.seed", false)
 
 	viper.SetDefault("factory.useSingletons", true)
+
+	viper.SetDefault("logging.type", "console")
+	viper.SetDefault("logging.endpoint", "localhost:9090")
+	viper.SetDefault("logging.samplingRate", 1.0)
+	viper.SetDefault("logging.format",
+		"%{color}%{level:.4s} %{time:15:04:05.000} %{shortfunc} %{id:03x}:%{color:reset} %{message}")
 }

@@ -6,6 +6,7 @@ import (
 
 var cMan CardManagement
 var uMan UserManagement
+var log Logging
 var router Router
 var app App
 var fact Factory
@@ -21,6 +22,7 @@ func LoadFromFile(directory, filename string) {
 	uMan = genUserManagement()
 	router = genRouter()
 	fact = genFactory()
+	log = genLogging()
 }
 
 func Load() {
@@ -45,4 +47,8 @@ func AppConfig() App {
 
 func FactoryCOnfig() Factory {
 	return fact
+}
+
+func LoggingConfig() Logging {
+	return log
 }
