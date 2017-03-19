@@ -30,6 +30,7 @@ type HttpRouter interface {
 
 type ProtoIO interface {
 	WriteProtoResponse(w http.ResponseWriter, message proto.Message) error
+	WriteCodedProtoResponse(w http.ResponseWriter, message proto.Message, statusCode int) error
 	ReadCardScoreReport(r *http.Request) (pbuf.CardScoreReport, error)
 	ReadCardSetRequest(r *http.Request) (pbuf.CardSetRequest, error)
 	ReadCardRequest(r *http.Request) (pbuf.CardRequest, error)

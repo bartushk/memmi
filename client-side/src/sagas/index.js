@@ -3,7 +3,7 @@ import pbuf from '../../src/pbuf/pbuf'
 import api from './proto-api'
 import {selectCardId} from '../reducers/main/selectors'
 
-const url = 'api/card/get-next'
+const url = 'api/card/get-card'
 const proto = pbuf.pbuf
 
 export function* getCard() {

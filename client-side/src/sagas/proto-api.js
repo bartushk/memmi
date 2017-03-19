@@ -63,6 +63,15 @@ function encode(proto, type) {
   }
 }
 
+function checkStatus(response) {
+  if (response.status >= 200 && response.status < 300) {
+    return response
+  }
+  const error = new Error(response.statusText)
+  error.response = response
+  throw error
+}
+
 export default function makeProtoRequest(url, requestProto, requestType, responseType) {
   let fetchArg = {
     method: 'POST',
@@ -78,8 +87,12 @@ export default function makeProtoRequest(url, requestProto, requestType, respons
     return _fetch(url, fetchArg, decodedValue, encodedValue)
   }
   return fetch(url, fetchArg)
+          .then(checkStatus)
           .then(response => response.arrayBuffer())
           .then((buf) => decode(new Buffer(buf), responseType))
+          .catch((error) => {
+            return decode(new Buffer(error.response.arrayBuffer()), 'request-error')
+          })
 }
 
 

@@ -11,6 +11,11 @@ import (
 type ProtoIoImpl struct {
 }
 
+func (io *ProtoIoImpl) WriteCodedProtoResponse(w http.ResponseWriter, message proto.Message, statusCode int) error {
+	w.WriteHeader(statusCode)
+	return io.WriteProtoResponse(w, message)
+}
+
 func (io *ProtoIoImpl) WriteProtoResponse(w http.ResponseWriter, message proto.Message) error {
 	data, err := proto.Marshal(message)
 	if err != nil {

@@ -16,6 +16,11 @@ func (io *MockProtoIO) WriteProtoResponse(w http.ResponseWriter, message proto.M
 	return args.Error(0)
 }
 
+func (io *MockProtoIO) WriteCodedProtoResponse(w http.ResponseWriter, message proto.Message, statusCode int) error {
+	args := io.Called(w, message, statusCode)
+	return args.Error(0)
+}
+
 func (io *MockProtoIO) ReadCardScoreReport(r *http.Request) (pbuf.CardScoreReport, error) {
 	args := io.Called(r)
 	return args.Get(0).(pbuf.CardScoreReport), args.Error(1)

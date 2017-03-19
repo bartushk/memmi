@@ -56,6 +56,79 @@ func Test_ProtoIO_WriteProtoResponse_GoodMessage_WrittenCorrectly(t *testing.T) 
 	}
 }
 
+// Write Coded Proto Response
+
+func Test_ProtoIO_WriteCodedProtoResponse_BadMessage_ReturnsError(t *testing.T) {
+	pio := ProtoIoImpl{}
+	writer := &MockResponseWriter{}
+	err := pio.WriteCodedProtoResponse(writer, nil, 5)
+	if err == nil {
+		t.Error("Should have received error.")
+	}
+
+	if len(writer.WriteHeaderInputs) != 1 {
+		t.Fatal("Expected one write to headers got:", len(writer.WriteHeaderInputs))
+	}
+
+	if !reflect.DeepEqual(writer.WriteHeaderInputs[0], 5) {
+		t.Error("Did not write the correct data. Expected:", 5,
+			"Received:", writer.WriteHeaderInputs[0])
+	}
+}
+
+func Test_ProtoIO_WriteCodedProtoResponse_BadWrite_GetError(t *testing.T) {
+	pio := ProtoIoImpl{}
+	writer := &MockResponseWriter{}
+	testMessage := &pbuf.Card{}
+	testError := errors.New("Test Error")
+
+	writer.WriteError = testError
+	err := pio.WriteCodedProtoResponse(writer, testMessage, 5)
+	if err != testError {
+		t.Error("Wrong error returned. Expected:", testError,
+			"Received:", err)
+	}
+
+	if len(writer.WriteHeaderInputs) != 1 {
+		t.Fatal("Expected one write to headers got:", len(writer.WriteHeaderInputs))
+	}
+
+	if !reflect.DeepEqual(writer.WriteHeaderInputs[0], 5) {
+		t.Error("Did not write the correct data. Expected:", 5,
+			"Received:", writer.WriteHeaderInputs[0])
+	}
+}
+
+func Test_ProtoIO_WriteCodedProtoResponse_GoodMessage_WrittenCorrectly(t *testing.T) {
+	pio := ProtoIoImpl{}
+	writer := &MockResponseWriter{}
+	testMessage := &pbuf.Card{Title: "Card Title"}
+	testData, _ := proto.Marshal(testMessage)
+
+	err := pio.WriteCodedProtoResponse(writer, testMessage, 5)
+	if err != nil {
+		t.Error("Should not have returned an error.")
+	}
+
+	if len(writer.WriteInputs) != 1 {
+		t.Fatal("Expeceted one write to responsewriter got:", len(writer.WriteInputs))
+	}
+
+	if !reflect.DeepEqual(writer.WriteInputs[0], testData) {
+		t.Error("Did not write the correct data. Expected:", testData,
+			"Received:", writer.WriteInputs[0])
+	}
+
+	if len(writer.WriteHeaderInputs) != 1 {
+		t.Fatal("Expected one write to headers got:", len(writer.WriteHeaderInputs))
+	}
+
+	if !reflect.DeepEqual(writer.WriteHeaderInputs[0], 5) {
+		t.Error("Did not write the correct data. Expected:", 5,
+			"Received:", writer.WriteHeaderInputs[0])
+	}
+}
+
 // Get Card Tests
 
 func Test_ProtoIO_ReadCardRequest_EmptyRequestBody_GetError(t *testing.T) {
