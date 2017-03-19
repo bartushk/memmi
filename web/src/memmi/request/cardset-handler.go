@@ -51,7 +51,6 @@ func (handler *CardSetRequestHandler) handleCardSet(w http.ResponseWriter, r *ht
 
 func (handler *CardSetRequestHandler) handleCard(w http.ResponseWriter, r *http.Request, user pbuf.User) bool {
 	cardRequest, err := handler.Pio.ReadCardRequest(r)
-	fmt.Println(cardRequest)
 	if err != nil {
 		handler.Pio.WriteCodedProtoResponse(w, BODY_READ_ERROR, http.StatusBadRequest)
 		return true

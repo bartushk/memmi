@@ -15,3 +15,8 @@ seed = true
 
 [factory]
 useSingletons = true
+
+[logging]
+logType = "console"
+logEndPoint = ""
+logSampling = 1.0

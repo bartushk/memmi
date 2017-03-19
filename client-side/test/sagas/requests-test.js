@@ -7,7 +7,7 @@ import {getCard} from '../../src/sagas/index'
 import api from '../../src/sagas/proto-api'
 import {selectCardId} from '../../src/reducers/main/selectors'
 
-const url = 'api/card/get-next'
+const url = 'api/card/get-card'
 const proto = pbuf.pbuf
 
 test('getCard saga.', (assert) => {

@@ -15,8 +15,6 @@ message App {
 }
 
 message Router {
-  LoggingType logType = 1;
-  string logEndpoint = 2;
   repeated string handlers = 3;
 }
 
@@ -34,4 +32,10 @@ message UserManagement {
 
 message Factory {
   bool UseSingletons = 1;
+}
+
+message Logging {
+  LoggingType logType = 1;
+  string legEndpoint = 2;
+  double logSampling = 3;
 }
