@@ -7,7 +7,7 @@ import (
 )
 
 func InitLogging() {
-	logConfig := config.LoggingConfig()
+	logConfig := config.GetConfig().Logging
 	format := logging.MustStringFormatter(logConfig.Format)
 	backend := logging.NewLogBackend(os.Stderr, "", 0)
 	backendFormatted := logging.NewBackendFormatter(backend, format)

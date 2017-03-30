@@ -12,6 +12,11 @@ enum LoggingType {
 
 message App {
   string server = 1;
+  Router router = 2;
+  CardManagement cardMan = 3;
+  UserManagement userMan = 4;
+  Factory factory = 5;
+  Logging logging = 6;
 }
 
 message Router {

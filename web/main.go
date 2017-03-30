@@ -20,6 +20,6 @@ func main() {
 	fact := factory.HardCodedFactory{}
 	router := fact.GetRouter()
 	http.HandleFunc("/", router.GetHandleFunc())
-	log.Infof("Server listening on '%s'", config.AppConfig().Server)
-	http.ListenAndServe(config.AppConfig().Server, nil)
+	log.Infof("Server listening with: \n'%s'\n", config.GetConfig())
+	http.ListenAndServe(config.GetConfig().Server, nil)
 }

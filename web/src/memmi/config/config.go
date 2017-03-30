@@ -17,38 +17,23 @@ func LoadFromFile(directory, filename string) {
 	viper.AddConfigPath(directory)
 	viper.ReadInConfig()
 
-	app = genApp()
 	cMan = genCardManagement()
 	uMan = genUserManagement()
 	router = genRouter()
 	fact = genFactory()
 	log = genLogging()
+	app = genApp()
+	app.CardMan = &cMan
+	app.UserMan = &uMan
+	app.Router = &router
+	app.Factory = &fact
+	app.Logging = &log
 }
 
 func Load() {
 	LoadFromFile("~/", ".memmirc")
 }
 
-func CardManagementConfig() CardManagement {
-	return cMan
-}
-
-func UserManagementConfig() UserManagement {
-	return uMan
-}
-
-func RouterConfig() Router {
-	return router
-}
-
-func AppConfig() App {
+func GetConfig() App {
 	return app
-}
-
-func FactoryCOnfig() Factory {
-	return fact
-}
-
-func LoggingConfig() Logging {
-	return log
 }
