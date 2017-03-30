@@ -3,10 +3,13 @@ package user
 import (
 	"errors"
 	"fmt"
+	"github.com/op/go-logging"
 	"memmi/card"
 	"memmi/pbuf"
 	"strconv"
 )
+
+var log = logging.MustGetLogger("memmi")
 
 func NewInMemoryManagement() *InMemoryUserManagement {
 	newMan := &InMemoryUserManagement{
@@ -38,6 +41,7 @@ func (manager *InMemoryUserManagement) GetHistory(user pbuf.User, cardSetId stri
 	set, err := manager.CardMan.GetCardSetById(cardSetId)
 
 	if err != nil {
+		log.Errorf("Could not find card set: %s", cardSetId)
 		return pbuf.UserHistory{}, err
 	}
 
@@ -47,6 +51,7 @@ func (manager *InMemoryUserManagement) GetHistory(user pbuf.User, cardSetId stri
 
 	// If not okay, generate a new blank set for this user
 	if !ok {
+		log.Infof("New history created user %s set %s.", user.Id, cardSetId)
 		newHistory := card.GenerateEmptyHistory(&set)
 		newHistory.UserId = user.Id
 		manager.userHistories[fullId] = newHistory
@@ -55,18 +60,22 @@ func (manager *InMemoryUserManagement) GetHistory(user pbuf.User, cardSetId stri
 
 	// Check if the history is the correct version, generate a new one if it isn't
 	if savedHistory.SetVersion != set.Version {
+		log.Infof("Old version history for user %s set %s.", user.Id, cardSetId)
+		log.Infof("Old version: %s New Version: %s", savedHistory.SetVersion, set.Version)
 		updatedHistory := card.GenerateEmptyHistory(&set)
 		updatedHistory.UserId = user.Id
 		manager.userHistories[fullId] = updatedHistory
 		return updatedHistory, nil
 	}
 
+	log.Infof("Clean fetch of user history for user %s set %s", user.Id, cardSetId)
 	return savedHistory, nil
 }
 
 func (manager *InMemoryUserManagement) GetAuthInfoByUserName(userName string) (pbuf.UserAuthInfo, error) {
 	userId, ok := manager.userIds[userName]
 	if !ok {
+		log.Errorf("Could not find authInfo for %s.", userName)
 		return pbuf.UserAuthInfo{}, errors.New("No auth info found.")
 	}
 	return manager.GetAuthInfoById(userId)
@@ -75,6 +84,7 @@ func (manager *InMemoryUserManagement) GetAuthInfoByUserName(userName string) (p
 func (manager *InMemoryUserManagement) GetAuthInfoById(userId string) (pbuf.UserAuthInfo, error) {
 	result, ok := manager.authInfo[userId]
 	if !ok {
+		log.Errorf("Could not find authInfo for %s.", userId)
 		return pbuf.UserAuthInfo{}, errors.New("No auth info found.")
 	}
 	return result, nil
@@ -83,6 +93,7 @@ func (manager *InMemoryUserManagement) GetAuthInfoById(userId string) (pbuf.User
 func (manager *InMemoryUserManagement) GetUserByUserName(userName string) (pbuf.User, error) {
 	userId, ok := manager.userIds[userName]
 	if !ok {
+		log.Errorf("Could not find authInfo for %s.", userName)
 		return pbuf.User{}, errors.New("No user found.")
 	}
 	return manager.GetUserById(userId)
@@ -91,6 +102,7 @@ func (manager *InMemoryUserManagement) GetUserByUserName(userName string) (pbuf.
 func (manager *InMemoryUserManagement) GetUserById(userId string) (pbuf.User, error) {
 	result, ok := manager.users[userId]
 	if !ok {
+		log.Errorf("Could not find user for %s.", userId)
 		return pbuf.User{}, errors.New("No user found.")
 	}
 	return result, nil
@@ -100,6 +112,7 @@ func (manager *InMemoryUserManagement) UpdateHistory(user pbuf.User, cardSetId s
 	fullId := manager.getHistoryKey(user.Id, cardSetId)
 	history, ok := manager.userHistories[fullId]
 	if !ok {
+		log.Errorf("Could not find history for %s %s", cardSetId, user)
 		return errors.New("Could not find history to update.")
 	}
 	for _, cardHistory := range history.History {
@@ -117,12 +130,14 @@ func (manager *InMemoryUserManagement) UpdateHistory(user pbuf.User, cardSetId s
 func (management *InMemoryUserManagement) AddUser(user pbuf.User, authInfo pbuf.UserAuthInfo) (string, error) {
 	for _, savedUser := range management.users {
 		if savedUser.UserName == user.UserName {
+			log.Errorf("User already exists with username: %s", user)
 			return "", errors.New("Tried adding a user that already exists userNames must be unique.")
 		}
 	}
 	id := strconv.Itoa(management.userCounter)
 	_, ok := management.users[id]
 	if ok {
+		log.Errorf("Id collision for user. %s %s", id, user)
 		return "", errors.New("Tried adding a user at an occupied id.")
 	}
 	user.Id = id
@@ -130,16 +145,19 @@ func (management *InMemoryUserManagement) AddUser(user pbuf.User, authInfo pbuf.
 	management.userIds[user.UserName] = id
 	management.authInfo[id] = authInfo
 	management.userCounter += 1
+	log.Infof("User succesfully added: %s", user)
 	return id, nil
 }
 
 func (management *InMemoryUserManagement) DeleteUser(userId string) error {
 	user, ok := management.users[userId]
 	if !ok {
-		return errors.New("User did not exisst and could not be deleted,")
+		log.Errorf("User did not exist and could not be deleted: %s", user)
+		return errors.New("User did not exist and could not be deleted,")
 	}
 	delete(management.userIds, user.UserName)
 	delete(management.authInfo, userId)
 	delete(management.users, userId)
+	log.Infof("User deleted: %s", user)
 	return nil
 }
